@@ -1,5 +1,8 @@
 const axios = require("axios");
 
+const { parseCsv } = require("./csv");
+const { parseFlights } = require("./flights");
+
 const URL = `https://www.bgaladder.net/Steward/GetLogFilesCSV`;
 
 // TODO: some validation:
@@ -10,10 +13,13 @@ const URL = `https://www.bgaladder.net/Steward/GetLogFilesCSV`;
 const CLUB = "CAM";
 
 export default async (req, res) => {
-  const season = req.query.season || new Date().getFullYear();
-  const params = { clubID: CLUB, Season: season };
-  const response = await axios.get(URL, { params });
-  const data = response.data;
+  const year = req.query.year || new Date().getFullYear();
+  const params = { clubID: CLUB, Season: year };
 
-  res.status(200).json({ club: CLUB, season, data });
+  console.log("GET", URL, params);
+
+  const response = await axios.get(URL, { params });
+  const flights = parseFlights(response.data);
+
+  res.status(200).json({ club: CLUB, year, flights });
 };

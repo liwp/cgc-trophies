@@ -5,7 +5,9 @@ const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const Trophy = () => {
   const router = useRouter();
-  const [season, trophy] = router.query.param || [];
+  const { season = new Date().getFullYear(), trophy } = router.query;
+  console.log("PARAMS", { season, trophy }, router.query);
+  // TODO: for CGC we need to do our magic season stuff...
   const { data, error } = useSWR(`/api/flights/${season}`, fetcher);
 
   if (error) return <div>Failed to load</div>;
