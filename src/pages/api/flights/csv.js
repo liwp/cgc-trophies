@@ -1,10 +1,6 @@
 const Papa = require("papaparse");
 const { identity, zipObject } = require("lodash");
 
-function parseBoolean(val) {
-  return val.toLowerCase() === "true" || val === "1";
-}
-
 const MONTHS = [
   "Jan",
   "Feb",
@@ -19,6 +15,10 @@ const MONTHS = [
   "Nov",
   "Dec",
 ];
+
+function parseBoolean(val) {
+  return val.toLowerCase() === "true" || val === "1";
+}
 
 function parseDate(val) {
   const match = val.match(/^(\d{2})-(...)-(\d{4})$/);
@@ -48,62 +48,49 @@ function parseNumber(val) {
   return parseFloat(val);
 }
 
-function parseSpec(obj, spec) {
-  try {
-    // Array spec
-    if (Array.isArray(spec)) {
-      return spec.map((s) => parseSpec(obj, s)).filter((x) => x !== undefined);
-    }
-
-    if (typeof spec !== "object") {
-      throw new Error(`spec must be an object or array - got: ${typeof spec}`);
-    }
-
-    const { header, type, xform } = spec;
-
-    // Object spec
-    if (!header) {
-      return Object.entries(spec).reduce((acc, [key, subspec]) => {
-        acc[key] = parseSpec(obj, subspec);
-        return acc;
-      }, {});
-    }
-
-    // Primitive spec
-    let fn;
-    switch (type) {
-      case "boolean":
-        fn = parseBoolean;
-        break;
-      case "date":
-        fn = parseDate;
-        break;
-      case "number":
-        fn = parseNumber;
-        break;
-      default:
-        fn = xform || identity;
-        break;
-    }
-
-    const cell = obj[header];
-    if (cell === undefined) {
-      throw new Error(`Cell with key ${header} is undefined`);
-    }
-    return fn(cell);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error("parseSpec", e.stack, spec, obj);
-    throw e;
-  }
-}
-
-function parseCsv(csv, spec) {
+function parseCsv(spec, csv) {
   const [headers, ...data] = Papa.parse(csv.trim()).data;
   return data.map((row) => {
     const obj = zipObject(headers, row);
-    return parseSpec(obj, spec);
+    return parseSpec(spec, obj);
   });
+}
+
+function parseSpec(spec, obj) {
+  const { src, type, xform = identity } = spec;
+  if (src === undefined) {
+    throw Error(`'src' not specified in spec: ${JSON.stringify(spec)}`);
+  }
+
+  let val;
+  switch (type) {
+    case "boolean":
+      val = parseBoolean(obj[src]);
+      break;
+    case "date":
+      val = parseDate(obj[src]);
+      break;
+    case "number":
+      val = parseNumber(obj[src]);
+      break;
+    case "object":
+      val = Object.entries(src).reduce((acc, [key, subspec]) => {
+        acc[key] = parseSpec(subspec, obj);
+        return acc;
+      }, {});
+      break;
+    case "array":
+      val = src.map((s) => parseSpec(s, obj));
+      break;
+    case "string":
+      val = obj[src];
+      break;
+    default:
+      throw new Error(`Unknown type in spec: ${JSON.stringify(spec)}`);
+      break;
+  }
+
+  return xform(val);
 }
 
 module.exports = {

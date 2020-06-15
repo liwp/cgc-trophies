@@ -1,155 +1,178 @@
 const { parseCsv } = require("./csv");
 
-const PILOT_SPEC = {
-  forename: {
-    header: "Forename",
-  },
-  surname: {
-    header: "Surname",
-  },
-};
-
 const GLIDER_SPEC = {
-  type: {
-    header: "Glider",
+  src: {
+    type: {
+      src: "Glider",
+      type: "string",
+    },
+    handicap: {
+      src: "Handicap",
+      type: "number",
+    },
+    registration: {
+      src: "Registration",
+      type: "string",
+    },
   },
-  handicap: {
-    header: "Handicap",
-    type: "number",
-  },
-  isWooden: {
-    header: "Wooden?",
-    type: "boolean",
-  },
-  registration: {
-    header: "Registration",
-  },
+  type: "object",
 };
 
 const LADDERS_SPEC = {
-  height: {
-    header: "Height Ladder",
-    type: "boolean",
+  src: {
+    height: {
+      src: "Height Ladder",
+      type: "boolean",
+    },
+    junior: {
+      src: "Junior Ladder",
+      type: "boolean",
+    },
+    // bolly
+    local1: {
+      src: "Local Ladder 1",
+      type: "boolean",
+    },
+    // syndicate
+    local2: {
+      src: "Local  Ladder 2",
+      type: "boolean",
+    },
+    // club fleet
+    local3: {
+      src: "Local  Ladder 3",
+      type: "boolean",
+    },
+    // shark
+    local4: {
+      src: "Local  Ladder 4",
+      type: "boolean",
+    },
+    // fastrackers
+    local5: {
+      src: "Local  Ladder 5",
+      type: "boolean",
+    },
+    open: {
+      src: "Open Ladder",
+      type: "boolean",
+    },
+    weekend: {
+      src: "Weekend Ladder",
+      type: "boolean",
+    },
   },
-  junior: {
-    header: "Junior Ladder",
-    type: "boolean",
-  },
-  // bolly
-  local1: {
-    header: "Local Ladder 1",
-    type: "boolean",
-  },
-  // syndicate
-  local2: {
-    header: "Local  Ladder 2",
-    type: "boolean",
-  },
-  // club fleet
-  local3: {
-    header: "Local  Ladder 3",
-    type: "boolean",
-  },
-  // shark
-  local4: {
-    header: "Local  Ladder 4",
-    type: "boolean",
-  },
-  // fastrackers
-  local5: {
-    header: "Local  Ladder 5",
-    type: "boolean",
-  },
-  open: {
-    header: "Open Ladder",
-    type: "boolean",
-  },
-  weekend: {
-    header: "Weekend Ladder",
-    type: "boolean",
+  type: "object",
+  xform: (ladders) => {
+    return Object.entries(ladders)
+      .filter(([_, v]) => v)
+      .map(([k]) => k);
   },
 };
 
-function genTaskSpec() {
-  return {
-    claimType: {
-      header: "Claim Type",
-    },
+const TASK_SPEC = {
+  src: {
     isCompleted: {
-      header: "Completed?",
+      src: "Completed?",
       type: "boolean",
     },
     crossCountryPoints: {
-      header: "Cross Country Points",
+      src: "Cross Country Points",
       type: "number",
     },
     isDeclared: {
-      header: "Declared?",
+      src: "Declared?",
       type: "boolean",
     },
     scoringDistanceKm: {
-      header: "Scoring Distance (km)",
+      src: "Scoring Distance (km)",
       type: "number",
     },
     handicappedDistanceKm: {
-      header: "Handicapped Distance (km)",
+      src: "Handicapped Distance (km)",
       type: "number",
     },
     handicappedSpeedKph: {
-      header: "Handicapped Speed (kph)",
-      type: "number",
-    },
-    heightGainFt: {
-      header: "Height gain (ft)",
+      src: "Handicapped Speed (kph)",
       type: "number",
     },
     launchSite: {
-      header: "Launch Site",
+      src: "Launch Site",
+      type: "string",
     },
-    tps: [
-      {
-        header: "Start Point",
-      },
-      {
-        header: "TP 1",
-      },
-      {
-        header: "TP 2",
-      },
-      {
-        header: "TP 3",
-      },
-      {
-        header: "TP 4",
-      },
-      {
-        header: "Finish Point",
-      },
-    ],
-  };
-}
+    start: {
+      src: "Start Point",
+      type: "string",
+    },
+    finish: {
+      src: "Finish Point",
+      type: "string",
+    },
+    turnpoints: {
+      src: [
+        {
+          src: "TP 1",
+          type: "string",
+        },
+        {
+          src: "TP 2",
+          type: "string",
+        },
+        {
+          src: "TP 3",
+          type: "string",
+        },
+        {
+          src: "TP 4",
+          type: "string",
+        },
+      ],
+      type: "array",
+      xform: (tps) => tps.filter((tp) => tp.trim() !== ""),
+    },
+  },
+  type: "object",
+};
 
-function genSpec() {
-  return {
+const SPEC = {
+  src: {
     id: {
-      header: "FlightID",
+      src: "FlightID",
+      type: "string",
     },
-    flightDate: {
-      header: "Flight Date",
+    date: {
+      src: "Flight Date",
       type: "date",
     },
-    pilot: PILOT_SPEC,
+    pilot: {
+      src: {
+        first: {
+          src: "Forename",
+          type: "string",
+        },
+        last: {
+          src: "Surname",
+          type: "string",
+        },
+      },
+      type: "object",
+      xform: ({ first, last }) => `${last}, ${first}`,
+    },
     glider: GLIDER_SPEC,
     ladders: LADDERS_SPEC,
-    task: genTaskSpec(),
-  };
-}
+    task: TASK_SPEC,
+  },
+  type: "object",
+};
 
 function parseFlights(csv) {
-  return parseCsv(csv, genSpec());
+  return parseCsv(SPEC, csv);
 }
 
 module.exports = {
-  genSpec,
+  GLIDER_SPEC,
+  LADDERS_SPEC,
+  SPEC,
+  TASK_SPEC,
   parseFlights,
 };
