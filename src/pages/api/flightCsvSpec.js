@@ -1,5 +1,3 @@
-const { parseCsv } = require("./csv");
-
 const GLIDER_SPEC = {
   src: {
     type: {
@@ -165,14 +163,9 @@ const SPEC = {
   type: "object",
 };
 
-function parseFlights(csv) {
-  return parseCsv(SPEC, csv);
-}
-
 module.exports = {
   GLIDER_SPEC,
   LADDERS_SPEC,
   SPEC,
   TASK_SPEC,
-  parseFlights,
 };

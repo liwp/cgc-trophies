@@ -1,7 +1,13 @@
 import { trophyEval } from "./eval";
 import TROPHIES from "./cgc_trophies";
 
-export default ({ flights, season, trophy }) => {
+// TODO:
+// - render results in a table?
+// - style link
+// - remove JSON dump
+// - pass trophy object into the component?
+
+export default ({ flights, trophy, year }) => {
   const { description, expr, name } = TROPHIES[trophy];
   const results = trophyEval(flights, expr);
 
@@ -11,14 +17,20 @@ export default ({ flights, season, trophy }) => {
         Cambridge Gliding Centre Trophies
       </h1>
       <h2>
-        {season} - {name}
+        {year} - {name}
       </h2>
       <p>{description}</p>
       <h3>Results</h3>
       <ul>
         {results.map((r) => (
           <li key={r.id}>
-            {r.pilot} - {r._score}
+            {r.pilot} - {r.date.toISOString()} - {r._score} -{" "}
+            <a
+              target="_blank"
+              href={`https://www.bgaladder.net/flightdetails/${r.id}`}
+            >
+              BGA Ladder
+            </a>
           </li>
         ))}
       </ul>

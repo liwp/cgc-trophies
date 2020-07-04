@@ -83,6 +83,13 @@ FASTrackers
 // wouldn't have to know about ladder vs flight trophies, or syndicates...
 
 const TROPHIES = {
+  // TODO: need to nest this somehow? general stuff vs trophies? We could stick
+  // all the trophies in a list and access them by name...
+  default: "gransden",
+  seasonStart: {
+    month: 10,
+    day: 1,
+  },
   allAlexander: {
     name: "A.L.L. Alexander Trophy",
     description:
