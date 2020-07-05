@@ -9,8 +9,10 @@ const comparators = {
 export function trophyEval(flights, expr) {
   // eslint-disable-next-line no-param-reassign
   flights = chain(flights);
+
   expr.forEach(([op, ...args]) => {
     switch (op) {
+      // TODO: accept predicate functions
       case "filter": {
         const [field, comparator = "=", value = true] = args;
         const pred = comparators[comparator];
@@ -23,6 +25,10 @@ export function trophyEval(flights, expr) {
         flights = flights.filter((flight) => pred(get(flight, field), value));
         break;
       }
+      // TODO: we can replace `score` with a project which:
+      // - accepts and array of keys or functions
+      // - use an identity fn to return units
+      // TODO: would also be nice to accept single key / function
       case "project": {
         const [field, fieldsOfProjection] = args;
         const projection = isFunction(fieldsOfProjection)
@@ -33,6 +39,13 @@ export function trophyEval(flights, expr) {
           Object.assign({}, f, { [field]: projection(f) })
         );
         break;
+      }
+      case "score": {
+        const [field, unit] = args;
+        // eslint-disable-next-line no-param-reassign
+        flights = flights.map((f) =>
+          Object.assign({}, f, { score: { value: get(f, field), unit } })
+        );
       }
       case "sort": {
         const [field, order] = args;

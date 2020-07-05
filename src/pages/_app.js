@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import useSWR from "swr";
 
 import TROPHIES from "./cgc_trophies";
+import { trophyEval } from "./eval";
+
 import "../styles/index.css";
 
 const THIS_YEAR = new Date().getFullYear();
@@ -39,31 +41,62 @@ function seasonDates(year, seasonConfig) {
   return [start, end];
 }
 
+const Layout = ({ children }) => (
+  <div className="p-4 shadow rounded bg-white">{children}</div>
+);
+
 const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
-  let { year = THIS_YEAR, trophy = "gransden" } = router.query;
+  let { year = THIS_YEAR, trophy = TROPHIES.config.default } = router.query;
 
   console.log("QUERY", { year, trophy });
 
-  const [start, end] = seasonDates(year, TROPHIES.seasonStart);
+  const [start, end] = seasonDates(year, TROPHIES.config.seasonStart);
   const { data, error } = useSWR(
     `/api/flights?start=${start.toISOString()}&end=${end.toISOString()}`,
     fetcher
   );
 
-  // TODO: we need to apply the same template to all of these... Maybe move all
-  // of this to some subcomponent.
-  if (error) return <div>Failed to load</div>;
-  if (!data) return <div>Loading...</div>;
-  if (!TROPHIES[trophy])
+  if (error)
     return (
-      <Link href="/">
-        <a>Home</a>
-      </Link>
+      <Layout>
+        <div>Failed to load flight data. Please try refreshing the page.</div>
+      </Layout>
+    );
+  if (!data)
+    return (
+      <Layout>
+        <div>Loading flight data...</div>
+      </Layout>
+    );
+
+  const trophyConfig = TROPHIES.trophies.find(({ name }) => name === trophy);
+  if (!trophyConfig)
+    return (
+      <Layout>
+        <div>
+          Unknown trophy: <em>{trophy}</em>.
+        </div>
+        <div>
+          Return back to the{" "}
+          <Link href="/">
+            <a>main page</a>
+          </Link>
+        </div>
+      </Layout>
     );
 
   const { flights } = data;
-  pageProps = { flights, year, trophy, ...pageProps };
+
+  const results = trophyEval(flights, trophyConfig.expr);
+
+  const trophies = Object.values(TROPHIES.trophies).map((trophy) => ({
+    ...trophy,
+    results: trophyEval(flights, trophy.expr),
+    year,
+  }));
+
+  pageProps = { results, year, trophies, trophy, ...pageProps };
 
   return (
     <div className="p-4 shadow rounded bg-white">
