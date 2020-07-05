@@ -14,12 +14,18 @@ const CLUB = "CAM";
 
 export default async (req, res) => {
   const { start, end } = req.query;
+  if (!start || !end) {
+    res.status(400).json({ error: "missing query params: start or end" });
+    return;
+  }
   const startDate = new Date(start);
   const endDate = new Date(end);
+  const startYear = startDate.getFullYear();
+  const endYear = endDate.getFullYear();
 
-  const years = Array(endDate.getFullYear() - startDate.getFullYear() + 1)
+  const years = Array(endYear - startYear + 1)
     .fill()
-    .map((_, i) => startDate.getFullYear() + i);
+    .map((_, i) => startYear + i);
 
   console.log("REQ", startDate, endDate, years);
 
@@ -39,5 +45,13 @@ export default async (req, res) => {
 
   console.log("FILTERED flights", fs.length);
 
+  // Set cache headers - cache
+  if (endYear < new Date().getFullYear()) {
+    // Cache requests for historical seasons 'forever' (for 1 year)
+    res.setHeader("Cache-Control", "max-age=31536000");
+  } else {
+    // Cache this season temporarily
+    res.setHeader("Cache-Control", "max-age=60, stale-while-revalidate=240");
+  }
   res.status(200).json({ club: CLUB, start, end, flights: fs });
 };
