@@ -8,6 +8,7 @@ function parseFlights(csv) {
 }
 
 const URL = `https://www.bgaladder.net/Steward/GetLogFilesCSV`;
+//const URL = `https://staging.bgaladder.net/Steward/GetLogFilesCSV`;
 
 // TODO: pull from env var, or something?
 const CLUB = "CAM";
