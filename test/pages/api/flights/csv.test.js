@@ -1,4 +1,4 @@
-const csv = require("../../../../src/pages/api/flights/csv.js");
+const csv = require("../../../../src/pages/api/csv.js");
 
 const data = `
 b_col,d_col,n_col,s_col
@@ -194,7 +194,7 @@ c1,c2,c1
       };
 
       expect(() => csv.parseCsv(spec, data)).toThrow(
-        "Unknown spec type: undefined"
+        "Unknown type in spec: {\"src\":\"b_col\"}"
       );
     });
   });

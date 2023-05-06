@@ -78,7 +78,7 @@ const TROPHIES = {
   config: {
     default: "Gransden Trophy",
     seasonStart: {
-      month: 10,
+      month: 1,
       day: 1,
     },
   },

@@ -2,8 +2,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 
-import TROPHIES from "./cgc_trophies";
-import { trophyEval } from "./eval";
+import TROPHIES from "../lib/cgc_trophies";
+import { trophyEval } from "../lib/eval";
 
 import "../styles/index.css";
 
