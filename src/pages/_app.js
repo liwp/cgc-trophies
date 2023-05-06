@@ -80,7 +80,7 @@ const MyApp = ({ Component, pageProps }) => {
         <div>
           Return back to the{" "}
           <Link href="/">
-            <a>main page</a>
+            main page
           </Link>
         </div>
       </Layout>

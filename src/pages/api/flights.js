@@ -13,7 +13,7 @@ const URL = `https://www.bgaladder.net/Steward/GetLogFilesCSV`;
 // TODO: pull from env var, or something?
 const CLUB = "CAM";
 
-export default async (req, res) => {
+async function getFlights(req, res) {
   const { start, end } = req.query;
   if (!start || !end) {
     res.status(400).json({ error: "missing query params: start or end" });
@@ -56,3 +56,5 @@ export default async (req, res) => {
   }
   res.status(200).json({ club: CLUB, start, end, flights: fs });
 };
+
+export default getFlights;

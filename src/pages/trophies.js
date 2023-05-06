@@ -1,4 +1,5 @@
 import { sample, uniqBy } from "lodash";
+import Image from "next/image";
 
 // TODO:
 // - render results in a table?
@@ -44,7 +45,14 @@ const Result = ({ result }) => {
 };
 
 const TrophyImage = ({ image }) => {
-  return !!image ? <img className="float-right h-24" src={image} /> : null;
+  return !!image ?
+    <Image
+      alt="trophy photo"
+      className="float-right h-24"
+      src={image}
+      height="200"
+      width="200" />
+    : null;
 };
 
 const TrophyPage = ({ trophies, trophy }) => {

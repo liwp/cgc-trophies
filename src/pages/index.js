@@ -14,7 +14,7 @@ const TrophyWinner = ({ trophy }) => {
         pathname: "/trophies",
         query: { year, trophy: name },
       }}
-    >
+      legacyBehavior>
       <span>
         {name}: {!!result ? results[0].pilot : "No qualifying flights"}
       </span>
@@ -22,7 +22,7 @@ const TrophyWinner = ({ trophy }) => {
   );
 };
 
-export default ({ trophies }) => {
+const TrophyList = ({ trophies }) => {
   return (
     <ul>
       {trophies.map((trophy) => (
@@ -33,3 +33,5 @@ export default ({ trophies }) => {
     </ul>
   );
 };
+
+export default TrophyList;
