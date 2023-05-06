@@ -1,3 +1,4 @@
+import { ChakraProvider } from '@chakra-ui/react'
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useSWR from "swr";
@@ -100,7 +101,9 @@ const MyApp = ({ Component, pageProps }) => {
 
   return (
     <div className="p-4 shadow rounded bg-white">
-      <Component {...pageProps} />
+      <ChakraProvider>
+        <Component {...pageProps} />
+      </ChakraProvider>
     </div>
   );
 };
