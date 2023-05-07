@@ -22,13 +22,9 @@ const fetcher = (url) =>
       })),
     }));
 
-const Layout = ({ children }) => (
-  <div className="p-4 shadow rounded bg-white">{children}</div>
-);
-
 const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
-  let season = parseInt(router.query.year);
+  let season = parseInt(router.query.season);
   let trophy = router.query.trophy || TROPHIES.config.default;
 
   if (isNaN(season)) {
@@ -38,13 +34,12 @@ const MyApp = ({ Component, pageProps }) => {
   console.log("QUERY", { season, trophy });
 
   // TODO: remove trophy query param default, or replace with path segment?
-  // TODO: change `year` to `season`
   // TODO: if `season` is not present, set to current year (from 1.3. onwards)
   // TODO: look up the flights only when the season changes
-  // TODO: then filter locally based on i) trophy config, or ii) default
 
   const [startYear, endYear] = [season - 1, season + 1];
 
+  // TODO: just request three years, skip future year when startYear == THIS_YEAR
   const { data, error } = useSWR(
     `/api/flights?start=${startYear}&end=${endYear}`,
     fetcher
@@ -52,43 +47,16 @@ const MyApp = ({ Component, pageProps }) => {
 
   if (error)
     return (
-      <Layout>
-        <div>Failed to load flight data. Please try refreshing the page.</div>
-      </Layout>
+      <div>Failed to load flight data. Please try refreshing the page.</div>
     );
   if (!data)
     return (
-      <Layout>
-        <div>Loading flight data...</div>
-      </Layout>
-    );
-
-  const trophyConfig = TROPHIES.trophies.find(({ name }) => name === trophy);
-  if (!trophyConfig)
-    return (
-      <Layout>
-        <div>
-          Unknown trophy: <em>{trophy}</em>.
-        </div>
-        <div>
-          Return back to the{" "}
-          <Link href="/">
-            main page
-          </Link>
-        </div>
-      </Layout>
+      <div>Loading flight data...</div>
     );
 
   const { flights } = data;
 
-  const trophies = Object.values(TROPHIES.trophies).map((trophy) => ({
-    ...trophy,
-    results: trophyEval(TROPHIES.config, season, flights, trophy),
-    year: season,
-  }));
-
-  // TODO: rename year
-  pageProps = { config: TROPHIES.config, year: season, trophies, trophy, ...pageProps };
+  pageProps = { flights, season, trophy, ...pageProps };
 
   return (
     <ChakraProvider>

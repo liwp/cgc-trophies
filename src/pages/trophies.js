@@ -1,6 +1,9 @@
 import { sample, uniqBy } from "lodash";
 import Image from "next/image";
 
+import TROPHIES from "../lib/cgc_trophies";
+import { trophyEval } from "../lib/eval";
+
 // TODO:
 // - render results in a table?
 
@@ -55,23 +58,39 @@ const TrophyImage = ({ image }) => {
     : null;
 };
 
-const TrophyPage = ({ config, trophies, trophy }) => {
-  const { description, expr, img, name, results, year } = trophies.find(
-    ({ name }) => name === trophy
-  );
-  // pick random image from a selection
-  const image = sample(img);
+const TrophyPage = ({ flights, season, trophies, trophy }) => {
+  const config = TROPHIES.trophies.find(({ name }) => name === trophy);
+  if (!config)
+    return (
+      <div>
+        <div>
+          Unknown trophy: <em>{trophy}</em>.
+        </div>
+        <div>
+          Return back to the{" "}
+          <Link href="/">
+            main page
+          </Link>
+        </div>
+      </div>
+    );
+
+  const results = trophyEval(TROPHIES.config, season, flights, config);
+
+  // TODO: do we want uniqBy(results, 'pilot').map(...) here? OTOH multiple
+  // results is annoying, but sometimes the first flight might be disqualified,
+  // so we'd want to see the others too...
 
   return (
     <div>
       <h1>
-        {year} - {name}
+        {season} - {config.name}
       </h1>
-      <TrophyImage image={image} />
-      <p>{description}</p>
+      <TrophyImage image={sample(config.img)} />
+      <p>{config.description}</p>
       <h2>Results</h2>
       <ul>
-        {uniqBy(results, "pilot").map((r) => (
+        {results.map((r) => (
           <Result key={r.id} result={r} />
         ))}
       </ul>
