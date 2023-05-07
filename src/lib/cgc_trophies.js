@@ -8,11 +8,6 @@ const IS_FROM_GRANSDEN_LODGE = [
 const IS_COMPLETED = ["filter", "task.isCompleted"];
 const IS_DECLARED = ["filter", "task.isDeclared"];
 
-function season({ date }) {
-  const month = new Date(date).getMonth();
-  return month >= 9 || month <= 2 ? "winter" : "summer";
-}
-
 /* Raw flight:
    {
    id: "83184",
@@ -59,9 +54,6 @@ FASTrackers
 "https://www.camgliding.uk/wp-content/uploads/2018/01/Ted-Warner-Trophy.jpg"
 */
 
-// TODO:
-// - replace `season()` with a filter on flight date - tricky bit is converting
-//   day-month to day-month-year
 // TODO: add trophy type: flight / ladder - this can be used to render things
 // differently, but hopefully `eval` can also evaluate the trophy rules
 // differently.
@@ -77,9 +69,15 @@ FASTrackers
 const TROPHIES = {
   config: {
     default: "Gransden Trophy",
-    seasonStart: {
-      month: 1,
-      day: 1,
+    season: {
+      start: {
+        month: 1,
+        day: 1,
+      },
+      end: {
+        month: 12,
+        day: 31,
+      },
     },
   },
   trophies: [
@@ -176,12 +174,20 @@ const TROPHIES = {
       expr: [
         IS_FROM_GRANSDEN_LODGE,
         IS_COMPLETED,
-        ["project", "season", season],
-        ["filter", "season", "=", "winter"],
         ["filter", "task.turnpoints.length", "<=", 3],
         ["score", "task.handicappedDistanceKm", "km"],
         ["sort", "score.value", "desc"],
       ],
+      season: {
+        start: {
+          month: 10,
+          day: 1,
+        },
+        end: {
+          month: 3,
+          day: 31,
+        },
+      },
     },
     {
       name: "Mug Metal Machin Trophy",

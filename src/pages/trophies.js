@@ -55,13 +55,12 @@ const TrophyImage = ({ image }) => {
     : null;
 };
 
-const TrophyPage = ({ trophies, trophy }) => {
+const TrophyPage = ({ config, trophies, trophy }) => {
   const { description, expr, img, name, results, year } = trophies.find(
     ({ name }) => name === trophy
   );
+  // pick random image from a selection
   const image = sample(img);
-
-  console.log(results);
 
   return (
     <div>

@@ -81,16 +81,14 @@ const MyApp = ({ Component, pageProps }) => {
 
   const { flights } = data;
 
-  const results = trophyEval(flights, trophyConfig.expr);
-
   const trophies = Object.values(TROPHIES.trophies).map((trophy) => ({
     ...trophy,
-    results: trophyEval(flights, trophy.expr),
+    results: trophyEval(TROPHIES.config, season, flights, trophy),
     year: season,
   }));
 
   // TODO: rename year
-  pageProps = { results, year: season, trophies, trophy, ...pageProps };
+  pageProps = { config: TROPHIES.config, year: season, trophies, trophy, ...pageProps };
 
   return (
     <ChakraProvider>

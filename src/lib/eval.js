@@ -6,11 +6,37 @@ const comparators = {
   "<=>": (xs, ys) => isEqual(xs, ys) || isEqual(xs, reverse(ys)),
 };
 
-export function trophyEval(flights, expr) {
-  // eslint-disable-next-line no-param-reassign
-  flights = chain(flights);
+function configToDate(season, {day, month}) {
+  return new Date(`${season}-${month}-${day}`);
+}
 
-  expr.forEach(([op, ...args]) => {
+function inSeasonPredicate(season, config, name) {
+  let start = configToDate(season, config.start);
+  let end = configToDate(season, config.end);
+
+  if (start > end) {
+    end.setFullYear(end.getFullYear() + 1);
+  }
+
+  console.log("PRED CONFIG", {name, config, start, end});
+
+  return ({ date }) => {
+    const flight = new Date(date);
+    return start < flight && flight < end;
+  };
+}
+
+export function trophyEval(defaultConfig, season, flights, trophy) {
+  const inSeason = inSeasonPredicate(season, trophy.season || defaultConfig.season, trophy.name);
+
+  console.log("FLIGHTS", flights.length);
+
+  // eslint-disable-next-line no-param-reassign
+  flights = chain(flights).filter(inSeason);
+
+  console.log("CONFIG", defaultConfig.season, trophy.season, trophy.name, season);
+
+  trophy.expr.forEach(([op, ...args]) => {
     switch (op) {
       // TODO: accept predicate functions
       case "filter": {
@@ -58,5 +84,9 @@ export function trophyEval(flights, expr) {
     }
   });
 
-  return flights.value();
+  const ret = flights.value();
+
+  console.log("FLIGHTS2", ret.length);
+
+  return ret;
 }
