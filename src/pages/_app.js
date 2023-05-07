@@ -1,4 +1,4 @@
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react';
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useSWR from "swr";
@@ -22,39 +22,31 @@ const fetcher = (url) =>
       })),
     }));
 
-function seasonDates(year, seasonConfig) {
-  const startOfYear = new Date(`${year}-01-01`);
-
-  // left-pad with 0
-  const [month, day] = [seasonConfig.month, seasonConfig.day].map((n) =>
-    `0${n}`.slice(-2)
-  );
-  const start = new Date(`${year}-${month}-${day}`);
-
-  if (startOfYear < start) {
-    start.setFullYear(start.getFullYear() - 1);
-  }
-
-  const end = new Date(`${start.getFullYear() + 1}-${month}-${day}`);
-  if (end < start) {
-    start.setFullYear(start.getFullYear() - 1);
-  }
-  return [start, end];
-}
-
 const Layout = ({ children }) => (
   <div className="p-4 shadow rounded bg-white">{children}</div>
 );
 
 const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
-  let { year = THIS_YEAR, trophy = TROPHIES.config.default } = router.query;
+  let season = parseInt(router.query.year);
+  let trophy = router.query.trophy || TROPHIES.config.default;
 
-  console.log("QUERY", { year, trophy });
+  if (isNaN(season)) {
+    season = THIS_YEAR;
+  }
 
-  const [start, end] = seasonDates(year, TROPHIES.config.seasonStart);
+  console.log("QUERY", { season, trophy });
+
+  // TODO: remove trophy query param default, or replace with path segment?
+  // TODO: change `year` to `season`
+  // TODO: if `season` is not present, set to current year (from 1.3. onwards)
+  // TODO: look up the flights only when the season changes
+  // TODO: then filter locally based on i) trophy config, or ii) default
+
+  const [startYear, endYear] = [season - 1, season + 1];
+
   const { data, error } = useSWR(
-    `/api/flights?start=${start.toISOString()}&end=${end.toISOString()}`,
+    `/api/flights?start=${startYear}&end=${endYear}`,
     fetcher
   );
 
@@ -94,17 +86,16 @@ const MyApp = ({ Component, pageProps }) => {
   const trophies = Object.values(TROPHIES.trophies).map((trophy) => ({
     ...trophy,
     results: trophyEval(flights, trophy.expr),
-    year,
+    year: season,
   }));
 
-  pageProps = { results, year, trophies, trophy, ...pageProps };
+  // TODO: rename year
+  pageProps = { results, year: season, trophies, trophy, ...pageProps };
 
   return (
-    <div className="p-4 shadow rounded bg-white">
-      <ChakraProvider>
-        <Component {...pageProps} />
-      </ChakraProvider>
-    </div>
+    <ChakraProvider>
+      <Component {...pageProps} />
+    </ChakraProvider>
   );
 };
 

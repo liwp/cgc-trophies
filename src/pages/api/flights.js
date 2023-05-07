@@ -8,27 +8,23 @@ function parseFlights(csv) {
 }
 
 const URL = `https://www.bgaladder.net/Steward/GetLogFilesCSV`;
-//const URL = `https://staging.bgaladder.net/Steward/GetLogFilesCSV`;
 
 // TODO: pull from env var, or something?
 const CLUB = "CAM";
 
 async function getFlights(req, res) {
-  const { start, end } = req.query;
-  if (!start || !end) {
-    res.status(400).json({ error: "missing query params: start or end" });
+  const start = parseInt(req.query.start);
+  const end = parseInt(req.query.end);
+  if (isNaN(start) || isNaN(end)) {
+    res.status(400).json({ error: `missing query params: ${isNaN(start) ? 'start' : 'end'}` });
     return;
   }
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  const startYear = startDate.getFullYear();
-  const endYear = endDate.getFullYear();
 
-  const years = Array(endYear - startYear + 1)
+  const years = Array(end - start + 1)
     .fill()
-    .map((_, i) => startYear + i);
+    .map((_, i) => start + i);
 
-  console.log("REQ", startDate, endDate, years);
+  console.log("REQ", years);
 
   const responses = years.map((year) => {
     const params = { clubID: CLUB, Season: year };
@@ -42,19 +38,15 @@ async function getFlights(req, res) {
 
   console.log("ALL flights", flights.length);
 
-  const fs = flights.filter(({ date }) => startDate <= date && date < endDate);
-
-  console.log("FILTERED flights", fs.length);
-
   // Set cache headers - cache
-  if (endYear < new Date().getFullYear()) {
+  if (end < new Date().getFullYear()) {
     // Cache requests for historical seasons 'forever' (for 1 year)
     res.setHeader("Cache-Control", "max-age=31536000");
   } else {
     // Cache this season temporarily
     res.setHeader("Cache-Control", "max-age=60, stale-while-revalidate=240");
   }
-  res.status(200).json({ club: CLUB, start, end, flights: fs });
+  res.status(200).json({ club: CLUB, start, end, flights });
 };
 
 export default getFlights;
