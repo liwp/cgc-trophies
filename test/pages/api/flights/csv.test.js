@@ -194,7 +194,7 @@ c1,c2,c1
       };
 
       expect(() => csv.parseCsv(spec, data)).toThrow(
-        "Unknown type in spec: {\"src\":\"b_col\"}"
+        'Unknown type in spec: {"src":"b_col"}'
       );
     });
   });

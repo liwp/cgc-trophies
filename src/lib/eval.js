@@ -6,7 +6,7 @@ const comparators = {
   "<=>": (xs, ys) => isEqual(xs, ys) || isEqual(xs, reverse(ys)),
 };
 
-function configToDate(season, {day, month}) {
+function configToDate(season, { day, month }) {
   return new Date(`${season}-${month}-${day}`);
 }
 
@@ -18,7 +18,7 @@ function inSeasonPredicate(season, config, name) {
     end.setFullYear(end.getFullYear() + 1);
   }
 
-  console.log("PRED CONFIG", {name, config, start, end});
+  console.log("PRED CONFIG", { name, config, start, end });
 
   return ({ date }) => {
     const flight = new Date(date);
@@ -27,14 +27,24 @@ function inSeasonPredicate(season, config, name) {
 }
 
 export function trophyEval(defaultConfig, season, flights, trophy) {
-  const inSeason = inSeasonPredicate(season, trophy.season || defaultConfig.season, trophy.name);
+  const inSeason = inSeasonPredicate(
+    season,
+    trophy.season || defaultConfig.season,
+    trophy.name
+  );
 
   console.log("FLIGHTS", flights.length);
 
   // eslint-disable-next-line no-param-reassign
   flights = chain(flights).filter(inSeason);
 
-  console.log("CONFIG", defaultConfig.season, trophy.season, trophy.name, season);
+  console.log(
+    "CONFIG",
+    defaultConfig.season,
+    trophy.season,
+    trophy.name,
+    season
+  );
 
   trophy.expr.forEach(([op, ...args]) => {
     switch (op) {

@@ -16,7 +16,9 @@ async function getFlights(req, res) {
   const start = parseInt(req.query.start);
   const end = parseInt(req.query.end);
   if (isNaN(start) || isNaN(end)) {
-    res.status(400).json({ error: `missing query params: ${isNaN(start) ? 'start' : 'end'}` });
+    res.status(400).json({
+      error: `missing query params: ${isNaN(start) ? "start" : "end"}`,
+    });
     return;
   }
 
@@ -47,6 +49,6 @@ async function getFlights(req, res) {
     res.setHeader("Cache-Control", "max-age=60, stale-while-revalidate=240");
   }
   res.status(200).json({ club: CLUB, start, end, flights });
-};
+}
 
 export default getFlights;

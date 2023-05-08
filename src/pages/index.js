@@ -17,7 +17,8 @@ const TrophyWinner = ({ trophy }) => {
         pathname: "/trophies",
         query: { season, trophy: name },
       }}
-      legacyBehavior>
+      legacyBehavior
+    >
       <span>
         {name}: {!!result ? results[0].pilot : "No qualifying flights"}
       </span>

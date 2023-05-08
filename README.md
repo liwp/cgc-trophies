@@ -1,5 +1,4 @@
-Cambridge Gliding Centre Annual Trophies
-===
+# Cambridge Gliding Centre Annual Trophies
 
 This is a next.js / Raect app with a backend API is tries to read flight
 information for a given gliding season from the [BGA
@@ -29,7 +28,6 @@ we've so far run into:
   trophy (they were awarded the trophy in the end).
 - Not all the flights that should be considered for a trophy are uploaded to the
   BGA Ladder, and those flights will clearly not show up in the results.
-
 
 These are just a few complications that we run into when trying to automate
 awarding trophies.

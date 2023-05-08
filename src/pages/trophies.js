@@ -48,14 +48,15 @@ const Result = ({ result }) => {
 };
 
 const TrophyImage = ({ image }) => {
-  return !!image ?
+  return !!image ? (
     <Image
       alt="trophy photo"
       className="float-right h-24"
       src={image}
       height="200"
-      width="200" />
-    : null;
+      width="200"
+    />
+  ) : null;
 };
 
 const TrophyPage = ({ flights, season, trophies, trophy }) => {
@@ -67,10 +68,7 @@ const TrophyPage = ({ flights, season, trophies, trophy }) => {
           Unknown trophy: <em>{trophy}</em>.
         </div>
         <div>
-          Return back to the{" "}
-          <Link href="/">
-            main page
-          </Link>
+          Return back to the <Link href="/">main page</Link>
         </div>
       </div>
     );

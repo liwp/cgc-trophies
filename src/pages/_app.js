@@ -1,4 +1,4 @@
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useSWR from "swr";
@@ -49,10 +49,7 @@ const MyApp = ({ Component, pageProps }) => {
     return (
       <div>Failed to load flight data. Please try refreshing the page.</div>
     );
-  if (!data)
-    return (
-      <div>Loading flight data...</div>
-    );
+  if (!data) return <div>Loading flight data...</div>;
 
   const { flights } = data;
 
