@@ -18,8 +18,6 @@ function inSeasonPredicate(season, config, name) {
     end.setFullYear(end.getFullYear() + 1);
   }
 
-  console.log("PRED CONFIG", { name, config, start, end });
-
   return ({ date }) => {
     const flight = new Date(date);
     return start < flight && flight < end;
@@ -33,18 +31,8 @@ export function trophyEval(defaultConfig, season, flights, trophy) {
     trophy.name
   );
 
-  console.log("FLIGHTS", flights.length);
-
   // eslint-disable-next-line no-param-reassign
   flights = chain(flights).filter(inSeason);
-
-  console.log(
-    "CONFIG",
-    defaultConfig.season,
-    trophy.season,
-    trophy.name,
-    season
-  );
 
   trophy.expr.forEach(([op, ...args]) => {
     switch (op) {
@@ -94,9 +82,5 @@ export function trophyEval(defaultConfig, season, flights, trophy) {
     }
   });
 
-  const ret = flights.value();
-
-  console.log("FLIGHTS2", ret.length);
-
-  return ret;
+  return flights.value();
 }

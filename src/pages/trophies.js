@@ -1,8 +1,16 @@
-import { sample, uniqBy } from "lodash";
+import { keyBy, sample, uniqBy } from "lodash";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
-import TROPHIES from "../lib/cgc_trophies";
+import CGC_TROPHIES from "../lib/cgc_trophies";
+import FlightLoadFailure from "../components/FlightLoadFailure";
+import Loading from "../components/Loading";
+import UnknownTrophy from "../components/UnknownTrophy";
 import { trophyEval } from "../lib/eval";
+import useFlights from "../lib/useFlights";
+
+const CONFIG = CGC_TROPHIES.config;
+const TROPHIES = keyBy(CGC_TROPHIES.trophies, "id");
 
 // TODO:
 // - render results in a table?
@@ -36,11 +44,7 @@ const Result = ({ result }) => {
     <li key={id}>
       <span className="capitalize">{pilot}</span> - {date.toISOString()} -{" "}
       <Score value={value} unit={unit} /> -{" "}
-      <a
-        className="hover:underline text-purple-500"
-        target="_blank"
-        href={`https://www.bgaladder.net/flightdetails/${id}`}
-      >
+      <a target="_blank" href={`https://www.bgaladder.net/flightdetails/${id}`}>
         BGA Ladder
       </a>
     </li>
@@ -59,21 +63,18 @@ const TrophyImage = ({ image }) => {
   ) : null;
 };
 
-const TrophyPage = ({ flights, season, trophies, trophy }) => {
-  const config = TROPHIES.trophies.find(({ name }) => name === trophy);
-  if (!config)
-    return (
-      <div>
-        <div>
-          Unknown trophy: <em>{trophy}</em>.
-        </div>
-        <div>
-          Return back to the <Link href="/">main page</Link>
-        </div>
-      </div>
-    );
+const TrophyPage = () => {
+  const router = useRouter();
+  let trophyId = router.query.trophy || CONFIG.default;
+  const { data, error, isLoading, season } = useFlights();
 
-  const results = trophyEval(TROPHIES.config, season, flights, config);
+  if (error) return <FlightLoadFailure />;
+  if (isLoading) return <Loading />;
+
+  const config = TROPHIES[trophyId];
+  if (!config) return <UnknownTrophy trophyId={trophyId} />;
+
+  const results = trophyEval(CONFIG, season, data.flights, config);
 
   // TODO: do we want uniqBy(results, 'pilot').map(...) here? OTOH multiple
   // results is annoying, but sometimes the first flight might be disqualified,

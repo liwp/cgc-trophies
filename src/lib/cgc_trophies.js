@@ -68,7 +68,7 @@ FASTrackers
 
 const TROPHIES = {
   config: {
-    default: "Gransden Trophy",
+    default: "5",
     season: {
       start: {
         month: 1,
@@ -82,6 +82,7 @@ const TROPHIES = {
   },
   trophies: [
     {
+      id: "1",
       name: "A.L.L. Alexander Trophy",
       description:
         "For the highest scoring flight on the BGA ladder flown in a glider with a handicap of 95 or less, launched from Gransden Lodge.",
@@ -93,6 +94,7 @@ const TROPHIES = {
       ],
     },
     {
+      id: "2",
       name: "Boal Pot",
       description:
         "For the fastest, handicapped flight round Soham(SOH), Eastwell(EAW), and Calvert(CAL) – 305.5km. The task can be done either way round.",
@@ -106,6 +108,7 @@ const TROPHIES = {
       ],
     },
     {
+      id: "3",
       name: "Boomerang",
       description:
         "For the fastest, handicapped out-and-return flight to Shipston-on-Stour(SHP) – 208.7km, not necessarily declared. For pilots who have not completed a UK 500 km flight at the beginning of the season.",
@@ -118,6 +121,7 @@ const TROPHIES = {
       ],
     },
     {
+      id: "4",
       name: "Double Century Trophy",
       description:
         "Fastest handicapped flight: Bicester Control Tower (BIC) – Husbands Bosworth (HUS) – 205.0km. For pilots who have not flown a 300km at the start of the ladder season. The task can be done either way round.",
@@ -134,6 +138,7 @@ const TROPHIES = {
       ],
     },
     {
+      id: "5",
       name: "Gransden Trophy",
       description:
         "For the fastest, handicapped speed around turning points at Burley Gate (BUG) and Mendlesham Mast (MEN) – 507km. The task can be done either way round.",
@@ -150,6 +155,7 @@ const TROPHIES = {
       ],
     },
     {
+      id: "6",
       name: "Jubilee Bowl Trophy",
       description:
         "For the longest, handicapped, completed flight around up to 2 turning points, not necessarily declared.",
@@ -165,6 +171,7 @@ const TROPHIES = {
       ],
     },
     {
+      id: "7",
       name: "Kelman Clock",
       description:
         "For the longest, handicapped, flight around up to three turning points, launched from GRL during the Winter Season.",
@@ -190,6 +197,7 @@ const TROPHIES = {
       },
     },
     {
+      id: "8",
       name: "Mug Metal Machin Trophy",
       description:
         "For the longest, handicapped, declared, completed flight around up to 3 turning points.",
@@ -206,6 +214,7 @@ const TROPHIES = {
       ],
     },
     {
+      id: "9",
       name: "Pons Pot Trophy",
       description:
         "For the longest, handicapped, declared, uncompleted flight around up to 3 turning points.",
@@ -219,6 +228,7 @@ const TROPHIES = {
       ],
     },
     {
+      id: "10",
       name: "Sanville Enigma",
       description:
         "For the fastest, handicapped out-and-return flight to Great Malvern(GRM) – 305km.",
@@ -235,6 +245,7 @@ const TROPHIES = {
       ],
     },
     {
+      id: "11",
       name: "Slazenger Trophy",
       description:
         "For the fastest, handicapped flight around the Slazenger triangle: Turning points at Newport Pagnell and Rushden (110Km). The Task can be done either way round. For novices only.",
