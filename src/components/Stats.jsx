@@ -1,5 +1,6 @@
 import {
   Box,
+  Center,
   Heading,
   Stat,
   StatLabel,
@@ -12,11 +13,17 @@ import { calculateStats } from "../lib/stats";
 
 const FlightCategory = ({ completed, label, total }) => {
   return (
-    <Stat>
-      <StatLabel>{label}</StatLabel>
-      <StatNumber>{completed || 0}</StatNumber>
-      <StatHelpText>Attempts {total || 0}</StatHelpText>
-    </Stat>
+    <Center>
+      <Stat>
+        <StatLabel>{label}</StatLabel>
+        <StatNumber>{completed || 0}</StatNumber>
+        <StatHelpText>
+          Attempts
+          <br />
+          {total || 0}
+        </StatHelpText>
+      </Stat>
+    </Center>
   );
 };
 
@@ -31,8 +38,7 @@ const Stats = ({ flights, season }) => {
   const stats = calculateStats(flightsInYear);
 
   return (
-    <Box>
-      <Heading>Season Stats</Heading>
+    <Box minWidth="600px">
       <StatGroup>
         <FlightCategory label={"All Flights"} {...stats["open"]} />
         <FlightCategory label={"300 km"} {...stats["300km"]} />

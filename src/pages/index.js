@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
+  Heading,
   LinkBox,
   LinkOverlay,
   Table,
@@ -13,6 +14,7 @@ import {
   Th,
   Thead,
   Tr,
+  VStack,
 } from "@chakra-ui/react";
 
 import TROPHIES from "../lib/cgc_trophies";
@@ -49,8 +51,10 @@ const TrophyList = ({ flights, season }) => {
   }));
 
   return (
-    <TableContainer>
-      <Table size="sm" variant="simple">
+    // TODO: Make the container a bit wider, but I think we want to change the
+    // layout in general.
+    <TableContainer minWidth="600px">
+      <Table size="md" variant="striped">
         <TableCaption>
           Cambridge Gliding Centre {season} Trophy Winners
         </TableCaption>
@@ -78,11 +82,12 @@ const TrophiesPage = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div>
+    <VStack>
       <Season season={season} />
+      <Heading size="xl">CGC {season} Trophies</Heading>
       <Stats flights={flights} season={season} />
       <TrophyList flights={flights} season={season} />
-    </div>
+    </VStack>
   );
 };
 

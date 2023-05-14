@@ -1,3 +1,5 @@
+const { capitalize } = require("lodash");
+
 const GLIDER_SPEC = {
   src: {
     type: {
@@ -160,7 +162,7 @@ const SPEC = {
         },
       },
       type: "object",
-      xform: ({ first, last }) => `${last}, ${first}`,
+      xform: ({ first, last }) => `${capitalize(last)}, ${capitalize(first)}`,
     },
     glider: GLIDER_SPEC,
     ladders: LADDERS_SPEC,
