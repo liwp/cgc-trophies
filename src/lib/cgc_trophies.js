@@ -8,52 +8,6 @@ const IS_FROM_GRANSDEN_LODGE = [
 const IS_COMPLETED = ["filter", "task.isCompleted"];
 const IS_DECLARED = ["filter", "task.isDeclared"];
 
-/* Raw flight:
-   {
-   id: "83184",
-   date: "2019-10-11T00:00:00.000Z",
-   pilot: "Atkin, Phil",
-   glider: {
-   type: "ASW 20C (15.0)",
-   handicap: 100,
-   registration: "G-CHSK",
-   },
-   ladders: ["height", "open"],
-   task: {
-   isCompleted: true,
-   crossCountryPoints: 0,
-   isDeclared: true,
-   scoringDistanceKm: 0,
-   handicappedDistanceKm: 0,
-   handicappedSpeedKph: 0,
-   launchSite: "Aboyne",
-   start: "",
-   finish: "",
-   turnpoints: [],
-   },
-   }
-*/
-
-/*
-  Trophy images:-
-
-Missing:
-- A.L.L. Alexander trophy
-- Boal Pot
-- Boomerang
-- Pons Pot
-
-Open ladder
-"https://www.camgliding.uk/wp-content/uploads/2018/01/Pot-Pewter-Pringle-1.jpg"
-"https://www.camgliding.uk/wp-content/uploads/2018/01/Pot-Pewter-Pringle-2.jpg"
-
-Club fleet ladder
-"https://www.camgliding.uk/wp-content/uploads/2018/01/Presidents-Ladder-1.jpg"
-
-FASTrackers
-"https://www.camgliding.uk/wp-content/uploads/2018/01/Ted-Warner-Trophy.jpg"
-*/
-
 // TODO: add trophy type: flight / ladder - this can be used to render things
 // differently, but hopefully `eval` can also evaluate the trophy rules
 // differently.
@@ -69,6 +23,7 @@ FASTrackers
 const TROPHIES = {
   config: {
     default: "5",
+    ignore: {},
     season: {
       start: {
         month: 1,
@@ -119,6 +74,7 @@ const TROPHIES = {
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
       ],
+      ignore: { 99094: "500km - Robert Welford", 101828: "500km - David Tew" },
     },
     {
       id: "4",
@@ -136,6 +92,11 @@ const TROPHIES = {
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
       ],
+      ignore: {
+        101013: "300km - Jem Davies",
+        101070: "300km - Jem Davies",
+        102116: "300km - Paul Bonhomme",
+      },
     },
     {
       id: "5",
@@ -156,7 +117,7 @@ const TROPHIES = {
     },
     {
       id: "6",
-      name: "Jubilee Bowl Trophy",
+      name: "Jubilee Bowl",
       description:
         "For the longest, handicapped, completed flight around up to 2 turning points, not necessarily declared.",
       img: [
@@ -195,6 +156,9 @@ const TROPHIES = {
           day: 31,
         },
       },
+      ignore: {
+        105786: "whoops",
+      },
     },
     {
       id: "8",
@@ -215,7 +179,7 @@ const TROPHIES = {
     },
     {
       id: "9",
-      name: "Pons Pot Trophy",
+      name: "Pons Pot",
       description:
         "For the longest, handicapped, declared, uncompleted flight around up to 3 turning points.",
       expr: [

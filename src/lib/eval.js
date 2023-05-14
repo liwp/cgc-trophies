@@ -31,12 +31,18 @@ export function trophyEval(defaultConfig, season, flights, trophy) {
     trophy.name
   );
 
+  const ignoredIds = { ...defaultConfig.ignore, ...trophy.ignore };
+
   // eslint-disable-next-line no-param-reassign
-  flights = chain(flights).filter(inSeason);
+  flights = chain(flights)
+    .filter(inSeason)
+    .map((flight) => ({
+      ...flight,
+      ignore: ignoredIds[flight.id],
+    }));
 
   trophy.expr.forEach(([op, ...args]) => {
     switch (op) {
-      // TODO: accept predicate functions
       case "filter": {
         const [field, comparator = "=", value = true] = args;
         const pred = comparators[comparator];

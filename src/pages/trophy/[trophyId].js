@@ -1,4 +1,6 @@
-import { keyBy, sample, take, uniqBy } from "lodash";
+import React, { useState } from "react";
+import { chain, keyBy, sample, take, uniqBy } from "lodash";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import {
   Box,
@@ -6,11 +8,14 @@ import {
   CardHeader,
   CardBody,
   Center,
+  FormControl,
+  FormLabel,
   Heading,
   Image,
   Link,
   Stack,
   StackDivider,
+  Switch,
   Table,
   TableCaption,
   TableContainer,
@@ -23,7 +28,7 @@ import {
   Tr,
   VStack,
 } from "@chakra-ui/react";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 
 import CGC_TROPHIES from "../../lib/cgc_trophies";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
@@ -129,9 +134,31 @@ const TrophyImage = ({ image }) => {
   ) : null;
 };
 
+const Toggle = ({ id, label, onChange, isChecked }) => {
+  return (
+    <FormControl display="flex" alignItems="center" justifyContent="flex-end">
+      <FormLabel htmlFor={id} mb="0">
+        {label}
+      </FormLabel>
+      <Switch id={id} isChecked={isChecked} onChange={onChange} size="sm" />
+    </FormControl>
+  );
+};
+
+const AllTrophies = ({ season }) => {
+  return (
+    <Box display="flex" alignItems="center">
+      <Link as={NextLink} href={`/?season=${season}`}>
+        <ArrowBackIcon /> <Text as="span">All Trophies</Text>
+      </Link>
+    </Box>
+  );
+};
+
 const TrophyPage = () => {
   const router = useRouter();
   const trophyId = router.query.trophyId;
+  const [unique, setUnique] = useState(true);
   const { error, flights, isLoading, season } = useFlights();
 
   if (error) return <FlightLoadFailure />;
@@ -140,8 +167,13 @@ const TrophyPage = () => {
   const config = TROPHIES[trophyId];
   if (!config) return <UnknownTrophy trophyId={trophyId} />;
 
-  // Take the first 50 flights - avoids long lists on trophies like the Jubilee Bowl
-  const results = take(trophyEval(CONFIG, season, flights, config), 50);
+  let resultsChain = chain(trophyEval(CONFIG, season, flights, config)).filter(
+    ({ ignore }) => !ignore
+  );
+  if (unique) {
+    resultsChain = resultsChain.uniqBy("pilot");
+  }
+  const results = resultsChain.value();
 
   // TODO: do we want uniqBy(results, 'pilot').map(...) here? OTOH multiple
   // results is annoying, but sometimes the first flight might be disqualified,
@@ -149,6 +181,8 @@ const TrophyPage = () => {
 
   return (
     <Card variant="outline">
+      <AllTrophies season={season} />
+
       <CardHeader>
         <Heading size="md">{config.name}</Heading>
       </CardHeader>
@@ -161,7 +195,17 @@ const TrophyPage = () => {
               {config.description}
             </Text>
           </Box>
+
           <Box>
+            <Box pb="20px">
+              <Toggle
+                id="unique"
+                isChecked={unique}
+                label="One flight per pilot?"
+                onChange={() => setUnique(!unique)}
+              />
+            </Box>
+
             <ResultsList
               results={results}
               season={season}

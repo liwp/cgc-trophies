@@ -1,4 +1,5 @@
 import React from "react";
+import { chain } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
@@ -44,11 +45,17 @@ const TrophyWinner = ({ trophy }) => {
 };
 
 const TrophyList = ({ flights, season }) => {
-  const trophies = Object.values(TROPHIES.trophies).map((trophy) => ({
-    ...trophy,
-    results: trophyEval(TROPHIES.config, season, flights, trophy),
-    season,
-  }));
+  const trophies = Object.values(TROPHIES.trophies).map((trophy) => {
+    const results = chain(trophyEval(TROPHIES.config, season, flights, trophy))
+      .filter(({ ignore }) => !ignore)
+      .value();
+
+    return {
+      ...trophy,
+      results,
+      season,
+    };
+  });
 
   return (
     // TODO: Make the container a bit wider, but I think we want to change the
