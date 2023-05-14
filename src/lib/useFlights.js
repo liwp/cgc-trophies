@@ -40,17 +40,21 @@ function useFlights() {
     }
   }, [router, router.isReady, season]);
 
-  // TODO: just request three years, skip future year when startYear == THIS_YEAR
   const [startYear, endYear] = [season - 1, season + 1];
-
   const { data, error, isLoading } = useSWR(
     `/api/flights?start=${startYear}&end=${endYear}`,
     fetcher
   );
 
+  // TODO: pick up launch site from config
+  const flights =
+    !isLoading && !error
+      ? data.flights.filter((f) => f.task.launchSite === "Gransden Lodge")
+      : undefined;
+
   return {
-    data,
     error,
+    flights,
     isLoading,
     season,
   };

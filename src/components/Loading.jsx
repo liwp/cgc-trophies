@@ -1,5 +1,12 @@
+import { Spinner } from "@chakra-ui/react";
+
 function Loading() {
-  return <div>Loading flight data...</div>;
+  return (
+    <div>
+      <Spinner size="xl" />
+      <div>Loading flight data...</div>
+    </div>
+  );
 }
 
 export default Loading;

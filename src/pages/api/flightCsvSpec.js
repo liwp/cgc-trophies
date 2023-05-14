@@ -70,6 +70,12 @@ const LADDERS_SPEC = {
 
 const TASK_SPEC = {
   src: {
+    // TODO: not sure what this means. We include only 'C' in stats
+    // calculations.
+    claimType: {
+      src: "Claim Type",
+      type: "string",
+    },
     isCompleted: {
       src: "Completed?",
       type: "boolean",

@@ -2,12 +2,12 @@ import { keyBy, sample, uniqBy } from "lodash";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-import CGC_TROPHIES from "../lib/cgc_trophies";
-import FlightLoadFailure from "../components/FlightLoadFailure";
-import Loading from "../components/Loading";
-import UnknownTrophy from "../components/UnknownTrophy";
-import { trophyEval } from "../lib/eval";
-import useFlights from "../lib/useFlights";
+import CGC_TROPHIES from "../../lib/cgc_trophies";
+import FlightLoadFailure from "../../components/FlightLoadFailure";
+import Loading from "../../components/Loading";
+import UnknownTrophy from "../../components/UnknownTrophy";
+import { trophyEval } from "../../lib/eval";
+import useFlights from "../../lib/useFlights";
 
 const CONFIG = CGC_TROPHIES.config;
 const TROPHIES = keyBy(CGC_TROPHIES.trophies, "id");
@@ -65,7 +65,7 @@ const TrophyImage = ({ image }) => {
 
 const TrophyPage = () => {
   const router = useRouter();
-  let trophyId = router.query.trophy || CONFIG.default;
+  const trophyId = router.query.trophyId;
   const { error, flights, isLoading, season } = useFlights();
 
   if (error) return <FlightLoadFailure />;
