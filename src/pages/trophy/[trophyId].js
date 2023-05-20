@@ -98,33 +98,53 @@ const Result = ({ result }) => {
 };
 
 const ResultsList = ({ results, season, trophy }) => {
-  // TODO: don't render Task for fixed task trophies? I think it's ok to render
-  // this, eg the pilot could've flown the task the opposite way round.
+  const [unique, setUnique] = useState(true);
+
+  results = unique ? uniqBy(results, "pilot") : results;
+
+  if (results.length === 0) {
+    return (
+      <Center>
+        <Heading size="sm">No qualifying flights</Heading>
+      </Center>
+    );
+  }
 
   return (
-    <TableContainer>
-      <Table size="md" variant="striped">
-        <TableCaption>
-          {trophy} {season} Results
-        </TableCaption>
-        <Thead>
-          <Tr>
-            <Th>Pilot</Th>
-            <Th>Date</Th>
-            <Th>Score</Th>
-            <Th>Task</Th>
-            <Th>
-              <Center>Ladder</Center>
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {results.map((result) => (
-            <Result key={result.id} result={result} />
-          ))}
-        </Tbody>
-      </Table>
-    </TableContainer>
+    <Box>
+      <Box pb="20px">
+        <Toggle
+          id="unique"
+          isChecked={unique}
+          label="One flight per pilot?"
+          onChange={() => setUnique(!unique)}
+        />
+      </Box>
+
+      <TableContainer>
+        <Table size="md" variant="striped">
+          <TableCaption>
+            {trophy} {season} Results
+          </TableCaption>
+          <Thead>
+            <Tr>
+              <Th>Pilot</Th>
+              <Th>Date</Th>
+              <Th>Score</Th>
+              <Th>Task</Th>
+              <Th>
+                <Center>Ladder</Center>
+              </Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {results.map((result) => (
+              <Result key={result.id} result={result} />
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };
 
@@ -155,10 +175,10 @@ const AllTrophies = ({ season }) => {
   );
 };
 
+// TODO: split into i) Layout (without loading errors etc) and ii) trophy table
 const TrophyPage = () => {
   const router = useRouter();
   const trophyId = router.query.trophyId;
-  const [unique, setUnique] = useState(true);
   const { error, flights, isLoading, season } = useFlights();
 
   if (error) return <FlightLoadFailure />;
@@ -167,24 +187,18 @@ const TrophyPage = () => {
   const config = TROPHIES[trophyId];
   if (!config) return <UnknownTrophy trophyId={trophyId} />;
 
-  let resultsChain = chain(trophyEval(CONFIG, season, flights, config)).filter(
-    ({ ignore }) => !ignore
-  );
-  if (unique) {
-    resultsChain = resultsChain.uniqBy("pilot");
-  }
-  const results = resultsChain.value();
+  let results = trophyEval(CONFIG, season, flights, config);
 
-  // TODO: do we want uniqBy(results, 'pilot').map(...) here? OTOH multiple
-  // results is annoying, but sometimes the first flight might be disqualified,
-  // so we'd want to see the others too...
-
+  // TODO: shouldn't really be a Card...
   return (
     <Card variant="outline">
       <AllTrophies season={season} />
 
-      <CardHeader>
-        <Heading size="md">{config.name}</Heading>
+      <CardHeader display="flex" alignItems="center">
+        <Heading size="md" flex="1">
+          {config.name}
+        </Heading>
+        <Season season={season} />
       </CardHeader>
 
       <CardBody>
@@ -196,38 +210,10 @@ const TrophyPage = () => {
             </Text>
           </Box>
 
-          <Box>
-            <Box pb="20px">
-              <Toggle
-                id="unique"
-                isChecked={unique}
-                label="One flight per pilot?"
-                onChange={() => setUnique(!unique)}
-              />
-            </Box>
-
-            <ResultsList
-              results={results}
-              season={season}
-              trophy={config.name}
-            />
-          </Box>
+          <ResultsList results={results} season={season} trophy={config.name} />
         </Stack>
       </CardBody>
     </Card>
-
-    // <VStack>
-    //   <Season season={season} />
-    //   <Heading size="xl">{config.name}</Heading>
-    //   <TrophyImage image={sample(config.img)} />
-    //   <Card>
-    //     <CardBody>
-    //       <Text>{config.description}</Text>
-    //     </CardBody>
-    //   </Card>
-    //   <Heading size="lg">Results</Heading>
-    //   <ResultsList results={results} season={season} trophy={config.name} />
-    // </VStack>
   );
 };
 

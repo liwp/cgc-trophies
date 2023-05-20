@@ -23,7 +23,7 @@ const IS_DECLARED = ["filter", "task.isDeclared"];
 const TROPHIES = {
   config: {
     default: "5",
-    ignore: {},
+    exclude: {},
     season: {
       start: {
         month: 1,
@@ -74,7 +74,16 @@ const TROPHIES = {
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
       ],
-      ignore: { 99094: "500km - Robert Welford", 101828: "500km - David Tew" },
+      exclude: {
+        70424: "500km - Wendy Head (2018)",
+        70456: "500km - David Tew (2018)",
+        78319: "500km - Stephen Gibson (2019)",
+        80474: "500km - Stephen Gibson (2019)",
+        87519: "500km - Robert Theil (2020)",
+        90002: "500km - Phil Jeffery (2021)",
+        99094: "500km - Robert Welford (2022)",
+        101828: "500km - David Tew (2022)",
+      },
     },
     {
       id: "4",
@@ -92,10 +101,15 @@ const TROPHIES = {
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
       ],
-      ignore: {
-        101013: "300km - Jem Davies",
-        101070: "300km - Jem Davies",
-        102116: "300km - Paul Bonhomme",
+      exclude: {
+        78303: "300km - Oliver Bosanko (2019)",
+        78871: "300km - Robert Theil (2019)",
+        89774: "300km - Robert Theil (2021)",
+        89804: "300km - Mike Smith (2021)",
+        94246: "300km - Peter Belcher (2021)",
+        101013: "300km - Jem Davies (2022)",
+        101070: "300km - Jem Davies (2022)",
+        102116: "300km - Paul Bonhomme (2022)",
       },
     },
     {
@@ -156,8 +170,8 @@ const TROPHIES = {
           day: 31,
         },
       },
-      ignore: {
-        105786: "whoops",
+      exclude: {
+        105786: "whoops (2022)",
       },
     },
     {
@@ -176,6 +190,9 @@ const TROPHIES = {
         ["score", "task.handicappedDistanceKm", "km"],
         ["sort", "score.value", "desc"],
       ],
+      include: {
+        78692: "Navigational TP - Malte Grosche (2019)",
+      },
     },
     {
       id: "9",
@@ -190,6 +207,7 @@ const TROPHIES = {
         ["score", "task.handicappedDistanceKm", "km"],
         ["sort", "score.value", "desc"],
       ],
+      include: { 85196: "Navigational TP - Malte Grosche (2020)" },
     },
     {
       id: "10",
@@ -225,6 +243,10 @@ const TROPHIES = {
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
       ],
+      exclude: {
+        86545: "300km - Oliver Bosanko",
+        86543: "300km - Oliver Bosanko",
+      },
     },
   ],
 };

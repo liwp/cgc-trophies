@@ -10,7 +10,7 @@ function configToDate(season, { day, month }) {
   return new Date(`${season}-${month}-${day}`);
 }
 
-function inSeasonPredicate(season, config, name) {
+function inSeasonPredicate(season, config) {
   let start = configToDate(season, config.start);
   let end = configToDate(season, config.end);
 
@@ -24,21 +24,35 @@ function inSeasonPredicate(season, config, name) {
   };
 }
 
+/**
+ * deafultConfig: {season: ..., exclude: ...}
+ * trophy: {season: ..., exclude: ..., include: ...}
+ *
+ * where
+ * season: {start: {month: ..., day: ...}, end: {month: ..., day: ...}}
+ * exclude: {<id>: "<reason>"} (a set of ignored flights)
+ * include: {<id>: "<reason>"} (a set of included flights)
+ *
+ * Some flights are either ignored, eg airspace issues or pilot doesn't qualify
+ * for the trophy, and others are included, eg the use of an extra navigational
+ * TP
+ */
 export function trophyEval(defaultConfig, season, flights, trophy) {
   const inSeason = inSeasonPredicate(
     season,
-    trophy.season || defaultConfig.season,
-    trophy.name
+    trophy.season || defaultConfig.season
   );
 
-  const ignoredIds = { ...defaultConfig.ignore, ...trophy.ignore };
+  const excludedIds = { ...defaultConfig.exclude, ...trophy.exclude };
+  const includedIds = trophy.include || {};
 
   // eslint-disable-next-line no-param-reassign
   flights = chain(flights)
     .filter(inSeason)
     .map((flight) => ({
       ...flight,
-      ignore: ignoredIds[flight.id],
+      exclude: excludedIds[flight.id],
+      include: includedIds[flight.id],
     }));
 
   trophy.expr.forEach(([op, ...args]) => {
@@ -52,7 +66,16 @@ export function trophyEval(defaultConfig, season, flights, trophy) {
           );
         }
         // eslint-disable-next-line no-param-reassign
-        flights = flights.filter((flight) => pred(get(flight, field), value));
+        flights = flights.filter((flight) => {
+          if (!!flight.exclude) {
+            console.log(`flight excluded - ${flight.id}: ${flight.exclude}`);
+            return false;
+          } else if (!!flight.include) {
+            return true;
+          } else {
+            return pred(get(flight, field), value);
+          }
+        });
         break;
       }
       // TODO: we can replace `score` with a project which:
@@ -88,5 +111,12 @@ export function trophyEval(defaultConfig, season, flights, trophy) {
     }
   });
 
-  return flights.value();
+  return flights
+    .map((flight) => {
+      if (!!flight.include) {
+        console.log(`flight included - ${flight.id}: ${flight.include}`);
+      }
+      return flight;
+    })
+    .value();
 }
