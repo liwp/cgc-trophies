@@ -184,7 +184,7 @@ c1,c2,c1
       };
 
       expect(() => csv.parseCsv(spec, data)).toThrow(
-        `'src' not specified in spec: {"type":"boolean"}`
+        `'src' not specified in spec: {"type":"boolean"}`,
       );
     });
 
@@ -194,7 +194,7 @@ c1,c2,c1
       };
 
       expect(() => csv.parseCsv(spec, data)).toThrow(
-        'Unknown type in spec: {"src":"b_col"}'
+        'Unknown type in spec: {"src":"b_col"}',
       );
     });
   });
@@ -240,7 +240,7 @@ c1,c2,c1
       ].forEach((str) => {
         it(`should throw when date is of invalid format (${str})`, () => {
           expect(() => csv.parseDate(str)).toThrow(
-            `Invalid date format: ${str}`
+            `Invalid date format: ${str}`,
           );
         });
       });
@@ -261,7 +261,7 @@ c1,c2,c1
     ["true", "foobar", "01/02/2017"].forEach((str) => {
       it(`should throw when number if of invalid format (${str})`, () => {
         expect(() => csv.parseNumber(str)).toThrow(
-          `Invalid number format: ${str}`
+          `Invalid number format: ${str}`,
         );
       });
     });

@@ -32,7 +32,7 @@ const Stats = ({ flights, season }) => {
   const end = new Date(`${season}-12-31`);
 
   const flightsInYear = flights.filter(
-    ({ date }) => start <= date && date <= end
+    ({ date }) => start <= date && date <= end,
   );
 
   const stats = calculateStats(flightsInYear);

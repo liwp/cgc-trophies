@@ -40,7 +40,7 @@ function inSeasonPredicate(season, config) {
 export function trophyEval(defaultConfig, season, flights, trophy) {
   const inSeason = inSeasonPredicate(
     season,
-    trophy.season || defaultConfig.season
+    trophy.season || defaultConfig.season,
   );
 
   const excludedIds = { ...defaultConfig.exclude, ...trophy.exclude };
@@ -62,7 +62,7 @@ export function trophyEval(defaultConfig, season, flights, trophy) {
         const pred = comparators[comparator];
         if (!pred) {
           throw new Error(
-            `Unknown filter predicate: ${comparator} in ${op} ${args}`
+            `Unknown filter predicate: ${comparator} in ${op} ${args}`,
           );
         }
         // eslint-disable-next-line no-param-reassign
@@ -89,7 +89,7 @@ export function trophyEval(defaultConfig, season, flights, trophy) {
           : (f) => fieldsOfProjection.map((key) => get(f, key));
         // eslint-disable-next-line no-param-reassign
         flights = flights.map((f) =>
-          Object.assign({}, f, { [field]: projection(f) })
+          Object.assign({}, f, { [field]: projection(f) }),
         );
         break;
       }
@@ -97,7 +97,7 @@ export function trophyEval(defaultConfig, season, flights, trophy) {
         const [field, unit] = args;
         // eslint-disable-next-line no-param-reassign
         flights = flights.map((f) =>
-          Object.assign({}, f, { score: { value: get(f, field), unit } })
+          Object.assign({}, f, { score: { value: get(f, field), unit } }),
         );
       }
       case "sort": {

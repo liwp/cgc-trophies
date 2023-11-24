@@ -11,7 +11,7 @@ function tpDistance(tp1, tp2) {
       {
         type: "Point",
         coordinates: [tp2.lon, tp2.lat],
-      }
+      },
     ) / 1000
   );
 }
@@ -76,7 +76,7 @@ function updateAttemptedDistance(stats, { task: { tps, scoringDistanceKm } }) {
   } else {
     attemptedKm += zipWith(dropRight(tps, 1), drop(tps, 1), tpDistance).reduce(
       (sum, x) => sum + x,
-      0
+      0,
     );
   }
 

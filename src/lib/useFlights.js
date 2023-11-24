@@ -43,7 +43,7 @@ function useFlights() {
   const [startYear, endYear] = [season - 1, season + 1];
   const { data, error, isLoading } = useSWR(
     `/api/flights?start=${startYear}&end=${endYear}`,
-    fetcher
+    fetcher,
   );
 
   // TODO: pick up launch site from config
