@@ -7,7 +7,7 @@ function parseFlights(csv) {
   return parseCsv(SPEC, csv);
 }
 
-const URL = `https://www.bgaladder.net/Steward/GetLogFilesCSV`;
+const URL = `https://api.bgaladder.net/api/getlogfilescsv`;
 
 // TODO: pull from env var, or something?
 const CLUB = "CAM";
@@ -26,12 +26,8 @@ async function getFlights(req, res) {
     .fill()
     .map((_, i) => start + i);
 
-  console.log("REQ", years);
-
   const responses = years.map((year) => {
-    const params = { clubID: CLUB, Season: year };
-    console.log("GET", URL, params);
-    return axios.get(URL, { params });
+    return axios.get(`${URL}/${year}/${CLUB}`);
   });
 
   const flights = (await Promise.all(responses))
