@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-function UnknownTrophy({ trophyId }) {
+function UnknownTrophy({ trophyId }: { trophyId: string }) {
   return (
     <div>
       <div>

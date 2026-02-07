@@ -3,3 +3,4 @@
 /coverage/
 *.~undo-tree~
 .DS_Store
+*.tsbuildinfo

@@ -1,4 +1,6 @@
-const csv = require("../../../../src/pages/api/csv.js");
+import { parseCsv, parseBoolean, parseDate, parseNumber } from "../../../../src/pages/api/csv";
+
+const csv = { parseCsv, parseBoolean, parseDate, parseNumber };
 
 const data = `
 b_col,d_col,n_col,s_col

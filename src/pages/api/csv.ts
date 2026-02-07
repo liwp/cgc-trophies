@@ -1,5 +1,5 @@
-const Papa = require("papaparse");
-const { identity, zipObject } = require("lodash");
+import Papa from "papaparse";
+import { identity, zipObject } from "lodash";
 
 const MONTHS = [
   "Jan",
@@ -16,18 +16,18 @@ const MONTHS = [
   "Dec",
 ];
 
-function parseBoolean(val) {
+function parseBoolean(val: string): boolean {
   return val.toLowerCase() === "true" || val === "1";
 }
 
-function parseDate(val) {
+function parseDate(val: string): Date {
   const match = val.match(/^(\d{2})-(...)-(\d{4})$/);
   if (!match) {
     throw new Error(`Invalid date format: ${val}`);
   }
 
   const [day, monthName, year] = match.slice(1);
-  if (day > 31) {
+  if (parseInt(day) > 31) {
     throw new Error(`Invalid date format: ${val}`);
   }
   const month = MONTHS.indexOf(monthName);
@@ -35,10 +35,10 @@ function parseDate(val) {
     throw new Error(`Invalid date format: ${val}`);
   }
 
-  return new Date(Date.UTC(year, month, day));
+  return new Date(Date.UTC(parseInt(year), month, parseInt(day)));
 }
 
-function parseNumber(val) {
+function parseNumber(val: string): number {
   if (val === "") {
     return 0;
   }
@@ -48,21 +48,21 @@ function parseNumber(val) {
   return parseFloat(val);
 }
 
-function parseCsv(spec, csv) {
-  const [headers, ...data] = Papa.parse(csv.trim()).data;
+function parseCsv(spec: any, csv: string): any[] {
+  const [headers, ...data] = Papa.parse(csv.trim()).data as string[][];
   return data.map((row) => {
     const obj = zipObject(headers, row);
     return parseSpec(spec, obj);
   });
 }
 
-function parseSpec(spec, obj) {
+function parseSpec(spec: any, obj: Record<string, string>): any {
   const { src, type, xform = identity } = spec;
   if (src === undefined) {
     throw Error(`'src' not specified in spec: ${JSON.stringify(spec)}`);
   }
 
-  let val;
+  let val: any;
   switch (type) {
     case "boolean":
       val = parseBoolean(obj[src]);
@@ -74,28 +74,22 @@ function parseSpec(spec, obj) {
       val = parseNumber(obj[src]);
       break;
     case "object":
-      val = Object.entries(src).reduce((acc, [key, subspec]) => {
+      val = Object.entries(src).reduce((acc: Record<string, any>, [key, subspec]) => {
         acc[key] = parseSpec(subspec, obj);
         return acc;
       }, {});
       break;
     case "array":
-      val = src.map((s) => parseSpec(s, obj));
+      val = (src as any[]).map((s) => parseSpec(s, obj));
       break;
     case "string":
       val = obj[src];
       break;
     default:
       throw new Error(`Unknown type in spec: ${JSON.stringify(spec)}`);
-      break;
   }
 
   return xform(val);
 }
 
-module.exports = {
-  parseCsv,
-  parseBoolean,
-  parseDate,
-  parseNumber,
-};
+export { parseCsv, parseBoolean, parseDate, parseNumber };

@@ -1,7 +1,11 @@
-const { drop, dropRight, zipWith } = require("lodash");
-const wgs84util = require("wgs84-util");
+import { drop, dropRight, zipWith } from "lodash";
+import wgs84util from "wgs84-util";
+import type { Flight } from "../types";
 
-function tpDistance(tp1, tp2) {
+function tpDistance(
+  tp1: { lon: number; lat: number },
+  tp2: { lon: number; lat: number },
+): number {
   return (
     wgs84util.distanceBetween(
       {
@@ -16,39 +20,43 @@ function tpDistance(tp1, tp2) {
   );
 }
 
+interface CategoryStat {
+  completed: number;
+  total: number;
+  percentage: number;
+}
+
 const categories = [
   {
     key: "open",
-    // TODO: should we check the flight?
     pred: () => true,
   },
   {
     key: "weekend",
-    // TODO: I think it's flight.ladders.weekendLadder...
-    pred: (flight) => flight.weekendLadder,
+    pred: (flight: any) => flight.weekendLadder,
   },
   {
     key: "300km",
-    pred: ({ task: { scoringDistanceKm } }) =>
+    pred: ({ task: { scoringDistanceKm } }: Flight) =>
       300 <= scoringDistanceKm && scoringDistanceKm < 400,
   },
   {
     key: "400km",
-    pred: ({ task: { scoringDistanceKm } }) =>
+    pred: ({ task: { scoringDistanceKm } }: Flight) =>
       400 <= scoringDistanceKm && scoringDistanceKm < 500,
   },
   {
     key: "500km",
-    pred: ({ task: { scoringDistanceKm } }) =>
+    pred: ({ task: { scoringDistanceKm } }: Flight) =>
       500 <= scoringDistanceKm && scoringDistanceKm < 750,
   },
   {
     key: "750km",
-    pred: ({ task: { scoringDistanceKm } }) => 750 <= scoringDistanceKm,
+    pred: ({ task: { scoringDistanceKm } }: Flight) => 750 <= scoringDistanceKm,
   },
 ];
 
-function updateCategory(stats, flight) {
+function updateCategory(stats: CategoryStat | undefined, flight: Flight): CategoryStat {
   const { isCompleted = false, isDeclared = false } = flight.task || {};
   let { completed, total } = stats || { total: 0, completed: 0, percentage: 0 };
 
@@ -57,25 +65,25 @@ function updateCategory(stats, flight) {
   }
   total += 1;
 
-  return Object.assign({}, stats, {
+  return {
+    ...stats,
     completed,
     total,
     percentage: (100 * completed) / total,
-  });
+  };
 }
 
-function updateAttemptedDistance(stats, { task: { tps, scoringDistanceKm } }) {
+function updateAttemptedDistance(
+  stats: { attemptedKm: number },
+  { task: { tps, scoringDistanceKm } }: any,
+) {
   let { attemptedKm } = stats;
 
-  if (!tps || tps.some(({ id }) => id[0] === "*")) {
-    // If there are any user-defined TPs (ie starts with *) use the scoring
-    // distance as the attempted distance.
-    // TODO: we could work out the projection to the last leg for the
-    // abandonment point
+  if (!tps || tps.some(({ id }: { id: string }) => id[0] === "*")) {
     attemptedKm += scoringDistanceKm;
   } else {
     attemptedKm += zipWith(dropRight(tps, 1), drop(tps, 1), tpDistance).reduce(
-      (sum, x) => sum + x,
+      (sum: number, x: number) => sum + x,
       0,
     );
   }
@@ -86,14 +94,14 @@ function updateAttemptedDistance(stats, { task: { tps, scoringDistanceKm } }) {
   };
 }
 
-function updateStats(prevStats, flight) {
+function updateStats(prevStats: Record<string, CategoryStat>, flight: Flight) {
   if (flight.task.claimType !== "C") {
     return prevStats;
   }
 
-  const nextStats = Object.assign({}, prevStats);
+  const nextStats = { ...prevStats };
   categories
-    .filter(({ pred }) => pred(flight))
+    .filter(({ pred }) => pred(flight as any))
     .forEach(({ key }) => {
       nextStats[key] = updateCategory(nextStats[key], flight);
     });
@@ -101,14 +109,8 @@ function updateStats(prevStats, flight) {
   return nextStats;
 }
 
-function calculateStats(flights) {
+function calculateStats(flights: Flight[]) {
   return flights.reduce(updateStats, {});
 }
 
-module.exports = {
-  calculateStats,
-  categories,
-  updateAttemptedDistance,
-  updateCategory,
-  updateStats,
-};
+export { calculateStats, categories, updateAttemptedDistance, updateCategory, updateStats };

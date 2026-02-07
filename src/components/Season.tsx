@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 // proper season that the ladder has data for.
 const firstYear = 2007;
 
-const Season = ({ season }) => {
+const Season = ({ season }: { season: number }) => {
   const router = useRouter();
   const currentYear = new Date().getFullYear();
 

@@ -1,4 +1,4 @@
-const { capitalize } = require("lodash");
+import { capitalize } from "lodash";
 
 const GLIDER_SPEC = {
   src: {
@@ -63,7 +63,7 @@ const LADDERS_SPEC = {
     },
   },
   type: "object",
-  xform: (ladders) => {
+  xform: (ladders: Record<string, boolean>) => {
     return Object.entries(ladders)
       .filter(([_, v]) => v)
       .map(([k]) => k);
@@ -72,8 +72,6 @@ const LADDERS_SPEC = {
 
 const TASK_SPEC = {
   src: {
-    // TODO: not sure what this means. We include only 'C' in stats
-    // calculations.
     claimType: {
       src: "Claim Type",
       type: "string",
@@ -134,7 +132,7 @@ const TASK_SPEC = {
         },
       ],
       type: "array",
-      xform: (tps) => tps.filter((tp) => tp.trim() !== ""),
+      xform: (tps: string[]) => tps.filter((tp) => tp.trim() !== ""),
     },
   },
   type: "object",
@@ -162,7 +160,8 @@ const SPEC = {
         },
       },
       type: "object",
-      xform: ({ first, last }) => `${capitalize(last)}, ${capitalize(first)}`,
+      xform: ({ first, last }: { first: string; last: string }) =>
+        `${capitalize(last)}, ${capitalize(first)}`,
     },
     glider: GLIDER_SPEC,
     ladders: LADDERS_SPEC,
@@ -171,9 +170,4 @@ const SPEC = {
   type: "object",
 };
 
-module.exports = {
-  GLIDER_SPEC,
-  LADDERS_SPEC,
-  SPEC,
-  TASK_SPEC,
-};
+export { GLIDER_SPEC, LADDERS_SPEC, SPEC, TASK_SPEC };

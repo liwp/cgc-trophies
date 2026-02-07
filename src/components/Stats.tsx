@@ -10,8 +10,17 @@ import {
 } from "@chakra-ui/react";
 
 import { calculateStats } from "../lib/stats";
+import type { Flight } from "../types";
 
-const FlightCategory = ({ completed, label, total }) => {
+const FlightCategory = ({
+  completed,
+  label,
+  total,
+}: {
+  completed?: number;
+  label: string;
+  total?: number;
+}) => {
   return (
     <Center>
       <Stat>
@@ -27,7 +36,7 @@ const FlightCategory = ({ completed, label, total }) => {
   );
 };
 
-const Stats = ({ flights, season }) => {
+const Stats = ({ flights, season }: { flights: Flight[]; season: number }) => {
   const start = new Date(`${season}-01-01`);
   const end = new Date(`${season}-12-31`);
 

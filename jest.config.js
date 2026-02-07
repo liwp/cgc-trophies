@@ -1,6 +1,6 @@
 module.exports = {
   collectCoverageFrom: [
-    "**/*.{js,jsx}",
+    "**/*.{js,jsx,ts,tsx}",
     "!**/node_modules/**",
     "!**/test/**",
     "!**/coverage/**",
@@ -18,10 +18,10 @@ module.exports = {
     "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js",
     "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/__mocks__/fileMock.js",
   },
-  setupFiles: ["<rootDir>/test/setup.js"],
+  setupFiles: ["<rootDir>/test/setup.ts"],
   testMatch: ["**/?(*.)+(spec|test).[jt]s?(x)"],
   testPathIgnorePatterns: ["/.next/", "/node_modules/", "/coverage/"],
   transform: {
-    "^.+\\.jsx?$": "babel-jest",
+    "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
   },
 };

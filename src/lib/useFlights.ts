@@ -1,39 +1,42 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import useSWR from "swr";
+import type { Flight } from "../types";
 
 const THIS_YEAR = new Date().getFullYear();
 
-function fetcher(url) {
+function fetcher(url: string) {
   return fetch(url)
     .then((res) => res.json())
     .then((data) => ({
       ...data,
-      flights: data.flights.map((flight) => ({
+      flights: data.flights.map((flight: any) => ({
         ...flight,
-        // Convert flight date to a JS Date object
         date: new Date(flight.date),
       })),
     }));
 }
 
-function currentSeason() {
+function currentSeason(): number {
   const now = new Date();
-  // 1st March
   const startOfSeason = new Date(now.getFullYear(), 2, 1);
-  // If `now` is before 1st March, default to the previous year as `season`, eg 2022 instead of 2023
   return startOfSeason < now ? now.getFullYear() : now.getFullYear() - 1;
 }
 
-function useFlights() {
+function useFlights(): {
+  error: any;
+  flights: Flight[] | undefined;
+  isLoading: boolean;
+  season: number;
+} {
   const router = useRouter();
-  let season = parseInt(router.query.season);
+  let season = parseInt(router.query.season as string);
   if (isNaN(season)) {
     season = currentSeason();
   }
 
   useEffect(() => {
-    if (router.isReady && isNaN(parseInt(router.query.season))) {
+    if (router.isReady && isNaN(parseInt(router.query.season as string))) {
       router.replace({
         query: { ...router.query, season },
       });
@@ -46,10 +49,9 @@ function useFlights() {
     fetcher,
   );
 
-  // TODO: pick up launch site from config
   const flights =
     !isLoading && !error
-      ? data.flights.filter((f) => f.task.launchSite === "Gransden Lodge")
+      ? data.flights.filter((f: Flight) => f.task.launchSite === "Gransden Lodge")
       : undefined;
 
   return {
