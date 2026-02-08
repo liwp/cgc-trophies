@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { chain } from "lodash";
 import Link from "next/link";
 import {
   Heading,
+  IconButton,
   Table,
   TableCaption,
   TableContainer,
@@ -10,10 +11,11 @@ import {
   Td,
   Th,
   Thead,
+  Tooltip,
   Tr,
   VStack,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { CheckIcon, CopyIcon } from "@chakra-ui/icons";
 
 import TROPHIES from "../lib/cgc_trophies";
 import FlightLoadFailure from "../components/FlightLoadFailure";
@@ -22,15 +24,37 @@ import Season from "../components/Season";
 import Stats from "../components/Stats";
 import WinnerDetails from "../components/WinnerDetails";
 import { trophyEval, ladderEval } from "../lib/eval";
-import { flightCopyData, flightFlightDetails, formatPilotName, ladderCopyData, ladderFlightDetails } from "../lib/trophyCopyData";
+import { copyDataToClipboard, flightCopyData, flightFlightDetails, formatPilotName, ladderCopyData, ladderFlightDetails } from "../lib/trophyCopyData";
 import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
 import useFlights from "../lib/useFlights";
 import type { Flight, FlightTrophy, LadderTrophy, ScoredFlight, LadderResult } from "../types";
 
+const CopyButton = ({ data }: { data: [string, string][] }) => {
+  const [copied, setCopied] = React.useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    copyDataToClipboard(data).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <Tooltip label={copied ? "Copied!" : "Copy for spreadsheet"} closeOnClick={false}>
+      <IconButton
+        aria-label="Copy to clipboard"
+        icon={copied ? <CheckIcon /> : <CopyIcon />}
+        size="xs"
+        variant="ghost"
+        colorScheme={copied ? "green" : "gray"}
+        onClick={handleCopy}
+      />
+    </Tooltip>
+  );
+};
+
 const TrophyWinner = ({ trophy }: { trophy: any }) => {
   const { id, name, results, season, type, groupBy } = trophy;
   const result = results[0];
-  const [expanded, setExpanded] = useState(false);
 
   let winner: string;
   let copyData: [string, string][] | null = null;
@@ -54,22 +78,19 @@ const TrophyWinner = ({ trophy }: { trophy: any }) => {
 
   return (
     <>
-      <Tr
-        cursor={copyData ? "pointer" : undefined}
-        onClick={copyData ? () => setExpanded(!expanded) : undefined}
-      >
+      <Tr>
         <Td>
           <Link href={`/trophy/${id}?season=${season}`}>{name}</Link>
         </Td>
         <Td>{winner}</Td>
         <Td width="24px" px={1}>
-          {copyData && (expanded ? <ChevronUpIcon /> : <ChevronDownIcon />)}
+          {copyData && <CopyButton data={copyData} />}
         </Td>
       </Tr>
-      {expanded && copyData && (
+      {copyData && (
         <Tr>
           <Td colSpan={3} p={0}>
-            <WinnerDetails data={copyData} flights={flights} flightDetail={flightDetail} />
+            <WinnerDetails flights={flights} flightDetail={flightDetail} />
           </Td>
         </Tr>
       )}

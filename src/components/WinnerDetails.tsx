@@ -2,9 +2,7 @@ import React from "react";
 import {
   Box,
   HStack,
-  IconButton,
   Link,
-  SimpleGrid,
   Table,
   Tbody,
   Td,
@@ -14,8 +12,7 @@ import {
   Tooltip,
   Tr,
 } from "@chakra-ui/react";
-import { CheckIcon, CopyIcon, ExternalLinkIcon, ViewIcon } from "@chakra-ui/icons";
-import { copyDataToClipboard } from "../lib/trophyCopyData";
+import { ExternalLinkIcon, ViewIcon } from "@chakra-ui/icons";
 import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
 
 const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
@@ -103,63 +100,19 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
 };
 
 const WinnerDetails = ({
-  data,
   flights,
   flightDetail,
 }: {
-  data: [string, string][];
   flights?: FlightDetail[];
   flightDetail?: SingleFlightDetail;
-}) => {
-  const [copied, setCopied] = React.useState(false);
-
-  const handleCopy = () => {
-    copyDataToClipboard(data).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
-  return (
-    <Box pl={4} pr={4} pb={3} pt={1}>
-      <HStack align="start" spacing={4}>
-        <Box flex={1}>
-          {flights ? (
-            <FlightTable flights={flights} />
-          ) : flightDetail ? (
-            <FlightSummary flight={flightDetail} />
-          ) : (
-            <SimpleGrid columns={2} spacing={1}>
-              {data.map(([label, value]) => (
-                <React.Fragment key={label}>
-                  <Text fontSize="xs" color="gray.500">
-                    {label}
-                  </Text>
-                  <Text fontSize="xs">
-                    {value.startsWith("https://") ? (
-                      <Link href={value} isExternal onClick={(e) => e.stopPropagation()}>
-                        {value}
-                      </Link>
-                    ) : value}
-                  </Text>
-                </React.Fragment>
-              ))}
-            </SimpleGrid>
-          )}
-        </Box>
-        <Tooltip label={copied ? "Copied!" : "Copy for spreadsheet"} closeOnClick={false}>
-          <IconButton
-            aria-label="Copy to clipboard"
-            icon={copied ? <CheckIcon /> : <CopyIcon />}
-            size="sm"
-            variant="ghost"
-            colorScheme={copied ? "green" : "gray"}
-            onClick={handleCopy}
-          />
-        </Tooltip>
-      </HStack>
-    </Box>
-  );
-};
+}) => (
+  <Box pl={4} pr={4} pb={3} pt={1}>
+    {flights ? (
+      <FlightTable flights={flights} />
+    ) : flightDetail ? (
+      <FlightSummary flight={flightDetail} />
+    ) : null}
+  </Box>
+);
 
 export default WinnerDetails;
