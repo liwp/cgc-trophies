@@ -7,8 +7,6 @@ import {
   Tbody,
   Td,
   Text,
-  Th,
-  Thead,
   Tooltip,
   Tr,
 } from "@chakra-ui/react";
@@ -17,33 +15,33 @@ import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
 
 const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
   <Table size="sm" variant="unstyled">
-    <Thead>
-      <Tr>
-        <Th px={1}>Pilot</Th>
-        <Th px={1}>Date</Th>
-        <Th px={1} isNumeric>Pts</Th>
-        <Th px={1} isNumeric>Dist</Th>
-        <Th px={1} isNumeric>Speed (HC)</Th>
-        <Th px={1}>Task</Th>
-        <Th px={1}></Th>
-      </Tr>
-    </Thead>
     <Tbody>
       {flights.map((f) => (
         <Tr key={f.ladderUrl}>
-          <Td px={1} fontSize="xs">{f.pilot}</Td>
           <Td px={1} fontSize="xs">{f.date.toLocaleDateString()}</Td>
-          <Td px={1} fontSize="xs" isNumeric>{f.points.toFixed(0)}</Td>
-          <Td px={1} fontSize="xs" isNumeric>{f.distanceKm.toFixed(0)} km</Td>
-          <Td px={1} fontSize="xs" isNumeric>{f.speedKph.toFixed(1)} kph</Td>
           <Td px={1} fontSize="xs">{f.task}</Td>
+          <Td px={1} fontSize="xs" isNumeric>
+            <Tooltip label="Scoring distance" fontSize="xs">
+              <Text as="span">{f.distanceKm.toFixed(0)} km</Text>
+            </Tooltip>
+          </Td>
+          <Td px={1} fontSize="xs" isNumeric>
+            <Tooltip label="Handicapped speed" fontSize="xs">
+              <Text as="span">{f.speedKph.toFixed(1)} kph</Text>
+            </Tooltip>
+          </Td>
+          <Td px={1} fontSize="xs" isNumeric>
+            <Tooltip label="Cross-country points" fontSize="xs">
+              <Text as="span">{f.points.toFixed(0)} pts</Text>
+            </Tooltip>
+          </Td>
           <Td px={1} fontSize="xs">
             <HStack spacing={1}>
               <Link href={f.ladderUrl} isExternal onClick={(e) => e.stopPropagation()}>
-                <ExternalLinkIcon />
+                <ExternalLinkIcon verticalAlign="middle" />
               </Link>
               <Link href={f.igcUrl} isExternal onClick={(e) => e.stopPropagation()}>
-                <ViewIcon />
+                <ViewIcon verticalAlign="middle" />
               </Link>
             </HStack>
           </Td>
