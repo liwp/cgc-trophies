@@ -1,10 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { chain } from "lodash";
 import Link from "next/link";
 import {
   Heading,
-  LinkBox,
-  LinkOverlay,
   Table,
   TableCaption,
   TableContainer,
@@ -15,21 +13,26 @@ import {
   Tr,
   VStack,
 } from "@chakra-ui/react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 
 import TROPHIES from "../lib/cgc_trophies";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
+import WinnerDetails from "../components/WinnerDetails";
 import { trophyEval, ladderEval } from "../lib/eval";
+import { flightCopyData, ladderCopyData } from "../lib/trophyCopyData";
 import useFlights from "../lib/useFlights";
-import type { Flight, Trophy, FlightTrophy, LadderTrophy, ScoredFlight, LadderResult } from "../types";
+import type { Flight, FlightTrophy, LadderTrophy, ScoredFlight, LadderResult } from "../types";
 
 const TrophyWinner = ({ trophy }: { trophy: any }) => {
   const { id, name, results, season, type, groupBy } = trophy;
   const result = results[0];
+  const [expanded, setExpanded] = useState(false);
 
   let winner: string;
+  let copyData: [string, string][] | null = null;
   if (!result) {
     winner = "No qualifying flights";
   } else if (type === "ladder") {
@@ -37,19 +40,35 @@ const TrophyWinner = ({ trophy }: { trophy: any }) => {
     winner = groupBy === "registration"
       ? `${lr.key} (${lr.pilots.join(", ")})`
       : lr.key;
+    copyData = ladderCopyData(lr, groupBy);
   } else {
-    winner = (result as ScoredFlight).pilot;
+    const sf = result as ScoredFlight;
+    winner = sf.pilot;
+    copyData = flightCopyData(sf);
   }
 
   return (
-    <LinkBox as={Tr}>
-      <Td>
-        <LinkOverlay as={Link} href={`/trophy/${id}?season=${season}`}>
-          {name}
-        </LinkOverlay>
-      </Td>
-      <Td>{winner}</Td>
-    </LinkBox>
+    <>
+      <Tr
+        cursor={copyData ? "pointer" : undefined}
+        onClick={copyData ? () => setExpanded(!expanded) : undefined}
+      >
+        <Td>
+          <Link href={`/trophy/${id}?season=${season}`}>{name}</Link>
+        </Td>
+        <Td>{winner}</Td>
+        <Td width="24px" px={1}>
+          {copyData && (expanded ? <ChevronUpIcon /> : <ChevronDownIcon />)}
+        </Td>
+      </Tr>
+      {expanded && copyData && (
+        <Tr>
+          <Td colSpan={3} p={0}>
+            <WinnerDetails data={copyData} />
+          </Td>
+        </Tr>
+      )}
+    </>
   );
 };
 
@@ -85,6 +104,7 @@ const TrophyList = ({ flights, season }: { flights: Flight[]; season: number }) 
           <Tr>
             <Th>Trophy</Th>
             <Th>Winner</Th>
+            <Th width="24px"></Th>
           </Tr>
         </Thead>
         <Tbody>
