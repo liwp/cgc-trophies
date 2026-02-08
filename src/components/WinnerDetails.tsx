@@ -62,24 +62,24 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
   const isSpeedScore = score.unit === "kph";
   const isPtsScore = score.unit === "pts";
 
+  const distanceKm = isDistanceScore ? flight.handicappedDistanceKm : flight.scoringDistanceKm;
+  const distanceLabel = isDistanceScore ? "Handicapped distance" : "Scoring distance";
+
   return (
     <HStack spacing={1} flexWrap="wrap" fontSize="xs">
       <Text>{flight.date.toLocaleDateString()}</Text>
       <Text color="gray.500">·</Text>
-      <Text>{flight.gliderType} ({flight.gliderReg})</Text>
-      <Text color="gray.500">·</Text>
-      <Tooltip label="Handicapped distance" fontSize="xs">
-        <Text fontWeight={isDistanceScore ? "bold" : "normal"}>
-          {flight.handicappedDistanceKm.toFixed(1)} km
-        </Text>
-      </Tooltip>
-      <Tooltip label="Scoring distance" fontSize="xs">
-        <Text color="gray.500">({flight.scoringDistanceKm.toFixed(1)} km)</Text>
-      </Tooltip>
+      <Text>{flight.task}</Text>
       <Text color="gray.500">·</Text>
       <Tooltip label="Handicapped speed" fontSize="xs">
         <Text fontWeight={isSpeedScore ? "bold" : "normal"}>
           {flight.handicappedSpeedKph.toFixed(1)} kph
+        </Text>
+      </Tooltip>
+      <Text color="gray.500">·</Text>
+      <Tooltip label={distanceLabel} fontSize="xs">
+        <Text fontWeight={isDistanceScore ? "bold" : "normal"}>
+          {distanceKm.toFixed(1)} km
         </Text>
       </Tooltip>
       <Text color="gray.500">·</Text>
@@ -89,7 +89,7 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
           <Text color="gray.500">·</Text>
         </>
       )}
-      <Text>{flight.task}</Text>
+      <Text>{flight.gliderType} ({flight.gliderReg})</Text>
       <HStack spacing={1}>
         <Link href={flight.ladderUrl} isExternal onClick={(e) => e.stopPropagation()}>
           <ExternalLinkIcon />
