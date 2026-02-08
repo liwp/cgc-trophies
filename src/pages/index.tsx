@@ -22,8 +22,8 @@ import Season from "../components/Season";
 import Stats from "../components/Stats";
 import WinnerDetails from "../components/WinnerDetails";
 import { trophyEval, ladderEval } from "../lib/eval";
-import { flightCopyData, formatPilotName, ladderCopyData, ladderFlightDetails } from "../lib/trophyCopyData";
-import type { FlightDetail } from "../lib/trophyCopyData";
+import { flightCopyData, flightFlightDetails, formatPilotName, ladderCopyData, ladderFlightDetails } from "../lib/trophyCopyData";
+import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
 import useFlights from "../lib/useFlights";
 import type { Flight, FlightTrophy, LadderTrophy, ScoredFlight, LadderResult } from "../types";
 
@@ -35,6 +35,7 @@ const TrophyWinner = ({ trophy }: { trophy: any }) => {
   let winner: string;
   let copyData: [string, string][] | null = null;
   let flights: FlightDetail[] | undefined;
+  let flightDetail: SingleFlightDetail | undefined;
   if (!result) {
     winner = "No qualifying flights";
   } else if (type === "ladder") {
@@ -48,6 +49,7 @@ const TrophyWinner = ({ trophy }: { trophy: any }) => {
     const sf = result as ScoredFlight;
     winner = formatPilotName(sf.pilot);
     copyData = flightCopyData(sf);
+    flightDetail = flightFlightDetails(sf);
   }
 
   return (
@@ -67,7 +69,7 @@ const TrophyWinner = ({ trophy }: { trophy: any }) => {
       {expanded && copyData && (
         <Tr>
           <Td colSpan={3} p={0}>
-            <WinnerDetails data={copyData} flights={flights} />
+            <WinnerDetails data={copyData} flights={flights} flightDetail={flightDetail} />
           </Td>
         </Tr>
       )}

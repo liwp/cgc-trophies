@@ -36,6 +36,35 @@ export function ladderFlightDetails(result: LadderResult): FlightDetail[] {
   });
 }
 
+export interface SingleFlightDetail {
+  date: Date;
+  gliderType: string;
+  gliderReg: string;
+  handicappedDistanceKm: number;
+  scoringDistanceKm: number;
+  handicappedSpeedKph: number;
+  task: string;
+  score: { value: number; unit: string };
+  ladderUrl: string;
+  igcUrl: string;
+}
+
+export function flightFlightDetails(result: ScoredFlight): SingleFlightDetail {
+  const { id, date, glider, task, score } = result;
+  return {
+    date,
+    gliderType: glider.type,
+    gliderReg: glider.registration,
+    handicappedDistanceKm: task.handicappedDistanceKm,
+    scoringDistanceKm: task.scoringDistanceKm,
+    handicappedSpeedKph: task.handicappedSpeedKph,
+    task: [task.start, ...task.turnpoints, task.finish].join("-"),
+    score,
+    ladderUrl: flightUrl(id),
+    igcUrl: `https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${id}`,
+  };
+}
+
 export function flightCopyData(result: ScoredFlight): [string, string][] {
   const { id, date, pilot, glider, task } = result;
   const pairs: [string, string][] = [

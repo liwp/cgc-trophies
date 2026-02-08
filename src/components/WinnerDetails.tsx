@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { CheckIcon, CopyIcon, ExternalLinkIcon, ViewIcon } from "@chakra-ui/icons";
 import { copyDataToClipboard } from "../lib/trophyCopyData";
-import type { FlightDetail } from "../lib/trophyCopyData";
+import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
 
 const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
   <Table size="sm" variant="unstyled">
@@ -56,12 +56,60 @@ const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
   </Table>
 );
 
+const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
+  const { score } = flight;
+  const isDistanceScore = score.unit === "km";
+  const isSpeedScore = score.unit === "kph";
+  const isPtsScore = score.unit === "pts";
+
+  return (
+    <HStack spacing={1} flexWrap="wrap" fontSize="xs">
+      <Text>{flight.date.toLocaleDateString()}</Text>
+      <Text color="gray.500">·</Text>
+      <Text>{flight.gliderType} ({flight.gliderReg})</Text>
+      <Text color="gray.500">·</Text>
+      <Tooltip label="Handicapped distance" fontSize="xs">
+        <Text fontWeight={isDistanceScore ? "bold" : "normal"}>
+          {flight.handicappedDistanceKm.toFixed(1)} km
+        </Text>
+      </Tooltip>
+      <Tooltip label="Scoring distance" fontSize="xs">
+        <Text color="gray.500">({flight.scoringDistanceKm.toFixed(1)} km)</Text>
+      </Tooltip>
+      <Text color="gray.500">·</Text>
+      <Tooltip label="Handicapped speed" fontSize="xs">
+        <Text fontWeight={isSpeedScore ? "bold" : "normal"}>
+          {flight.handicappedSpeedKph.toFixed(1)} kph
+        </Text>
+      </Tooltip>
+      <Text color="gray.500">·</Text>
+      {isPtsScore && (
+        <>
+          <Text fontWeight="bold">{score.value.toFixed(0)} pts</Text>
+          <Text color="gray.500">·</Text>
+        </>
+      )}
+      <Text>{flight.task}</Text>
+      <HStack spacing={1}>
+        <Link href={flight.ladderUrl} isExternal onClick={(e) => e.stopPropagation()}>
+          <ExternalLinkIcon />
+        </Link>
+        <Link href={flight.igcUrl} isExternal onClick={(e) => e.stopPropagation()}>
+          <ViewIcon />
+        </Link>
+      </HStack>
+    </HStack>
+  );
+};
+
 const WinnerDetails = ({
   data,
   flights,
+  flightDetail,
 }: {
   data: [string, string][];
   flights?: FlightDetail[];
+  flightDetail?: SingleFlightDetail;
 }) => {
   const [copied, setCopied] = React.useState(false);
 
@@ -78,6 +126,8 @@ const WinnerDetails = ({
         <Box flex={1}>
           {flights ? (
             <FlightTable flights={flights} />
+          ) : flightDetail ? (
+            <FlightSummary flight={flightDetail} />
           ) : (
             <SimpleGrid columns={2} spacing={1}>
               {data.map(([label, value]) => (
