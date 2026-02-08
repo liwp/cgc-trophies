@@ -134,8 +134,21 @@ const TASK_SPEC = {
       type: "array",
       xform: (tps: string[]) => tps.filter((tp) => tp.trim() !== ""),
     },
+    taskAchievement: {
+      src: "Task Achievement",
+      type: "string",
+    },
   },
   type: "object",
+  xform: (task: Record<string, any>) => {
+    const pctMatch = task.taskAchievement?.match(/(\d+\.?\d*)%\s*Completed/);
+    const pct = pctMatch ? parseFloat(pctMatch[1]) : null;
+    const taskDistanceKm =
+      pct && pct > 0 && pct < 100
+        ? task.scoringDistanceKm / (pct / 100)
+        : task.scoringDistanceKm;
+    return { ...task, taskDistanceKm };
+  },
 };
 
 const SPEC = {
