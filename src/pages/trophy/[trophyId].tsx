@@ -36,6 +36,7 @@ import Season from "../../components/Season";
 import UnknownTrophy from "../../components/UnknownTrophy";
 import { trophyEval, ladderEval } from "../../lib/eval";
 import useFlights from "../../lib/useFlights";
+import { formatPilotName } from "../../lib/trophyCopyData";
 import type { Flight, FlightTrophy, LadderTrophy, LadderResult, ScoredFlight, Trophy } from "../../types";
 
 const CONFIG = CGC_TROPHIES.config;
@@ -79,7 +80,7 @@ const Result = ({ result }: { result: ScoredFlight }) => {
 
   return (
     <Tr>
-      <Td>{pilot}</Td>
+      <Td>{formatPilotName(pilot)}</Td>
       <Td>{date.toLocaleDateString()}</Td>
       <Td>
         <Score value={value} unit={unit} />
@@ -155,7 +156,7 @@ const ResultsList = ({ results, season, trophy }: { results: ScoredFlight[]; sea
 const LadderFlightRow = ({ flight }: { flight: Flight }) => {
   return (
     <Tr>
-      <Td pl="40px">{flight.pilot}</Td>
+      <Td pl="40px">{formatPilotName(flight.pilot)}</Td>
       <Td>{flight.date.toLocaleDateString()}</Td>
       <Td>{flight.task.crossCountryPoints.toFixed(0)} pts</Td>
       <Td>
@@ -182,8 +183,8 @@ const LadderResultRow = ({ result, rank, isSyndicate }: { result: LadderResult; 
         onClick={() => setExpanded(!expanded)}
       >
         <Td>{rank}</Td>
-        <Td>{result.key}</Td>
-        {isSyndicate && <Td>{result.pilots.join(", ")}</Td>}
+        <Td>{isSyndicate ? result.key : formatPilotName(result.key)}</Td>
+        {isSyndicate && <Td>{result.pilots.map(formatPilotName).join(", ")}</Td>}
         <Td>{result.totalScore.toFixed(0)} pts</Td>
         <Td>{result.flights.length}</Td>
         <Td>
