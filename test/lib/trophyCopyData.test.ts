@@ -136,7 +136,7 @@ describe("ladderFlightDetails", () => {
 
     expect(details).toHaveLength(1);
     expect(details[0]).toEqual({
-      pilot: "Holswilder, Alex",
+      pilot: "Alex Holswilder",
       date: new Date("2024-07-26"),
       points: 500,
       distanceKm: 680,

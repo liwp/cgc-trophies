@@ -11,7 +11,7 @@ export interface FlightDetail {
   igcUrl: string;
 }
 
-function formatPilotName(name: string): string {
+export function formatPilotName(name: string): string {
   const parts = name.split(", ");
   return parts.length === 2 ? `${parts[1]} ${parts[0]}` : name;
 }
@@ -24,7 +24,7 @@ export function ladderFlightDetails(result: LadderResult): FlightDetail[] {
   return result.flights.map((f) => {
     const url = flightUrl(f.id);
     return {
-      pilot: f.pilot,
+      pilot: formatPilotName(f.pilot),
       date: f.date,
       points: f.task.crossCountryPoints,
       distanceKm: f.task.handicappedDistanceKm,
