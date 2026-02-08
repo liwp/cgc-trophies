@@ -31,7 +31,7 @@ export function ladderFlightDetails(result: LadderResult): FlightDetail[] {
       speedKph: f.task.handicappedSpeedKph,
       task: [f.task.start, ...f.task.turnpoints, f.task.finish].join("-"),
       ladderUrl: url,
-      igcUrl: `https://igcviewer.bgaladder.net/?igc=${url}`,
+      igcUrl: `https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${f.id}`,
     };
   });
 }

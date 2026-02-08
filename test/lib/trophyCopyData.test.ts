@@ -143,7 +143,7 @@ describe("ladderFlightDetails", () => {
       speedKph: 74.2,
       task: "GRL-SHM-CAX-BRF-GRL",
       ladderUrl: "https://www.bgaladder.net/flightdetails/116237",
-      igcUrl: "https://igcviewer.bgaladder.net/?igc=https://www.bgaladder.net/flightdetails/116237",
+      igcUrl: "https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/116237",
     });
   });
 });
