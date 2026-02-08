@@ -26,7 +26,7 @@ const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
         <Th px={1}>Date</Th>
         <Th px={1} isNumeric>Pts</Th>
         <Th px={1} isNumeric>Dist</Th>
-        <Th px={1} isNumeric>Speed</Th>
+        <Th px={1} isNumeric>Speed (HC)</Th>
         <Th px={1}>Task</Th>
         <Th px={1}></Th>
       </Tr>

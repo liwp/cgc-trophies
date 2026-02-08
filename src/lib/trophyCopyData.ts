@@ -27,7 +27,7 @@ export function ladderFlightDetails(result: LadderResult): FlightDetail[] {
       pilot: formatPilotName(f.pilot),
       date: f.date,
       points: f.task.crossCountryPoints,
-      distanceKm: f.task.handicappedDistanceKm,
+      distanceKm: f.task.scoringDistanceKm,
       speedKph: f.task.handicappedSpeedKph,
       task: [f.task.start, ...f.task.turnpoints, f.task.finish].join("-"),
       ladderUrl: url,
