@@ -1,8 +1,39 @@
 import type { ScoredFlight, LadderResult } from "../types";
 
+export interface FlightDetail {
+  pilot: string;
+  date: Date;
+  points: number;
+  distanceKm: number;
+  speedKph: number;
+  task: string;
+  ladderUrl: string;
+  igcUrl: string;
+}
+
 function formatPilotName(name: string): string {
   const parts = name.split(", ");
   return parts.length === 2 ? `${parts[1]} ${parts[0]}` : name;
+}
+
+function flightUrl(id: string): string {
+  return `https://www.bgaladder.net/flightdetails/${id}`;
+}
+
+export function ladderFlightDetails(result: LadderResult): FlightDetail[] {
+  return result.flights.map((f) => {
+    const url = flightUrl(f.id);
+    return {
+      pilot: f.pilot,
+      date: f.date,
+      points: f.task.crossCountryPoints,
+      distanceKm: f.task.handicappedDistanceKm,
+      speedKph: f.task.handicappedSpeedKph,
+      task: [f.task.start, ...f.task.turnpoints, f.task.finish].join("-"),
+      ladderUrl: url,
+      igcUrl: `https://igcviewer.bgaladder.net/?igc=${url}`,
+    };
+  });
 }
 
 export function flightCopyData(result: ScoredFlight): [string, string][] {
@@ -22,7 +53,7 @@ export function flightCopyData(result: ScoredFlight): [string, string][] {
     ["Aircraft Reg.", glider.registration],
     ["H/C Distance (kms)", task.handicappedDistanceKm.toFixed(2)],
     ["H/C Speed (kph)", task.handicappedSpeedKph.toFixed(2)],
-    ["Ladder", `https://www.bgaladder.net/flightdetails/${id}`],
+    ["Ladder", flightUrl(id)],
   ];
   task.turnpoints.forEach((tp, i) => {
     pairs.push([`TP${i + 1}`, tp]);
@@ -42,12 +73,19 @@ export function ladderCopyData(
     (sum, f) => sum + f.task.scoringDistanceKm,
     0,
   );
-  return [
+  const pairs: [string, string][] = [
     ["Pilot Name", pilotName],
     ["Points", result.totalScore.toLocaleString("en-GB")],
     ["No. Of Flights", String(result.flights.length)],
     ["Scoring Distance (kms)", totalDistance.toFixed(2)],
   ];
+  result.flights.forEach((f, i) => {
+    const label = groupBy === "registration"
+      ? `Flight ${i + 1} (${formatPilotName(f.pilot)})`
+      : `Flight ${i + 1}`;
+    pairs.push([label, flightUrl(f.id)]);
+  });
+  return pairs;
 }
 
 export function copyDataToClipboard(data: [string, string][]): Promise<void> {
