@@ -22,7 +22,7 @@ import Season from "../components/Season";
 import Stats from "../components/Stats";
 import WinnerDetails from "../components/WinnerDetails";
 import { trophyEval, ladderEval } from "../lib/eval";
-import { flightCopyData, ladderCopyData, ladderFlightDetails } from "../lib/trophyCopyData";
+import { flightCopyData, formatPilotName, ladderCopyData, ladderFlightDetails } from "../lib/trophyCopyData";
 import type { FlightDetail } from "../lib/trophyCopyData";
 import useFlights from "../lib/useFlights";
 import type { Flight, FlightTrophy, LadderTrophy, ScoredFlight, LadderResult } from "../types";
@@ -40,13 +40,13 @@ const TrophyWinner = ({ trophy }: { trophy: any }) => {
   } else if (type === "ladder") {
     const lr = result as LadderResult;
     winner = groupBy === "registration"
-      ? `${lr.key} (${lr.pilots.join(", ")})`
-      : lr.key;
+      ? `${lr.key} (${lr.pilots.map(formatPilotName).join(", ")})`
+      : formatPilotName(lr.key);
     copyData = ladderCopyData(lr, groupBy);
     flights = ladderFlightDetails(lr);
   } else {
     const sf = result as ScoredFlight;
-    winner = sf.pilot;
+    winner = formatPilotName(sf.pilot);
     copyData = flightCopyData(sf);
   }
 
