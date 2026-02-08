@@ -66,7 +66,7 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
   const distanceLabel = isDistanceScore ? "Handicapped distance" : "Scoring distance";
 
   return (
-    <HStack spacing={1} flexWrap="wrap" fontSize="xs">
+    <HStack spacing={1} flexWrap="wrap" fontSize="xs" align="center">
       <Text>{flight.date.toLocaleDateString()}</Text>
       <Text color="gray.500">·</Text>
       <Text>{flight.task}</Text>
@@ -89,13 +89,13 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
           <Text color="gray.500">·</Text>
         </>
       )}
-      <Text>{flight.gliderType} ({flight.gliderReg})</Text>
+      <Text>{flight.gliderReg} · {flight.gliderType}</Text>
       <HStack spacing={1}>
         <Link href={flight.ladderUrl} isExternal onClick={(e) => e.stopPropagation()}>
-          <ExternalLinkIcon />
+          <ExternalLinkIcon verticalAlign="middle" />
         </Link>
         <Link href={flight.igcUrl} isExternal onClick={(e) => e.stopPropagation()}>
-          <ViewIcon />
+          <ViewIcon verticalAlign="middle" />
         </Link>
       </HStack>
     </HStack>
