@@ -37,22 +37,22 @@ const categories = [
   },
   {
     key: "300km",
-    pred: ({ task: { scoringDistanceKm } }: Flight) =>
-      300 <= scoringDistanceKm && scoringDistanceKm < 400,
+    pred: ({ task: { taskDistanceKm } }: Flight) =>
+      300 <= taskDistanceKm && taskDistanceKm < 400,
   },
   {
     key: "400km",
-    pred: ({ task: { scoringDistanceKm } }: Flight) =>
-      400 <= scoringDistanceKm && scoringDistanceKm < 500,
+    pred: ({ task: { taskDistanceKm } }: Flight) =>
+      400 <= taskDistanceKm && taskDistanceKm < 500,
   },
   {
     key: "500km",
-    pred: ({ task: { scoringDistanceKm } }: Flight) =>
-      500 <= scoringDistanceKm && scoringDistanceKm < 750,
+    pred: ({ task: { taskDistanceKm } }: Flight) =>
+      500 <= taskDistanceKm && taskDistanceKm < 750,
   },
   {
     key: "750km",
-    pred: ({ task: { scoringDistanceKm } }: Flight) => 750 <= scoringDistanceKm,
+    pred: ({ task: { taskDistanceKm } }: Flight) => 750 <= taskDistanceKm,
   },
 ];
 
