@@ -10,6 +10,8 @@ export interface Flight {
     crossCountryPoints: number;
     isDeclared: boolean;
     scoringDistanceKm: number;
+    taskDistanceKm: number;
+    taskAchievement: string;
     handicappedDistanceKm: number;
     handicappedSpeedKph: number;
     launchSite: string;
