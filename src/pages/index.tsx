@@ -1,5 +1,4 @@
 import React from "react";
-import { chain } from "lodash";
 import Link from "next/link";
 import {
   Heading,
@@ -24,10 +23,23 @@ import Season from "../components/Season";
 import Stats from "../components/Stats";
 import WinnerDetails from "../components/WinnerDetails";
 import { trophyEval, ladderEval } from "../lib/eval";
-import { copyDataToClipboard, flightCopyData, flightFlightDetails, formatPilotName, ladderCopyData, ladderFlightDetails } from "../lib/trophyCopyData";
+import {
+  copyDataToClipboard,
+  flightCopyData,
+  flightFlightDetails,
+  formatPilotName,
+  ladderCopyData,
+  ladderFlightDetails,
+} from "../lib/trophyCopyData";
 import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
 import useFlights from "../lib/useFlights";
-import type { Flight, FlightTrophy, LadderTrophy, ScoredFlight, LadderResult } from "../types";
+import type {
+  Flight,
+  FlightTrophy,
+  LadderTrophy,
+  ScoredFlight,
+  LadderResult,
+} from "../types";
 
 const CopyButton = ({ data }: { data: [string, string][] }) => {
   const [copied, setCopied] = React.useState(false);
@@ -39,7 +51,10 @@ const CopyButton = ({ data }: { data: [string, string][] }) => {
     });
   };
   return (
-    <Tooltip label={copied ? "Copied!" : "Copy for spreadsheet"} closeOnClick={false}>
+    <Tooltip
+      label={copied ? "Copied!" : "Copy for spreadsheet"}
+      closeOnClick={false}
+    >
       <IconButton
         aria-label="Copy to clipboard"
         icon={copied ? <CheckIcon /> : <CopyIcon />}
@@ -64,9 +79,10 @@ const TrophyWinner = ({ trophy }: { trophy: any }) => {
     winner = "No qualifying flights";
   } else if (type === "ladder") {
     const lr = result as LadderResult;
-    winner = groupBy === "registration"
-      ? `${lr.key} (${lr.pilots.map(formatPilotName).join(", ")})`
-      : formatPilotName(lr.key);
+    winner =
+      groupBy === "registration"
+        ? `${lr.key} (${lr.pilots.map(formatPilotName).join(", ")})`
+        : formatPilotName(lr.key);
     copyData = ladderCopyData(lr, groupBy);
     flights = ladderFlightDetails(lr);
   } else {
@@ -98,10 +114,21 @@ const TrophyWinner = ({ trophy }: { trophy: any }) => {
   );
 };
 
-const TrophyList = ({ flights, season }: { flights: Flight[]; season: number }) => {
+const TrophyList = ({
+  flights,
+  season,
+}: {
+  flights: Flight[];
+  season: number;
+}) => {
   const trophies = TROPHIES.trophies.map((trophy) => {
     if (trophy.type === "ladder") {
-      const results = ladderEval(TROPHIES.config, season, flights, trophy as LadderTrophy);
+      const results = ladderEval(
+        TROPHIES.config,
+        season,
+        flights,
+        trophy as LadderTrophy,
+      );
       return {
         ...trophy,
         results,
@@ -109,9 +136,12 @@ const TrophyList = ({ flights, season }: { flights: Flight[]; season: number }) 
         season,
       };
     } else {
-      const results = chain(trophyEval(TROPHIES.config, season, flights, trophy as FlightTrophy))
-        .filter((f: any) => !f.ignore)
-        .value();
+      const results = trophyEval(
+        TROPHIES.config,
+        season,
+        flights,
+        trophy as FlightTrophy,
+      ).filter((f: any) => !f.ignore);
       return {
         ...trophy,
         results,

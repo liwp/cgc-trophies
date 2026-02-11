@@ -1,4 +1,6 @@
-import { chain, get, isEqual, isFunction, reverse } from "lodash";
+import _ from "lodash";
+
+const { chain, get, isEqual, isFunction, reverse } = _;
 import type {
   Flight,
   FlightTrophy,
@@ -17,7 +19,10 @@ const comparators: Record<string, Comparator> = {
   "<=>": (xs, ys) => isEqual(xs, reverse(ys)) || isEqual(xs, ys),
 };
 
-function configToDate(season: number, { day, month }: { day: number; month: number }): Date {
+function configToDate(
+  season: number,
+  { day, month }: { day: number; month: number },
+): Date {
   return new Date(`${season}-${month}-${day}`);
 }
 
@@ -62,7 +67,10 @@ export function trophyEval(
     trophy.season || defaultConfig.season,
   );
 
-  const excludedIds: Record<string, string> = { ...defaultConfig.exclude, ...trophy.exclude };
+  const excludedIds: Record<string, string> = {
+    ...defaultConfig.exclude,
+    ...trophy.exclude,
+  };
   const includedIds: Record<string, string> = trophy.include || {};
 
   let chain_ = chain(flights)
