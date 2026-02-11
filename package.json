@@ -21,7 +21,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "axios": "^1.13.5",
-    "framer-motion": "^11.18.2",
+    "framer-motion": "^12.34.0",
     "lodash": "^4.17.23",
     "next": "^15.5.12",
     "papaparse": "^5.5.3",
