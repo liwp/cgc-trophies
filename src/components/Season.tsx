@@ -1,5 +1,4 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { IconButton, Stack } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
 // There is one flight in the previous season, so we think 2007 is the first
@@ -11,9 +10,10 @@ const Season = ({ season }: { season: number }) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <Stack gap={4} direction="row" align="center">
-      <IconButton
+    <div className="flex flex-row items-center gap-4">
+      <button
         aria-label="Previous season"
+        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
         disabled={season === firstYear}
         onClick={() =>
           router.replace({
@@ -21,11 +21,12 @@ const Season = ({ season }: { season: number }) => {
           })
         }
       >
-        <ChevronLeft />
-      </IconButton>
+        <ChevronLeft size={20} />
+      </button>
       <span>{season}</span>
-      <IconButton
+      <button
         aria-label="Next season"
+        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
         disabled={season === currentYear}
         onClick={() =>
           router.replace({
@@ -33,9 +34,9 @@ const Season = ({ season }: { season: number }) => {
           })
         }
       >
-        <ChevronRight />
-      </IconButton>
-    </Stack>
+        <ChevronRight size={20} />
+      </button>
+    </div>
   );
 };
 
