@@ -16,8 +16,6 @@
   "author": "Lauri Pesonen <lauri.pesonen@iki.fi>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@chakra-ui/react": "^3.33.0",
-    "@emotion/react": "^11.14.0",
     "@tailwindcss/postcss": "^4.1.18",
     "axios": "^1.13.5",
     "lodash": "^4.17.23",
