@@ -1,8 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Heading, IconButton, Table, VStack } from "@chakra-ui/react";
 import { Check, Copy } from "lucide-react";
-import Tooltip from "../components/ui/Tooltip";
 
 import TROPHIES from "../lib/cgc_trophies";
 import FlightLoadFailure from "../components/FlightLoadFailure";
@@ -39,17 +37,14 @@ const CopyButton = ({ data }: { data: [string, string][] }) => {
     });
   };
   return (
-    <Tooltip content={copied ? "Copied!" : "Copy for spreadsheet"}>
-      <IconButton
-        aria-label="Copy to clipboard"
-        size="xs"
-        variant="ghost"
-        colorPalette={copied ? "green" : "gray"}
-        onClick={handleCopy}
-      >
-        {copied ? <Check /> : <Copy />}
-      </IconButton>
-    </Tooltip>
+    <button
+      aria-label="Copy to clipboard"
+      className={`p-1 rounded hover:bg-gray-100 ${copied ? "text-green-600" : "text-gray-500"}`}
+      title={copied ? "Copied!" : "Copy for spreadsheet"}
+      onClick={handleCopy}
+    >
+      {copied ? <Check size={14} /> : <Copy size={14} />}
+    </button>
   );
 };
 
@@ -80,21 +75,21 @@ const TrophyWinner = ({ trophy }: { trophy: any }) => {
 
   return (
     <>
-      <Table.Row>
-        <Table.Cell>
+      <tr>
+        <td className="p-2">
           <Link href={`/trophy/${id}?season=${season}`}>{name}</Link>
-        </Table.Cell>
-        <Table.Cell>{winner}</Table.Cell>
-        <Table.Cell width="24px" px={1}>
+        </td>
+        <td className="p-2">{winner}</td>
+        <td className="w-6 px-1">
           {copyData && <CopyButton data={copyData} />}
-        </Table.Cell>
-      </Table.Row>
+        </td>
+      </tr>
       {copyData && (
-        <Table.Row>
-          <Table.Cell colSpan={3} p={0}>
+        <tr>
+          <td colSpan={3} className="p-0">
             <WinnerDetails flights={flights} flightDetail={flightDetail} />
-          </Table.Cell>
-        </Table.Row>
+          </td>
+        </tr>
       )}
     </>
   );
@@ -137,25 +132,25 @@ const TrophyList = ({
   });
 
   return (
-    <Table.ScrollArea minWidth="600px">
-      <Table.Root size="md" variant="outline" striped>
-        <Table.Caption>
+    <div className="min-w-[600px] overflow-x-auto">
+      <table className="w-full table-auto border-collapse">
+        <caption className="caption-bottom py-2 text-sm text-gray-500">
           Cambridge Gliding Centre {season} Trophy Winners
-        </Table.Caption>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader>Trophy</Table.ColumnHeader>
-            <Table.ColumnHeader>Winner</Table.ColumnHeader>
-            <Table.ColumnHeader width="24px"></Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {trophies.map((trophy) => (
+        </caption>
+        <thead>
+          <tr className="border-b">
+            <th className="p-2 text-left font-semibold">Trophy</th>
+            <th className="p-2 text-left font-semibold">Winner</th>
+            <th className="w-6"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {trophies.map((trophy, i) => (
             <TrophyWinner key={trophy.id} trophy={trophy} />
           ))}
-        </Table.Body>
-      </Table.Root>
-    </Table.ScrollArea>
+        </tbody>
+      </table>
+    </div>
   );
 };
 
@@ -166,12 +161,12 @@ const TrophiesPage = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <VStack>
+    <div className="flex flex-col items-center gap-4">
       <Season season={season} />
-      <Heading size="xl">CGC {season} Trophies</Heading>
+      <h1 className="text-2xl font-bold">CGC {season} Trophies</h1>
       <Stats flights={flights!} season={season} />
       <TrophyList flights={flights!} season={season} />
-    </VStack>
+    </div>
   );
 };
 
