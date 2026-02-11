@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import { useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Flight } from "../types";
@@ -314,7 +315,7 @@ const LoadingShowcase = () => {
         {show ? "Hide" : "Show"}
       </button>
       {show && (
-        <div className="h-48 overflow-hidden rounded border border-gray-200">
+        <div className="relative h-48 overflow-hidden rounded border border-gray-200 [&>div]:min-h-48 [&>div]:h-48">
           <Loading />
         </div>
       )}
@@ -389,7 +390,7 @@ const SECTIONS = [
   { id: "winner-details", title: "WinnerDetails" },
 ];
 
-export default function ComponentsPage() {
+function ComponentsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8 p-8">
       <h1 className="text-2xl font-bold">Components</h1>
@@ -460,3 +461,5 @@ export default function ComponentsPage() {
     </div>
   );
 }
+
+export default dynamic(() => Promise.resolve(ComponentsPage), { ssr: false });
