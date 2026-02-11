@@ -1,5 +1,3 @@
-import { Box, Center, Heading, Stat, StatGroup } from "@chakra-ui/react";
-
 import { calculateStats } from "../lib/stats";
 import type { Flight } from "../types";
 
@@ -13,17 +11,17 @@ const FlightCategory = ({
   total?: number;
 }) => {
   return (
-    <Center>
-      <Stat.Root>
-        <Stat.Label>{label}</Stat.Label>
-        <Stat.ValueText>{completed || 0}</Stat.ValueText>
-        <Stat.HelpText>
+    <div className="flex justify-center">
+      <div className="text-center">
+        <div className="text-sm text-gray-500">{label}</div>
+        <div className="text-2xl font-bold">{completed || 0}</div>
+        <div className="text-xs text-gray-500">
           Attempts
           <br />
           {total || 0}
-        </Stat.HelpText>
-      </Stat.Root>
-    </Center>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -38,15 +36,15 @@ const Stats = ({ flights, season }: { flights: Flight[]; season: number }) => {
   const stats = calculateStats(flightsInYear);
 
   return (
-    <Box minWidth="600px">
-      <StatGroup>
+    <div className="min-w-[600px]">
+      <div className="flex justify-around">
         <FlightCategory label={"All Flights"} {...stats["open"]} />
         <FlightCategory label={"300 km"} {...stats["300km"]} />
         <FlightCategory label={"400 km"} {...stats["400km"]} />
         <FlightCategory label={"500 km"} {...stats["500km"]} />
         <FlightCategory label={"750 km"} {...stats["750km"]} />
-      </StatGroup>
-    </Box>
+      </div>
+    </div>
   );
 };
 
