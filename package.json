@@ -18,14 +18,17 @@
   "dependencies": {
     "@chakra-ui/react": "^3.33.0",
     "@emotion/react": "^11.14.0",
+    "@tailwindcss/postcss": "^4.1.18",
     "axios": "^1.13.5",
     "lodash": "^4.17.23",
     "lucide-react": "^0.563.0",
     "next": "^15.5.12",
     "papaparse": "^5.5.3",
+    "postcss": "^8.5.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "swr": "^2.4.0",
+    "tailwindcss": "^4.1.18",
     "wgs84-util": "^3.0.0"
   },
   "devDependencies": {
