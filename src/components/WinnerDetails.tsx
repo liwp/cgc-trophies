@@ -1,5 +1,6 @@
 import { ExternalLink, Eye } from "lucide-react";
 import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
+import Tooltip from "./Tooltip";
 
 const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
   <table className="text-xs">
@@ -8,14 +9,20 @@ const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
         <tr key={f.ladderUrl}>
           <td className="px-1">{f.date.toLocaleDateString()}</td>
           <td className="px-1">{f.task}</td>
-          <td className="px-1 text-right" title="Scoring distance">
-            {f.distanceKm.toFixed(0)} km
+          <td className="px-1 text-right">
+            <Tooltip text="Scoring distance">
+              <span>{f.distanceKm.toFixed(0)} km</span>
+            </Tooltip>
           </td>
-          <td className="px-1 text-right" title="Handicapped speed">
-            {f.speedKph.toFixed(1)} kph
+          <td className="px-1 text-right">
+            <Tooltip text="Handicapped speed">
+              <span>{f.speedKph.toFixed(1)} kph</span>
+            </Tooltip>
           </td>
-          <td className="px-1 text-right" title="Cross-country points">
-            {f.points.toFixed(0)} pts
+          <td className="px-1 text-right">
+            <Tooltip text="Cross-country points">
+              <span>{f.points.toFixed(0)} pts</span>
+            </Tooltip>
           </td>
           <td className="px-1">
             <span className="inline-flex items-center gap-1">
@@ -62,19 +69,17 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
       <span className="text-gray-500">·</span>
       <span>{flight.task}</span>
       <span className="text-gray-500">·</span>
-      <span
-        className={isSpeedScore ? "font-bold" : ""}
-        title="Handicapped speed"
-      >
-        {flight.handicappedSpeedKph.toFixed(1)} kph
-      </span>
+      <Tooltip text="Handicapped speed">
+        <span className={isSpeedScore ? "font-bold" : ""}>
+          {flight.handicappedSpeedKph.toFixed(1)} kph
+        </span>
+      </Tooltip>
       <span className="text-gray-500">·</span>
-      <span
-        className={isDistanceScore ? "font-bold" : ""}
-        title={distanceLabel}
-      >
-        {distanceKm.toFixed(1)} km
-      </span>
+      <Tooltip text={distanceLabel}>
+        <span className={isDistanceScore ? "font-bold" : ""}>
+          {distanceKm.toFixed(1)} km
+        </span>
+      </Tooltip>
       <span className="text-gray-500">·</span>
       {isPtsScore && (
         <>

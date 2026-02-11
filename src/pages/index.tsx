@@ -7,6 +7,7 @@ import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
+import Tooltip from "../components/Tooltip";
 import WinnerDetails from "../components/WinnerDetails";
 import { trophyEval, ladderEval } from "../lib/eval";
 import {
@@ -37,14 +38,15 @@ const CopyButton = ({ data }: { data: [string, string][] }) => {
     });
   };
   return (
-    <button
-      aria-label="Copy to clipboard"
-      className={`p-1 rounded hover:bg-gray-100 ${copied ? "text-green-600" : "text-gray-500"}`}
-      title={copied ? "Copied!" : "Copy for spreadsheet"}
-      onClick={handleCopy}
-    >
-      {copied ? <Check size={14} /> : <Copy size={14} />}
-    </button>
+    <Tooltip text={copied ? "Copied!" : "Copy for spreadsheet"} align="right">
+      <button
+        aria-label="Copy to clipboard"
+        className={`p-1 rounded hover:bg-gray-100 ${copied ? "text-green-600" : "text-gray-500"}`}
+        onClick={handleCopy}
+      >
+        {copied ? <Check size={14} /> : <Copy size={14} />}
+      </button>
+    </Tooltip>
   );
 };
 
