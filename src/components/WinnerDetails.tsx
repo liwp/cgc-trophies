@@ -1,65 +1,46 @@
-import React from "react";
-import { Box, HStack, Link, Table, Text } from "@chakra-ui/react";
 import { ExternalLink, Eye } from "lucide-react";
-import Tooltip from "./ui/Tooltip";
 import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
 
 const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
-  <Table.Root size="sm">
-    <Table.Body>
+  <table className="text-xs">
+    <tbody>
       {flights.map((f) => (
-        <Table.Row key={f.ladderUrl}>
-          <Table.Cell px={1} fontSize="xs">
-            {f.date.toLocaleDateString()}
-          </Table.Cell>
-          <Table.Cell px={1} fontSize="xs">
-            {f.task}
-          </Table.Cell>
-          <Table.Cell px={1} fontSize="xs" textAlign="end">
-            <Tooltip content="Scoring distance">
-              <Text as="span" fontSize="xs">
-                {f.distanceKm.toFixed(0)} km
-              </Text>
-            </Tooltip>
-          </Table.Cell>
-          <Table.Cell px={1} fontSize="xs" textAlign="end">
-            <Tooltip content="Handicapped speed">
-              <Text as="span" fontSize="xs">
-                {f.speedKph.toFixed(1)} kph
-              </Text>
-            </Tooltip>
-          </Table.Cell>
-          <Table.Cell px={1} fontSize="xs" textAlign="end">
-            <Tooltip content="Cross-country points">
-              <Text as="span" fontSize="xs">
-                {f.points.toFixed(0)} pts
-              </Text>
-            </Tooltip>
-          </Table.Cell>
-          <Table.Cell px={1} fontSize="xs">
-            <HStack gap={1}>
-              <Link
+        <tr key={f.ladderUrl}>
+          <td className="px-1">{f.date.toLocaleDateString()}</td>
+          <td className="px-1">{f.task}</td>
+          <td className="px-1 text-right" title="Scoring distance">
+            {f.distanceKm.toFixed(0)} km
+          </td>
+          <td className="px-1 text-right" title="Handicapped speed">
+            {f.speedKph.toFixed(1)} kph
+          </td>
+          <td className="px-1 text-right" title="Cross-country points">
+            {f.points.toFixed(0)} pts
+          </td>
+          <td className="px-1">
+            <span className="inline-flex items-center gap-1">
+              <a
                 href={f.ladderUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
               >
-                <ExternalLink style={{ verticalAlign: "middle" }} />
-              </Link>
-              <Link
+                <ExternalLink size={12} className="align-middle" />
+              </a>
+              <a
                 href={f.igcUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Eye style={{ verticalAlign: "middle" }} />
-              </Link>
-            </HStack>
-          </Table.Cell>
-        </Table.Row>
+                <Eye size={12} className="align-middle" />
+              </a>
+            </span>
+          </td>
+        </tr>
       ))}
-    </Table.Body>
-  </Table.Root>
+    </tbody>
+  </table>
 );
 
 const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
@@ -76,51 +57,53 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
     : "Scoring distance";
 
   return (
-    <HStack gap={1} flexWrap="wrap" fontSize="xs" align="center">
-      <Text>{flight.date.toLocaleDateString()}</Text>
-      <Text color="gray.500">·</Text>
-      <Text>{flight.task}</Text>
-      <Text color="gray.500">·</Text>
-      <Tooltip content="Handicapped speed">
-        <Text fontWeight={isSpeedScore ? "bold" : "normal"}>
-          {flight.handicappedSpeedKph.toFixed(1)} kph
-        </Text>
-      </Tooltip>
-      <Text color="gray.500">·</Text>
-      <Tooltip content={distanceLabel}>
-        <Text fontWeight={isDistanceScore ? "bold" : "normal"}>
-          {distanceKm.toFixed(1)} km
-        </Text>
-      </Tooltip>
-      <Text color="gray.500">·</Text>
+    <span className="inline-flex flex-wrap items-center gap-1 text-xs">
+      <span>{flight.date.toLocaleDateString()}</span>
+      <span className="text-gray-500">·</span>
+      <span>{flight.task}</span>
+      <span className="text-gray-500">·</span>
+      <span
+        className={isSpeedScore ? "font-bold" : ""}
+        title="Handicapped speed"
+      >
+        {flight.handicappedSpeedKph.toFixed(1)} kph
+      </span>
+      <span className="text-gray-500">·</span>
+      <span
+        className={isDistanceScore ? "font-bold" : ""}
+        title={distanceLabel}
+      >
+        {distanceKm.toFixed(1)} km
+      </span>
+      <span className="text-gray-500">·</span>
       {isPtsScore && (
         <>
-          <Text fontWeight="bold">{score.value.toFixed(0)} pts</Text>
-          <Text color="gray.500">·</Text>
+          <span className="font-bold">{score.value.toFixed(0)} pts</span>
+          <span className="text-gray-500">·</span>
         </>
       )}
-      <Text>
+      <span>
         {flight.gliderReg} · {flight.gliderType}
-      </Text>
-      <HStack gap={1}>
-        <Link
+      </span>
+      <span className="inline-flex items-center gap-1">
+        <a
           href={flight.ladderUrl}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
         >
-          <ExternalLink style={{ verticalAlign: "middle" }} />
-        </Link>
-        <Link
+          <ExternalLink size={12} className="align-middle" />
+        </a>
+        <a
           href={flight.igcUrl}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
         >
-          <Eye style={{ verticalAlign: "middle" }} />
-        </Link>
-      </HStack>
-    </HStack>
+          <Eye size={12} className="align-middle" />
+        </a>
+      </span>
+    </span>
   );
 };
 
@@ -131,13 +114,13 @@ const WinnerDetails = ({
   flights?: FlightDetail[];
   flightDetail?: SingleFlightDetail;
 }) => (
-  <Box pl={4} pr={4} pb={3} pt={1}>
+  <div className="pl-4 pr-4 pb-3 pt-1">
     {flights ? (
       <FlightTable flights={flights} />
     ) : flightDetail ? (
       <FlightSummary flight={flightDetail} />
     ) : null}
-  </Box>
+  </div>
 );
 
 export default WinnerDetails;
