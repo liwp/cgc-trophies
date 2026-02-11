@@ -1,54 +1,65 @@
 import React from "react";
-import {
-  Box,
-  HStack,
-  Link,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Tooltip,
-  Tr,
-} from "@chakra-ui/react";
-import { ExternalLinkIcon, ViewIcon } from "@chakra-ui/icons";
+import { Box, HStack, Link, Table, Text } from "@chakra-ui/react";
+import { ExternalLink, Eye } from "lucide-react";
+import Tooltip from "./ui/Tooltip";
 import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
 
 const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
-  <Table size="sm" variant="unstyled">
-    <Tbody>
+  <Table.Root size="sm">
+    <Table.Body>
       {flights.map((f) => (
-        <Tr key={f.ladderUrl}>
-          <Td px={1} fontSize="xs">{f.date.toLocaleDateString()}</Td>
-          <Td px={1} fontSize="xs">{f.task}</Td>
-          <Td px={1} fontSize="xs" isNumeric>
-            <Tooltip label="Scoring distance" fontSize="xs">
-              <Text as="span">{f.distanceKm.toFixed(0)} km</Text>
+        <Table.Row key={f.ladderUrl}>
+          <Table.Cell px={1} fontSize="xs">
+            {f.date.toLocaleDateString()}
+          </Table.Cell>
+          <Table.Cell px={1} fontSize="xs">
+            {f.task}
+          </Table.Cell>
+          <Table.Cell px={1} fontSize="xs" textAlign="end">
+            <Tooltip content="Scoring distance">
+              <Text as="span" fontSize="xs">
+                {f.distanceKm.toFixed(0)} km
+              </Text>
             </Tooltip>
-          </Td>
-          <Td px={1} fontSize="xs" isNumeric>
-            <Tooltip label="Handicapped speed" fontSize="xs">
-              <Text as="span">{f.speedKph.toFixed(1)} kph</Text>
+          </Table.Cell>
+          <Table.Cell px={1} fontSize="xs" textAlign="end">
+            <Tooltip content="Handicapped speed">
+              <Text as="span" fontSize="xs">
+                {f.speedKph.toFixed(1)} kph
+              </Text>
             </Tooltip>
-          </Td>
-          <Td px={1} fontSize="xs" isNumeric>
-            <Tooltip label="Cross-country points" fontSize="xs">
-              <Text as="span">{f.points.toFixed(0)} pts</Text>
+          </Table.Cell>
+          <Table.Cell px={1} fontSize="xs" textAlign="end">
+            <Tooltip content="Cross-country points">
+              <Text as="span" fontSize="xs">
+                {f.points.toFixed(0)} pts
+              </Text>
             </Tooltip>
-          </Td>
-          <Td px={1} fontSize="xs">
-            <HStack spacing={1}>
-              <Link href={f.ladderUrl} isExternal onClick={(e) => e.stopPropagation()}>
-                <ExternalLinkIcon verticalAlign="middle" />
+          </Table.Cell>
+          <Table.Cell px={1} fontSize="xs">
+            <HStack gap={1}>
+              <Link
+                href={f.ladderUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ExternalLink style={{ verticalAlign: "middle" }} />
               </Link>
-              <Link href={f.igcUrl} isExternal onClick={(e) => e.stopPropagation()}>
-                <ViewIcon verticalAlign="middle" />
+              <Link
+                href={f.igcUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Eye style={{ verticalAlign: "middle" }} />
               </Link>
             </HStack>
-          </Td>
-        </Tr>
+          </Table.Cell>
+        </Table.Row>
       ))}
-    </Tbody>
-  </Table>
+    </Table.Body>
+  </Table.Root>
 );
 
 const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
@@ -57,22 +68,26 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
   const isSpeedScore = score.unit === "kph";
   const isPtsScore = score.unit === "pts";
 
-  const distanceKm = isDistanceScore ? flight.handicappedDistanceKm : flight.scoringDistanceKm;
-  const distanceLabel = isDistanceScore ? "Handicapped distance" : "Scoring distance";
+  const distanceKm = isDistanceScore
+    ? flight.handicappedDistanceKm
+    : flight.scoringDistanceKm;
+  const distanceLabel = isDistanceScore
+    ? "Handicapped distance"
+    : "Scoring distance";
 
   return (
-    <HStack spacing={1} flexWrap="wrap" fontSize="xs" align="center">
+    <HStack gap={1} flexWrap="wrap" fontSize="xs" align="center">
       <Text>{flight.date.toLocaleDateString()}</Text>
       <Text color="gray.500">·</Text>
       <Text>{flight.task}</Text>
       <Text color="gray.500">·</Text>
-      <Tooltip label="Handicapped speed" fontSize="xs">
+      <Tooltip content="Handicapped speed">
         <Text fontWeight={isSpeedScore ? "bold" : "normal"}>
           {flight.handicappedSpeedKph.toFixed(1)} kph
         </Text>
       </Tooltip>
       <Text color="gray.500">·</Text>
-      <Tooltip label={distanceLabel} fontSize="xs">
+      <Tooltip content={distanceLabel}>
         <Text fontWeight={isDistanceScore ? "bold" : "normal"}>
           {distanceKm.toFixed(1)} km
         </Text>
@@ -84,13 +99,25 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
           <Text color="gray.500">·</Text>
         </>
       )}
-      <Text>{flight.gliderReg} · {flight.gliderType}</Text>
-      <HStack spacing={1}>
-        <Link href={flight.ladderUrl} isExternal onClick={(e) => e.stopPropagation()}>
-          <ExternalLinkIcon verticalAlign="middle" />
+      <Text>
+        {flight.gliderReg} · {flight.gliderType}
+      </Text>
+      <HStack gap={1}>
+        <Link
+          href={flight.ladderUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <ExternalLink style={{ verticalAlign: "middle" }} />
         </Link>
-        <Link href={flight.igcUrl} isExternal onClick={(e) => e.stopPropagation()}>
-          <ViewIcon verticalAlign="middle" />
+        <Link
+          href={flight.igcUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Eye style={{ verticalAlign: "middle" }} />
         </Link>
       </HStack>
     </HStack>

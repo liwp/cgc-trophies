@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { IconButton, Stack } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
@@ -11,28 +11,30 @@ const Season = ({ season }: { season: number }) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <Stack spacing={4} direction="row" align="center">
+    <Stack gap={4} direction="row" align="center">
       <IconButton
         aria-label="Previous season"
-        icon={<ArrowLeftIcon />}
-        isDisabled={season === firstYear}
+        disabled={season === firstYear}
         onClick={() =>
           router.replace({
             query: { ...router.query, season: season - 1 },
           })
         }
-      />
+      >
+        <ChevronLeft />
+      </IconButton>
       <span>{season}</span>
       <IconButton
         aria-label="Next season"
-        icon={<ArrowRightIcon />}
-        isDisabled={season === currentYear}
+        disabled={season === currentYear}
         onClick={() =>
           router.replace({
             query: { ...router.query, season: season + 1 },
           })
         }
-      />
+      >
+        <ChevronRight />
+      </IconButton>
     </Stack>
   );
 };

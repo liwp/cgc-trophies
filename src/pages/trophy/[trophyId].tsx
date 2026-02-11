@@ -5,29 +5,19 @@ import { useRouter } from "next/router";
 import {
   Box,
   Card,
-  CardHeader,
-  CardBody,
   Center,
-  FormControl,
-  FormLabel,
+  Field,
   Heading,
   Image,
   Link,
+  Separator,
   Stack,
-  StackDivider,
   Switch,
   Table,
-  TableCaption,
-  TableContainer,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
   VStack,
 } from "@chakra-ui/react";
-import { ArrowBackIcon, ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { ArrowLeft, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 
 import CGC_TROPHIES from "../../lib/cgc_trophies";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
@@ -37,7 +27,14 @@ import UnknownTrophy from "../../components/UnknownTrophy";
 import { trophyEval, ladderEval } from "../../lib/eval";
 import useFlights from "../../lib/useFlights";
 import { formatPilotName } from "../../lib/trophyCopyData";
-import type { Flight, FlightTrophy, LadderTrophy, LadderResult, ScoredFlight, Trophy } from "../../types";
+import type {
+  Flight,
+  FlightTrophy,
+  LadderTrophy,
+  LadderResult,
+  ScoredFlight,
+  Trophy,
+} from "../../types";
 
 const CONFIG = CGC_TROPHIES.config;
 const TROPHIES = keyBy(CGC_TROPHIES.trophies, "id");
@@ -63,7 +60,11 @@ const Score = ({ value, unit }: { value: number; unit: string }) => {
   );
 };
 
-const Task = ({ task }: { task: { start: string; turnpoints: string[]; finish: string } }) => {
+const Task = ({
+  task,
+}: {
+  task: { start: string; turnpoints: string[]; finish: string };
+}) => {
   const tps = [task.start, ...task.turnpoints, task.finish];
 
   return <span>{tps.join(" - ")}</span>;
@@ -79,30 +80,39 @@ const Result = ({ result }: { result: ScoredFlight }) => {
   } = result;
 
   return (
-    <Tr>
-      <Td>{formatPilotName(pilot)}</Td>
-      <Td>{date.toLocaleDateString()}</Td>
-      <Td>
+    <Table.Row>
+      <Table.Cell>{formatPilotName(pilot)}</Table.Cell>
+      <Table.Cell>{date.toLocaleDateString()}</Table.Cell>
+      <Table.Cell>
         <Score value={value} unit={unit} />
-      </Td>
-      <Td>
+      </Table.Cell>
+      <Table.Cell>
         <Task task={task} />
-      </Td>
-      <Td>
+      </Table.Cell>
+      <Table.Cell>
         <Center>
           <Link
             href={`https://www.bgaladder.net/flightdetails/${id}`}
-            isExternal
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <ExternalLinkIcon />
+            <ExternalLink />
           </Link>
         </Center>
-      </Td>
-    </Tr>
+      </Table.Cell>
+    </Table.Row>
   );
 };
 
-const ResultsList = ({ results, season, trophy }: { results: ScoredFlight[]; season: number; trophy: string }) => {
+const ResultsList = ({
+  results,
+  season,
+  trophy,
+}: {
+  results: ScoredFlight[];
+  season: number;
+  trophy: string;
+}) => {
   const [unique, setUnique] = useState(true);
 
   const filtered = unique ? uniqBy(results, "pilot") : results;
@@ -120,77 +130,87 @@ const ResultsList = ({ results, season, trophy }: { results: ScoredFlight[]; sea
       <Box pb="20px">
         <Toggle
           id="unique"
-          isChecked={unique}
+          checked={unique}
           label="One flight per pilot?"
           onChange={() => setUnique(!unique)}
         />
       </Box>
 
-      <TableContainer>
-        <Table size="md" variant="striped">
-          <TableCaption>
+      <Table.ScrollArea>
+        <Table.Root size="md" variant="outline" striped>
+          <Table.Caption>
             {trophy} {season} Results
-          </TableCaption>
-          <Thead>
-            <Tr>
-              <Th>Pilot</Th>
-              <Th>Date</Th>
-              <Th>Score</Th>
-              <Th>Task</Th>
-              <Th>
+          </Table.Caption>
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeader>Pilot</Table.ColumnHeader>
+              <Table.ColumnHeader>Date</Table.ColumnHeader>
+              <Table.ColumnHeader>Score</Table.ColumnHeader>
+              <Table.ColumnHeader>Task</Table.ColumnHeader>
+              <Table.ColumnHeader>
                 <Center>Ladder</Center>
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+              </Table.ColumnHeader>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
             {filtered.map((result) => (
               <Result key={result.id} result={result} />
             ))}
-          </Tbody>
-        </Table>
-      </TableContainer>
+          </Table.Body>
+        </Table.Root>
+      </Table.ScrollArea>
     </Box>
   );
 };
 
 const LadderFlightRow = ({ flight }: { flight: Flight }) => {
   return (
-    <Tr>
-      <Td pl="40px">{formatPilotName(flight.pilot)}</Td>
-      <Td>{flight.date.toLocaleDateString()}</Td>
-      <Td>{flight.task.crossCountryPoints.toFixed(0)} pts</Td>
-      <Td>
+    <Table.Row>
+      <Table.Cell pl="40px">{formatPilotName(flight.pilot)}</Table.Cell>
+      <Table.Cell>{flight.date.toLocaleDateString()}</Table.Cell>
+      <Table.Cell>{flight.task.crossCountryPoints.toFixed(0)} pts</Table.Cell>
+      <Table.Cell>
         <Center>
           <Link
             href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
-            isExternal
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <ExternalLinkIcon />
+            <ExternalLink />
           </Link>
         </Center>
-      </Td>
-    </Tr>
+      </Table.Cell>
+    </Table.Row>
   );
 };
 
-const LadderResultRow = ({ result, rank, isSyndicate }: { result: LadderResult; rank: number; isSyndicate: boolean }) => {
+const LadderResultRow = ({
+  result,
+  rank,
+  isSyndicate,
+}: {
+  result: LadderResult;
+  rank: number;
+  isSyndicate: boolean;
+}) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <>
-      <Tr
-        cursor="pointer"
-        onClick={() => setExpanded(!expanded)}
-      >
-        <Td>{rank}</Td>
-        <Td>{isSyndicate ? result.key : formatPilotName(result.key)}</Td>
-        {isSyndicate && <Td>{result.pilots.map(formatPilotName).join(", ")}</Td>}
-        <Td>{result.totalScore.toFixed(0)} pts</Td>
-        <Td>{result.flights.length}</Td>
-        <Td>
-          {expanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
-        </Td>
-      </Tr>
+      <Table.Row cursor="pointer" onClick={() => setExpanded(!expanded)}>
+        <Table.Cell>{rank}</Table.Cell>
+        <Table.Cell>
+          {isSyndicate ? result.key : formatPilotName(result.key)}
+        </Table.Cell>
+        {isSyndicate && (
+          <Table.Cell>
+            {result.pilots.map(formatPilotName).join(", ")}
+          </Table.Cell>
+        )}
+        <Table.Cell>{result.totalScore.toFixed(0)} pts</Table.Cell>
+        <Table.Cell>{result.flights.length}</Table.Cell>
+        <Table.Cell>{expanded ? <ChevronUp /> : <ChevronDown />}</Table.Cell>
+      </Table.Row>
       {expanded &&
         result.flights.map((flight) => (
           <LadderFlightRow key={flight.id} flight={flight} />
@@ -219,22 +239,24 @@ const LadderResultsList = ({
   }
 
   return (
-    <TableContainer>
-      <Table size="md" variant="striped">
-        <TableCaption>
+    <Table.ScrollArea>
+      <Table.Root size="md" variant="outline" striped>
+        <Table.Caption>
           {trophy} {season} Results
-        </TableCaption>
-        <Thead>
-          <Tr>
-            <Th>Rank</Th>
-            <Th>{isSyndicate ? "Glider" : "Pilot"}</Th>
-            {isSyndicate && <Th>Pilots</Th>}
-            <Th>Score</Th>
-            <Th>Flights</Th>
-            <Th></Th>
-          </Tr>
-        </Thead>
-        <Tbody>
+        </Table.Caption>
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeader>Rank</Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {isSyndicate ? "Glider" : "Pilot"}
+            </Table.ColumnHeader>
+            {isSyndicate && <Table.ColumnHeader>Pilots</Table.ColumnHeader>}
+            <Table.ColumnHeader>Score</Table.ColumnHeader>
+            <Table.ColumnHeader>Flights</Table.ColumnHeader>
+            <Table.ColumnHeader></Table.ColumnHeader>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
           {results.map((result, i) => (
             <LadderResultRow
               key={result.key}
@@ -243,9 +265,9 @@ const LadderResultsList = ({
               isSyndicate={isSyndicate}
             />
           ))}
-        </Tbody>
-      </Table>
-    </TableContainer>
+        </Table.Body>
+      </Table.Root>
+    </Table.ScrollArea>
   );
 };
 
@@ -259,28 +281,37 @@ const Toggle = ({
   id,
   label,
   onChange,
-  isChecked,
+  checked,
 }: {
   id: string;
   label: string;
   onChange: () => void;
-  isChecked: boolean;
+  checked: boolean;
 }) => {
   return (
-    <FormControl display="flex" alignItems="center" justifyContent="flex-end">
-      <FormLabel htmlFor={id} mb="0">
+    <Field.Root display="flex" alignItems="center" justifyContent="flex-end">
+      <Field.Label htmlFor={id} mb="0">
         {label}
-      </FormLabel>
-      <Switch id={id} isChecked={isChecked} onChange={onChange} size="sm" />
-    </FormControl>
+      </Field.Label>
+      <Switch.Root
+        id={id}
+        checked={checked}
+        onCheckedChange={onChange}
+        size="sm"
+      >
+        <Switch.Thumb />
+      </Switch.Root>
+    </Field.Root>
   );
 };
 
 const AllTrophies = ({ season }: { season: number }) => {
   return (
     <Box display="flex" alignItems="center">
-      <Link as={NextLink} href={`/?season=${season}`}>
-        <ArrowBackIcon /> <Text as="span">All Trophies</Text>
+      <Link asChild>
+        <NextLink href={`/?season=${season}`}>
+          <ArrowLeft /> <Text as="span">All Trophies</Text>
+        </NextLink>
       </Link>
     </Box>
   );
@@ -300,18 +331,19 @@ const TrophyPage = () => {
   const isLadder = config.type === "ladder";
 
   return (
-    <Card variant="outline">
+    <Card.Root variant="outline">
       <AllTrophies season={season} />
 
-      <CardHeader display="flex" alignItems="center">
+      <Card.Header display="flex" alignItems="center">
         <Heading size="md" flex="1">
           {config.name}
         </Heading>
         <Season season={season} />
-      </CardHeader>
+      </Card.Header>
 
-      <CardBody>
-        <Stack divider={<StackDivider />} spacing="4">
+      <Card.Body>
+        <Stack gap="4">
+          <Separator />
           <Box>
             <TrophyImage image={sample(config.img)} />
             <Text pt="2" fontSize="sm">
@@ -319,23 +351,34 @@ const TrophyPage = () => {
             </Text>
           </Box>
 
+          <Separator />
           {isLadder ? (
             <LadderResultsList
-              results={ladderEval(CONFIG, season, flights!, config as LadderTrophy)}
+              results={ladderEval(
+                CONFIG,
+                season,
+                flights!,
+                config as LadderTrophy,
+              )}
               season={season}
               trophy={config.name}
               isSyndicate={(config as LadderTrophy).groupBy === "registration"}
             />
           ) : (
             <ResultsList
-              results={trophyEval(CONFIG, season, flights!, config as FlightTrophy)}
+              results={trophyEval(
+                CONFIG,
+                season,
+                flights!,
+                config as FlightTrophy,
+              )}
               season={season}
               trophy={config.name}
             />
           )}
         </Stack>
-      </CardBody>
-    </Card>
+      </Card.Body>
+    </Card.Root>
   );
 };
 

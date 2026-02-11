@@ -1,13 +1,4 @@
-import {
-  Box,
-  Center,
-  Heading,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatGroup,
-} from "@chakra-ui/react";
+import { Box, Center, Heading, Stat, StatGroup } from "@chakra-ui/react";
 
 import { calculateStats } from "../lib/stats";
 import type { Flight } from "../types";
@@ -23,15 +14,15 @@ const FlightCategory = ({
 }) => {
   return (
     <Center>
-      <Stat>
-        <StatLabel>{label}</StatLabel>
-        <StatNumber>{completed || 0}</StatNumber>
-        <StatHelpText>
+      <Stat.Root>
+        <Stat.Label>{label}</Stat.Label>
+        <Stat.ValueText>{completed || 0}</Stat.ValueText>
+        <Stat.HelpText>
           Attempts
           <br />
           {total || 0}
-        </StatHelpText>
-      </Stat>
+        </Stat.HelpText>
+      </Stat.Root>
     </Center>
   );
 };
