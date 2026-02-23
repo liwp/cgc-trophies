@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@theme {
+  --color-cambridge: #6cb4c4;
+  --color-cambridge-dark: #5a9baa;
+  --color-cambridge-light: #e8f4f7;
+}
