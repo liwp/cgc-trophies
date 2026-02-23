@@ -1,28 +1,66 @@
 import React, { useState } from "react";
-import { keyBy, sample, uniqBy } from "lodash";
+import { keyBy, uniqBy } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { ArrowLeft, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Copy,
+  ExternalLink,
+} from "lucide-react";
 
 import CGC_TROPHIES from "../../lib/cgc_trophies";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
 import Loading from "../../components/Loading";
+import PageLayout from "../../components/PageLayout";
 import Season from "../../components/Season";
+import Tooltip from "../../components/Tooltip";
 import UnknownTrophy from "../../components/UnknownTrophy";
 import { trophyEval, ladderEval } from "../../lib/eval";
+import { getTrophyNav } from "../../lib/trophyNav";
+import {
+  copyDataToClipboard,
+  flightCopyData,
+  formatPilotName,
+  ladderCopyData,
+} from "../../lib/trophyCopyData";
 import useFlights from "../../lib/useFlights";
-import { formatPilotName } from "../../lib/trophyCopyData";
 import type {
   Flight,
   FlightTrophy,
   LadderTrophy,
   LadderResult,
   ScoredFlight,
-  Trophy,
 } from "../../types";
 
 const CONFIG = CGC_TROPHIES.config;
 const TROPHIES = keyBy(CGC_TROPHIES.trophies, "id");
+
+const CopyButton = ({ data }: { data: [string, string][] }) => {
+  const [copied, setCopied] = React.useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    copyDataToClipboard(data).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <Tooltip text={copied ? "Copied!" : "Copy for spreadsheet"} align="right">
+      <button
+        aria-label="Copy to clipboard"
+        className={`p-1 rounded hover:bg-gray-100 ${copied ? "text-green-600" : "text-gray-400"}`}
+        onClick={handleCopy}
+      >
+        {copied ? <Check size={14} /> : <Copy size={14} />}
+      </button>
+    </Tooltip>
+  );
+};
 
 const Score = ({ value, unit }: { value: number; unit: string }) => {
   let display: string;
@@ -55,7 +93,13 @@ const Task = ({
   return <span>{tps.join(" - ")}</span>;
 };
 
-const Result = ({ result }: { result: ScoredFlight }) => {
+const Result = ({
+  result,
+  rank,
+}: {
+  result: ScoredFlight;
+  rank: number;
+}) => {
   const {
     date,
     id,
@@ -65,23 +109,27 @@ const Result = ({ result }: { result: ScoredFlight }) => {
   } = result;
 
   return (
-    <tr>
-      <td className="p-2">{formatPilotName(pilot)}</td>
-      <td className="p-2">{date.toLocaleDateString()}</td>
-      <td className="p-2">
+    <tr className={rank === 1 ? "bg-cambridge-light" : ""}>
+      <td className="px-4 py-3 text-gray-700">{formatPilotName(pilot)}</td>
+      <td className="px-4 py-3 text-gray-500">{date.toLocaleDateString()}</td>
+      <td className="px-4 py-3 text-gray-700">
         <Score value={value} unit={unit} />
       </td>
-      <td className="p-2">
+      <td className="px-4 py-3 text-gray-500">
         <Task task={task} />
       </td>
-      <td className="p-2 text-center">
-        <a
-          href={`https://www.bgaladder.net/flightdetails/${id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <ExternalLink size={16} className="inline" />
-        </a>
+      <td className="px-4 py-3 text-center">
+        <div className="inline-flex items-center gap-1">
+          {rank === 1 && <CopyButton data={flightCopyData(result)} />}
+          <a
+            href={`https://www.bgaladder.net/flightdetails/${id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-cambridge transition-colors"
+          >
+            <ExternalLink size={16} />
+          </a>
+        </div>
       </td>
     </tr>
   );
@@ -102,15 +150,15 @@ const ResultsList = ({
 
   if (filtered.length === 0) {
     return (
-      <div className="text-center">
-        <h3 className="text-sm font-semibold">No qualifying flights</h3>
+      <div className="py-8 text-center text-gray-400 italic">
+        No qualifying flights
       </div>
     );
   }
 
   return (
     <div>
-      <div className="pb-5">
+      <div className="pb-4">
         <Toggle
           id="unique"
           checked={unique}
@@ -121,21 +169,18 @@ const ResultsList = ({
 
       <div className="overflow-x-auto">
         <table className="w-full table-auto border-collapse">
-          <caption className="caption-bottom py-2 text-sm text-gray-500">
-            {trophy} {season} Results
-          </caption>
           <thead>
-            <tr className="border-b">
-              <th className="p-2 text-left font-semibold">Pilot</th>
-              <th className="p-2 text-left font-semibold">Date</th>
-              <th className="p-2 text-left font-semibold">Score</th>
-              <th className="p-2 text-left font-semibold">Task</th>
-              <th className="p-2 text-center font-semibold">Ladder</th>
+            <tr className="border-b border-gray-200 bg-gray-50">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Pilot</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Date</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Score</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Task</th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">Links</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((result, i) => (
-              <Result key={result.id} result={result} />
+              <Result key={result.id} result={result} rank={i + 1} />
             ))}
           </tbody>
         </table>
@@ -146,15 +191,16 @@ const ResultsList = ({
 
 const LadderFlightRow = ({ flight }: { flight: Flight }) => {
   return (
-    <tr>
-      <td className="p-2 pl-10">{formatPilotName(flight.pilot)}</td>
-      <td className="p-2">{flight.date.toLocaleDateString()}</td>
-      <td className="p-2">{flight.task.crossCountryPoints.toFixed(0)} pts</td>
-      <td className="p-2 text-center">
+    <tr className="bg-gray-50">
+      <td className="px-4 py-2 pl-10 text-gray-500">{formatPilotName(flight.pilot)}</td>
+      <td className="px-4 py-2 text-gray-500">{flight.date.toLocaleDateString()}</td>
+      <td className="px-4 py-2 text-gray-500">{flight.task.crossCountryPoints.toFixed(0)} pts</td>
+      <td className="px-4 py-2 text-center">
         <a
           href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
           target="_blank"
           rel="noopener noreferrer"
+          className="text-gray-400 hover:text-cambridge transition-colors"
         >
           <ExternalLink size={16} className="inline" />
         </a>
@@ -177,22 +223,33 @@ const LadderResultRow = ({
   return (
     <>
       <tr
-        className="cursor-pointer hover:bg-gray-50"
+        className={`cursor-pointer hover:bg-gray-50 transition-colors ${rank === 1 ? "bg-cambridge-light" : ""}`}
         onClick={() => setExpanded(!expanded)}
       >
-        <td className="p-2">{rank}</td>
-        <td className="p-2">
+        <td className="px-4 py-3 text-gray-500">{rank}</td>
+        <td className="px-4 py-3 text-gray-700">
           {isSyndicate ? result.key : formatPilotName(result.key)}
         </td>
         {isSyndicate && (
-          <td className="p-2">
+          <td className="px-4 py-3 text-gray-500">
             {result.pilots.map(formatPilotName).join(", ")}
           </td>
         )}
-        <td className="p-2">{result.totalScore.toFixed(0)} pts</td>
-        <td className="p-2">{result.flights.length}</td>
-        <td className="p-2">
-          {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        <td className="px-4 py-3 text-gray-700">{result.totalScore.toFixed(0)} pts</td>
+        <td className="px-4 py-3 text-gray-500">{result.flights.length}</td>
+        <td className="px-4 py-3">
+          <div className="inline-flex items-center gap-1">
+            {rank === 1 && (
+              <CopyButton
+                data={ladderCopyData(result, isSyndicate ? "registration" : "pilot")}
+              />
+            )}
+            {expanded ? (
+              <ChevronUp size={16} className="text-gray-400" />
+            ) : (
+              <ChevronDown size={16} className="text-gray-400" />
+            )}
+          </div>
         </td>
       </tr>
       {expanded &&
@@ -216,8 +273,8 @@ const LadderResultsList = ({
 }) => {
   if (results.length === 0) {
     return (
-      <div className="text-center">
-        <h3 className="text-sm font-semibold">No qualifying flights</h3>
+      <div className="py-8 text-center text-gray-400 italic">
+        No qualifying flights
       </div>
     );
   }
@@ -225,21 +282,18 @@ const LadderResultsList = ({
   return (
     <div className="overflow-x-auto">
       <table className="w-full table-auto border-collapse">
-        <caption className="caption-bottom py-2 text-sm text-gray-500">
-          {trophy} {season} Results
-        </caption>
         <thead>
-          <tr className="border-b">
-            <th className="p-2 text-left font-semibold">Rank</th>
-            <th className="p-2 text-left font-semibold">
+          <tr className="border-b border-gray-200 bg-gray-50">
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Rank</th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
               {isSyndicate ? "Glider" : "Pilot"}
             </th>
             {isSyndicate && (
-              <th className="p-2 text-left font-semibold">Pilots</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Pilots</th>
             )}
-            <th className="p-2 text-left font-semibold">Score</th>
-            <th className="p-2 text-left font-semibold">Flights</th>
-            <th className="p-2"></th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Score</th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Flights</th>
+            <th className="px-4 py-3"></th>
           </tr>
         </thead>
         <tbody>
@@ -257,16 +311,6 @@ const LadderResultsList = ({
   );
 };
 
-const TrophyImage = ({ image }: { image?: string }) => {
-  return !!image ? (
-    <img
-      alt="trophy photo"
-      className="rounded h-[150px] w-[150px] object-cover"
-      src={image}
-    />
-  ) : null;
-};
-
 const Toggle = ({
   id,
   label,
@@ -280,7 +324,7 @@ const Toggle = ({
 }) => {
   return (
     <div className="flex items-center justify-end gap-2">
-      <label htmlFor={id} className="text-sm">
+      <label htmlFor={id} className="text-sm text-gray-500">
         {label}
       </label>
       <input
@@ -294,15 +338,40 @@ const Toggle = ({
   );
 };
 
-const AllTrophies = ({ season }: { season: number }) => {
+const TrophyNavBar = ({ trophyId, season }: { trophyId: string; season: number }) => {
+  const { prev, next } = getTrophyNav(trophyId);
+
   return (
-    <div className="flex items-center">
+    <div className="flex items-center justify-between">
       <NextLink
         href={`/?season=${season}`}
-        className="inline-flex items-center gap-1"
+        className="inline-flex items-center gap-1 text-cambridge hover:text-cambridge-dark transition-colors"
       >
         <ArrowLeft size={16} /> <span>All Trophies</span>
       </NextLink>
+      <div className="flex items-center gap-3 text-sm">
+        {prev ? (
+          <NextLink
+            href={`/trophy/${prev.id}?season=${season}`}
+            className="inline-flex items-center gap-1 text-gray-500 hover:text-cambridge transition-colors"
+          >
+            <ChevronLeft size={16} /> {prev.name}
+          </NextLink>
+        ) : (
+          <span />
+        )}
+        {prev && next && <span className="text-gray-300">|</span>}
+        {next ? (
+          <NextLink
+            href={`/trophy/${next.id}?season=${season}`}
+            className="inline-flex items-center gap-1 text-gray-500 hover:text-cambridge transition-colors"
+          >
+            {next.name} <ChevronRight size={16} />
+          </NextLink>
+        ) : (
+          <span />
+        )}
+      </div>
     </div>
   );
 };
@@ -321,23 +390,18 @@ const TrophyPage = () => {
   const isLadder = config.type === "ladder";
 
   return (
-    <div className="border rounded-lg">
-      <AllTrophies season={season} />
+    <PageLayout>
+      <div className="flex flex-col gap-6">
+        <TrophyNavBar trophyId={trophyId} season={season} />
 
-      <div className="p-4 flex items-center">
-        <h2 className="text-lg font-semibold flex-1">{config.name}</h2>
-        <Season season={season} />
-      </div>
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">{config.name}</h2>
+          <Season season={season} />
+        </div>
 
-      <div className="p-4">
-        <div className="flex flex-col gap-4">
-          <hr />
-          <div>
-            <TrophyImage image={sample(config.img)} />
-            <p className="pt-2 text-sm">{config.description}</p>
-          </div>
+        <p className="text-sm text-gray-500">{config.description}</p>
 
-          <hr />
+        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
           {isLadder ? (
             <LadderResultsList
               results={ladderEval(
@@ -364,7 +428,7 @@ const TrophyPage = () => {
           )}
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
