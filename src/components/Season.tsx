@@ -1,8 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/router";
 
-// There is one flight in the previous season, so we think 2007 is the first
-// proper season that the ladder has data for.
 const firstYear = 2007;
 
 const Season = ({ season }: { season: number }) => {
@@ -10,31 +8,29 @@ const Season = ({ season }: { season: number }) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="flex flex-row items-center gap-4">
+    <div className="flex items-center gap-2">
       <button
         aria-label="Previous season"
-        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+        className="p-1.5 rounded-lg hover:bg-cambridge-light hover:text-cambridge-dark disabled:opacity-30 transition-colors"
         disabled={season === firstYear}
         onClick={() =>
-          router.replace({
-            query: { ...router.query, season: season - 1 },
-          })
+          router.replace({ query: { ...router.query, season: season - 1 } })
         }
       >
-        <ChevronLeft size={20} />
+        <ChevronLeft size={18} />
       </button>
-      <span>{season}</span>
+      <span className="text-lg font-semibold text-gray-900 tabular-nums min-w-[4ch] text-center">
+        {season}
+      </span>
       <button
         aria-label="Next season"
-        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+        className="p-1.5 rounded-lg hover:bg-cambridge-light hover:text-cambridge-dark disabled:opacity-30 transition-colors"
         disabled={season === currentYear}
         onClick={() =>
-          router.replace({
-            query: { ...router.query, season: season + 1 },
-          })
+          router.replace({ query: { ...router.query, season: season + 1 } })
         }
       >
-        <ChevronRight size={20} />
+        <ChevronRight size={18} />
       </button>
     </div>
   );
