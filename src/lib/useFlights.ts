@@ -51,7 +51,9 @@ function useFlights(): {
 
   const flights =
     !isLoading && !error
-      ? data.flights.filter((f: Flight) => f.task.launchSite === "Gransden Lodge")
+      ? data.flights.filter(
+          (f: Flight) => f.task.launchSite === "Gransden Lodge",
+        )
       : undefined;
 
   return {

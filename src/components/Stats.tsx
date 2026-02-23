@@ -12,8 +12,12 @@ const FlightCategory = ({
 }) => {
   return (
     <div className="text-center">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</div>
-      <div className="text-2xl font-bold text-gray-900 mt-1">{completed || 0}</div>
+      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+        {label}
+      </div>
+      <div className="text-2xl font-bold text-gray-900 mt-1">
+        {completed || 0}
+      </div>
       <div className="text-xs text-gray-400">of {total || 0} attempts</div>
     </div>
   );
@@ -22,7 +26,9 @@ const FlightCategory = ({
 const Stats = ({ flights, season }: { flights: Flight[]; season: number }) => {
   const start = new Date(`${season}-01-01`);
   const end = new Date(`${season}-12-31`);
-  const flightsInYear = flights.filter(({ date }) => start <= date && date <= end);
+  const flightsInYear = flights.filter(
+    ({ date }) => start <= date && date <= end,
+  );
   const stats = calculateStats(flightsInYear);
 
   return (

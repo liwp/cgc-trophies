@@ -1,4 +1,9 @@
-import type { TrophiesConfig, FlightTrophy, LadderTrophy, Trophy } from "../types";
+import type {
+  TrophiesConfig,
+  FlightTrophy,
+  LadderTrophy,
+  Trophy,
+} from "../types";
 
 // Common base lines for tasks
 const IS_FROM_GRANSDEN_LODGE: any[] = [

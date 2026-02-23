@@ -74,10 +74,13 @@ function parseSpec(spec: any, obj: Record<string, string>): any {
       val = parseNumber(obj[src]);
       break;
     case "object":
-      val = Object.entries(src).reduce((acc: Record<string, any>, [key, subspec]) => {
-        acc[key] = parseSpec(subspec, obj);
-        return acc;
-      }, {});
+      val = Object.entries(src).reduce(
+        (acc: Record<string, any>, [key, subspec]) => {
+          acc[key] = parseSpec(subspec, obj);
+          return acc;
+        },
+        {},
+      );
       break;
     case "array":
       val = (src as any[]).map((s) => parseSpec(s, obj));

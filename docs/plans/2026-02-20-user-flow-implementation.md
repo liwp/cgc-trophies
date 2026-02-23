@@ -17,6 +17,7 @@
 Set up the Cambridge blue/teal accent color in Tailwind v4 and create a shared page layout wrapper.
 
 **Files:**
+
 - Modify: `src/styles/globals.css`
 - Create: `src/components/PageLayout.tsx`
 - Modify: `src/components/Loading.tsx`
@@ -45,9 +46,7 @@ Create `src/components/PageLayout.tsx`:
 function PageLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-4xl px-6 py-8">
-        {children}
-      </div>
+      <div className="mx-auto max-w-4xl px-6 py-8">{children}</div>
     </div>
   );
 }
@@ -110,12 +109,14 @@ git commit -m "feat: add Cambridge teal theme tokens and PageLayout wrapper"
 Strip the home page down to a clean leaderboard table. Move CopyButton and WinnerDetails usage out.
 
 **Files:**
+
 - Modify: `src/pages/index.tsx`
 - Modify: `src/components/Stats.tsx`
 
 **Step 1: Rewrite the home page**
 
 Replace `src/pages/index.tsx` with a clean leaderboard. Key changes:
+
 - Remove `CopyButton`, `WinnerDetails` imports and components
 - Remove `TrophyWinner` inline flight detail rendering
 - Add `PageLayout` wrapper
@@ -154,7 +155,9 @@ function formatScore(trophy: any): string {
   const sf = trophy.results[0] as ScoredFlight | undefined;
   if (!sf) return "";
   const { value, unit } = sf.score;
-  return unit === "pts" ? `${value.toFixed(0)} ${unit}` : `${value.toFixed(1)} ${unit}`;
+  return unit === "pts"
+    ? `${value.toFixed(0)} ${unit}`
+    : `${value.toFixed(1)} ${unit}`;
 }
 
 function formatWinner(trophy: any): string {
@@ -169,13 +172,24 @@ function formatWinner(trophy: any): string {
   return sf ? formatPilotName(sf.pilot) : "No qualifying flights";
 }
 
-const TrophyList = ({ flights, season }: { flights: Flight[]; season: number }) => {
+const TrophyList = ({
+  flights,
+  season,
+}: {
+  flights: Flight[];
+  season: number;
+}) => {
   const trophies = TROPHIES.trophies.map((trophy) => {
     const results =
       trophy.type === "ladder"
         ? ladderEval(TROPHIES.config, season, flights, trophy as LadderTrophy)
         : trophyEval(TROPHIES.config, season, flights, trophy as FlightTrophy);
-    return { ...trophy, results, groupBy: (trophy as LadderTrophy).groupBy, season };
+    return {
+      ...trophy,
+      results,
+      groupBy: (trophy as LadderTrophy).groupBy,
+      season,
+    };
   });
 
   return (
@@ -183,16 +197,25 @@ const TrophyList = ({ flights, season }: { flights: Flight[]; season: number }) 
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Trophy</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Winner</th>
-            <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Score</th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+              Trophy
+            </th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+              Winner
+            </th>
+            <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+              Score
+            </th>
           </tr>
         </thead>
         <tbody>
           {trophies.map((trophy) => {
             const hasResults = trophy.results.length > 0;
             return (
-              <tr key={trophy.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              <tr
+                key={trophy.id}
+                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              >
                 <td className="px-4 py-3">
                   <Link
                     href={`/trophy/${trophy.id}?season=${season}`}
@@ -202,8 +225,12 @@ const TrophyList = ({ flights, season }: { flights: Flight[]; season: number }) 
                   </Link>
                 </td>
                 <td className="px-4 py-3 text-gray-700">
-                  {hasResults ? formatWinner(trophy) : (
-                    <span className="text-gray-400 italic">No qualifying flights</span>
+                  {hasResults ? (
+                    formatWinner(trophy)
+                  ) : (
+                    <span className="text-gray-400 italic">
+                      No qualifying flights
+                    </span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-right text-gray-500">
@@ -228,11 +255,16 @@ const TrophiesPage = () => {
     <PageLayout>
       <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">CGC {season} Trophies</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            CGC {season} Trophies
+          </h1>
           <div className="flex items-center gap-4">
             <Season season={season} />
             <Tooltip text="Admin view">
-              <Link href={`/admin?season=${season}`} className="p-2 rounded-lg text-gray-400 hover:text-cambridge hover:bg-cambridge-light transition-colors">
+              <Link
+                href={`/admin?season=${season}`}
+                className="p-2 rounded-lg text-gray-400 hover:text-cambridge hover:bg-cambridge-light transition-colors"
+              >
                 <Settings size={18} />
               </Link>
             </Tooltip>
@@ -267,8 +299,12 @@ const FlightCategory = ({
 }) => {
   return (
     <div className="text-center">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</div>
-      <div className="text-2xl font-bold text-gray-900 mt-1">{completed || 0}</div>
+      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+        {label}
+      </div>
+      <div className="text-2xl font-bold text-gray-900 mt-1">
+        {completed || 0}
+      </div>
       <div className="text-xs text-gray-400">of {total || 0} attempts</div>
     </div>
   );
@@ -277,7 +313,9 @@ const FlightCategory = ({
 const Stats = ({ flights, season }: { flights: Flight[]; season: number }) => {
   const start = new Date(`${season}-01-01`);
   const end = new Date(`${season}-12-31`);
-  const flightsInYear = flights.filter(({ date }) => start <= date && date <= end);
+  const flightsInYear = flights.filter(
+    ({ date }) => start <= date && date <= end,
+  );
   const stats = calculateStats(flightsInYear);
 
   return (
@@ -320,6 +358,7 @@ git commit -m "feat: simplify public home page to clean leaderboard"
 Create a small utility for getting previous/next trophy IDs from the TROPHIES config. This is used by the trophy detail page.
 
 **Files:**
+
 - Create: `src/lib/trophyNav.ts`
 - Create: `test/lib/trophyNav.test.ts`
 
@@ -420,11 +459,13 @@ git commit -m "feat: add trophyNav helper for prev/next trophy navigation"
 Add next/prev navigation, copy button on winner, remove trophy images, apply PageLayout and visual polish.
 
 **Files:**
+
 - Modify: `src/pages/trophy/[trophyId].tsx`
 
 **Step 1: Rewrite the trophy detail page**
 
 Key changes to `src/pages/trophy/[trophyId].tsx`:
+
 - Import `PageLayout` and wrap the page
 - Import `getTrophyNav` and render prev/next links at the top
 - Remove `TrophyImage` component entirely
@@ -443,6 +484,7 @@ The `AllTrophies` component already exists — update it and add the prev/next l
 For the copy button: import `copyDataToClipboard`, `flightCopyData`, `ladderCopyData` from `trophyCopyData.ts`. Add a copy icon button next to the first result row in `ResultsList` and `LadderResultsList`.
 
 This is a large file rewrite. The full replacement is the existing page with these specific modifications:
+
 - Remove `TrophyImage` component and its usage
 - Remove `sample` import from lodash (was for random image selection)
 - Add `getTrophyNav` import and `TrophyNavBar` component
@@ -453,6 +495,7 @@ This is a large file rewrite. The full replacement is the existing page with the
 **Step 2: Run dev server and verify**
 
 Open http://localhost:3000/trophy/L2?season=2025 — verify:
+
 - Next/prev trophy links work and preserve season
 - No trophy images shown
 - Copy button present on first result
@@ -480,6 +523,7 @@ git commit -m "feat: add next/prev navigation and copy button to trophy detail p
 Create the admin page with all trophies, expandable results, per-entry copy buttons and BGA links.
 
 **Files:**
+
 - Create: `src/pages/admin.tsx`
 
 **Step 1: Create the admin page**
@@ -492,6 +536,7 @@ Create `src/pages/admin.tsx`. This is the largest new file. Structure:
 4. `LadderResultEntry` — one ladder result row: rank, pilot/registration, total score, expandable flights, copy button, BGA links
 
 Key details:
+
 - Header: "CGC {season} Trophies — Admin" + season picker + "← Public view" link
 - TOC: horizontal list of trophy names as anchor links (`#trophy-{id}`)
 - Each trophy section has `id={`trophy-${trophy.id}`}` for anchor navigation
@@ -505,6 +550,7 @@ The admin page evaluates all trophies the same way the current home page does (u
 **Step 2: Run dev server and verify**
 
 Open http://localhost:3000/admin?season=2025 — verify:
+
 - All trophies listed with TOC at top
 - Anchor links scroll to the right section
 - Expandable results work for both flight and ladder trophies
@@ -532,6 +578,7 @@ git commit -m "feat: add admin dashboard with expandable results and per-entry c
 Apply the visual design to the Season picker and other shared components.
 
 **Files:**
+
 - Modify: `src/components/Season.tsx`
 - Modify: `src/components/FlightLoadFailure.tsx`
 - Modify: `src/components/UnknownTrophy.tsx`
@@ -539,6 +586,7 @@ Apply the visual design to the Season picker and other shared components.
 **Step 1: Update Season picker**
 
 Update `src/components/Season.tsx`:
+
 - Cambridge teal hover color on arrow buttons
 - Slightly larger season text
 
@@ -621,7 +669,10 @@ function UnknownTrophy({ trophyId }: { trophyId: string }) {
           Unknown trophy: <em className="text-cambridge-dark">{trophyId}</em>
         </p>
         <p className="mt-2">
-          <Link href="/" className="text-cambridge hover:text-cambridge-dark transition-colors">
+          <Link
+            href="/"
+            className="text-cambridge hover:text-cambridge-dark transition-colors"
+          >
             Return to the main page
           </Link>
         </p>
@@ -659,6 +710,7 @@ git commit -m "feat: polish Season picker and error components with Cambridge te
 Remove the stub route and unused code.
 
 **Files:**
+
 - Delete: `src/pages/season/[season]/trophy/[trophy].tsx`
 - Optionally clean up: `src/pages/components.tsx` (showcase page — keep or remove per preference)
 
@@ -693,12 +745,12 @@ git commit -m "chore: remove unused stub route /season/[season]/trophy/[trophy]"
 
 ## Task Summary
 
-| Task | Description | Key Files |
-|------|-------------|-----------|
-| 1 | Theme tokens + PageLayout | `globals.css`, `PageLayout.tsx`, `Loading.tsx` |
-| 2 | Clean public home page | `index.tsx`, `Stats.tsx` |
-| 3 | Trophy nav helper (TDD) | `trophyNav.ts`, `trophyNav.test.ts` |
-| 4 | Trophy detail page updates | `[trophyId].tsx` |
-| 5 | Admin dashboard (new page) | `admin.tsx` |
-| 6 | Polish shared components | `Season.tsx`, `FlightLoadFailure.tsx`, `UnknownTrophy.tsx` |
-| 7 | Cleanup stub route | Delete `[trophy].tsx` |
+| Task | Description                | Key Files                                                  |
+| ---- | -------------------------- | ---------------------------------------------------------- |
+| 1    | Theme tokens + PageLayout  | `globals.css`, `PageLayout.tsx`, `Loading.tsx`             |
+| 2    | Clean public home page     | `index.tsx`, `Stats.tsx`                                   |
+| 3    | Trophy nav helper (TDD)    | `trophyNav.ts`, `trophyNav.test.ts`                        |
+| 4    | Trophy detail page updates | `[trophyId].tsx`                                           |
+| 5    | Admin dashboard (new page) | `admin.tsx`                                                |
+| 6    | Polish shared components   | `Season.tsx`, `FlightLoadFailure.tsx`, `UnknownTrophy.tsx` |
+| 7    | Cleanup stub route         | Delete `[trophy].tsx`                                      |

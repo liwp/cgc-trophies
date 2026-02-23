@@ -10,7 +10,9 @@ const defaultConfig: TrophyConfig = {
   },
 };
 
-function makeFlight(overrides: Partial<Flight> & { id: string; pilot: string }): Flight {
+function makeFlight(
+  overrides: Partial<Flight> & { id: string; pilot: string },
+): Flight {
   return {
     date: new Date("2024-06-15"),
     glider: { type: "ASW 20", handicap: 100, registration: "G-TEST" },
@@ -45,9 +47,30 @@ describe("ladderEval", () => {
 
   it("groups flights by pilot and sums top N scores", () => {
     const flights: Flight[] = [
-      makeFlight({ id: "1", pilot: "Alice", task: { ...makeFlight({ id: "", pilot: "" }).task, crossCountryPoints: 100 } }),
-      makeFlight({ id: "2", pilot: "Alice", task: { ...makeFlight({ id: "", pilot: "" }).task, crossCountryPoints: 80 } }),
-      makeFlight({ id: "3", pilot: "Bob", task: { ...makeFlight({ id: "", pilot: "" }).task, crossCountryPoints: 90 } }),
+      makeFlight({
+        id: "1",
+        pilot: "Alice",
+        task: {
+          ...makeFlight({ id: "", pilot: "" }).task,
+          crossCountryPoints: 100,
+        },
+      }),
+      makeFlight({
+        id: "2",
+        pilot: "Alice",
+        task: {
+          ...makeFlight({ id: "", pilot: "" }).task,
+          crossCountryPoints: 80,
+        },
+      }),
+      makeFlight({
+        id: "3",
+        pilot: "Bob",
+        task: {
+          ...makeFlight({ id: "", pilot: "" }).task,
+          crossCountryPoints: 90,
+        },
+      }),
     ];
 
     const results = ladderEval(defaultConfig, 2024, flights, openTrophy);
@@ -65,7 +88,10 @@ describe("ladderEval", () => {
       makeFlight({
         id: String(i + 1),
         pilot: "Alice",
-        task: { ...makeFlight({ id: "", pilot: "" }).task, crossCountryPoints: (8 - i) * 10 },
+        task: {
+          ...makeFlight({ id: "", pilot: "" }).task,
+          crossCountryPoints: (8 - i) * 10,
+        },
       }),
     );
 
@@ -115,9 +141,30 @@ describe("ladderEval", () => {
 
   it("sorts results by total score descending", () => {
     const flights: Flight[] = [
-      makeFlight({ id: "1", pilot: "Alice", task: { ...makeFlight({ id: "", pilot: "" }).task, crossCountryPoints: 50 } }),
-      makeFlight({ id: "2", pilot: "Bob", task: { ...makeFlight({ id: "", pilot: "" }).task, crossCountryPoints: 100 } }),
-      makeFlight({ id: "3", pilot: "Charlie", task: { ...makeFlight({ id: "", pilot: "" }).task, crossCountryPoints: 75 } }),
+      makeFlight({
+        id: "1",
+        pilot: "Alice",
+        task: {
+          ...makeFlight({ id: "", pilot: "" }).task,
+          crossCountryPoints: 50,
+        },
+      }),
+      makeFlight({
+        id: "2",
+        pilot: "Bob",
+        task: {
+          ...makeFlight({ id: "", pilot: "" }).task,
+          crossCountryPoints: 100,
+        },
+      }),
+      makeFlight({
+        id: "3",
+        pilot: "Charlie",
+        task: {
+          ...makeFlight({ id: "", pilot: "" }).task,
+          crossCountryPoints: 75,
+        },
+      }),
     ];
 
     const results = ladderEval(defaultConfig, 2024, flights, openTrophy);
@@ -139,8 +186,18 @@ describe("ladderEval", () => {
 
     it("groups by glider registration", () => {
       const flights: Flight[] = [
-        makeFlight({ id: "1", pilot: "Alice", glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" }, ladders: ["local2"] }),
-        makeFlight({ id: "2", pilot: "Bob", glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" }, ladders: ["local2"] }),
+        makeFlight({
+          id: "1",
+          pilot: "Alice",
+          glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" },
+          ladders: ["local2"],
+        }),
+        makeFlight({
+          id: "2",
+          pilot: "Bob",
+          glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" },
+          ladders: ["local2"],
+        }),
       ];
 
       const results = ladderEval(defaultConfig, 2024, flights, syndicateTrophy);
@@ -153,8 +210,22 @@ describe("ladderEval", () => {
 
     it("filters groups with fewer than minPilots", () => {
       const flights: Flight[] = [
-        makeFlight({ id: "1", pilot: "Alice", glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" }, ladders: ["local2"] }),
-        makeFlight({ id: "2", pilot: "Alice", glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" }, ladders: ["local2"], task: { ...makeFlight({ id: "", pilot: "" }).task, crossCountryPoints: 80 } }),
+        makeFlight({
+          id: "1",
+          pilot: "Alice",
+          glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" },
+          ladders: ["local2"],
+        }),
+        makeFlight({
+          id: "2",
+          pilot: "Alice",
+          glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" },
+          ladders: ["local2"],
+          task: {
+            ...makeFlight({ id: "", pilot: "" }).task,
+            crossCountryPoints: 80,
+          },
+        }),
       ];
 
       const results = ladderEval(defaultConfig, 2024, flights, syndicateTrophy);
@@ -165,7 +236,14 @@ describe("ladderEval", () => {
 
   it("handles fewer than N flights per pilot", () => {
     const flights: Flight[] = [
-      makeFlight({ id: "1", pilot: "Alice", task: { ...makeFlight({ id: "", pilot: "" }).task, crossCountryPoints: 100 } }),
+      makeFlight({
+        id: "1",
+        pilot: "Alice",
+        task: {
+          ...makeFlight({ id: "", pilot: "" }).task,
+          crossCountryPoints: 100,
+        },
+      }),
     ];
 
     const results = ladderEval(defaultConfig, 2024, flights, openTrophy);

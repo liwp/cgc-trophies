@@ -19,10 +19,10 @@ Clean, scannable leaderboard. Top to bottom:
 2. **Stats bar**: Existing flight completion stats (All Flights, 300km, 400km, 500km, 750km) in a card
 3. **Trophy table**: One row per trophy
 
-| Trophy | Winner | Score |
-|---|---|---|
-| Pot Pewter Pringle | J. Smith | 542 pts |
-| Mug Metal Machin | R. Welford | 312.4 km |
+| Trophy             | Winner     | Score    |
+| ------------------ | ---------- | -------- |
+| Pot Pewter Pringle | J. Smith   | 542 pts  |
+| Mug Metal Machin   | R. Welford | 312.4 km |
 
 - Trophy name links to `/trophy/[trophyId]`
 - No copy buttons, no inline flight details, no expandable rows

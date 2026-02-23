@@ -93,13 +93,7 @@ const Task = ({
   return <span>{tps.join(" - ")}</span>;
 };
 
-const Result = ({
-  result,
-  rank,
-}: {
-  result: ScoredFlight;
-  rank: number;
-}) => {
+const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
   const {
     date,
     id,
@@ -171,11 +165,21 @@ const ResultsList = ({
         <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Pilot</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Date</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Score</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Task</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">Links</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Pilot
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Date
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Score
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Task
+              </th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                Links
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -192,9 +196,15 @@ const ResultsList = ({
 const LadderFlightRow = ({ flight }: { flight: Flight }) => {
   return (
     <tr className="bg-gray-50">
-      <td className="px-4 py-2 pl-10 text-gray-500">{formatPilotName(flight.pilot)}</td>
-      <td className="px-4 py-2 text-gray-500">{flight.date.toLocaleDateString()}</td>
-      <td className="px-4 py-2 text-gray-500">{flight.task.crossCountryPoints.toFixed(0)} pts</td>
+      <td className="px-4 py-2 pl-10 text-gray-500">
+        {formatPilotName(flight.pilot)}
+      </td>
+      <td className="px-4 py-2 text-gray-500">
+        {flight.date.toLocaleDateString()}
+      </td>
+      <td className="px-4 py-2 text-gray-500">
+        {flight.task.crossCountryPoints.toFixed(0)} pts
+      </td>
       <td className="px-4 py-2 text-center">
         <a
           href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
@@ -235,13 +245,18 @@ const LadderResultRow = ({
             {result.pilots.map(formatPilotName).join(", ")}
           </td>
         )}
-        <td className="px-4 py-3 text-gray-700">{result.totalScore.toFixed(0)} pts</td>
+        <td className="px-4 py-3 text-gray-700">
+          {result.totalScore.toFixed(0)} pts
+        </td>
         <td className="px-4 py-3 text-gray-500">{result.flights.length}</td>
         <td className="px-4 py-3">
           <div className="inline-flex items-center gap-1">
             {rank === 1 && (
               <CopyButton
-                data={ladderCopyData(result, isSyndicate ? "registration" : "pilot")}
+                data={ladderCopyData(
+                  result,
+                  isSyndicate ? "registration" : "pilot",
+                )}
               />
             )}
             {expanded ? (
@@ -284,15 +299,23 @@ const LadderResultsList = ({
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Rank</th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+              Rank
+            </th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
               {isSyndicate ? "Glider" : "Pilot"}
             </th>
             {isSyndicate && (
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Pilots</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Pilots
+              </th>
             )}
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Score</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Flights</th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+              Score
+            </th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+              Flights
+            </th>
             <th className="px-4 py-3"></th>
           </tr>
         </thead>
@@ -338,7 +361,13 @@ const Toggle = ({
   );
 };
 
-const TrophyNavBar = ({ trophyId, season }: { trophyId: string; season: number }) => {
+const TrophyNavBar = ({
+  trophyId,
+  season,
+}: {
+  trophyId: string;
+  season: number;
+}) => {
   const { prev, next } = getTrophyNav(trophyId);
 
   return (

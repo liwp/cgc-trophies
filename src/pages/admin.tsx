@@ -69,11 +69,17 @@ const FlightResultEntry = ({
       : `${score.value.toFixed(1)} ${score.unit}`;
 
   return (
-    <tr className={rank === 1 ? "bg-cambridge-light" : "hover:bg-gray-50 transition-colors"}>
+    <tr
+      className={
+        rank === 1 ? "bg-cambridge-light" : "hover:bg-gray-50 transition-colors"
+      }
+    >
       <td className="px-4 py-2 text-gray-500 text-sm">{rank}</td>
       <td className="px-4 py-2 text-gray-700">{formatPilotName(pilot)}</td>
       <td className="px-4 py-2 text-gray-700">{scoreDisplay}</td>
-      <td className="px-4 py-2 text-gray-500 text-sm">{date.toLocaleDateString()}</td>
+      <td className="px-4 py-2 text-gray-500 text-sm">
+        {date.toLocaleDateString()}
+      </td>
       <td className="px-4 py-2 text-gray-500 text-sm">{tps}</td>
       <td className="px-4 py-2">
         <div className="inline-flex items-center gap-1">
@@ -95,11 +101,15 @@ const FlightResultEntry = ({
 const LadderFlightRow = ({ flight }: { flight: Flight }) => (
   <tr className="bg-gray-50">
     <td className="px-4 py-1.5" />
-    <td className="px-4 py-1.5 text-gray-500 text-sm pl-10">{formatPilotName(flight.pilot)}</td>
+    <td className="px-4 py-1.5 text-gray-500 text-sm pl-10">
+      {formatPilotName(flight.pilot)}
+    </td>
     <td className="px-4 py-1.5 text-gray-500 text-sm">
       {flight.task.crossCountryPoints.toFixed(0)} pts
     </td>
-    <td className="px-4 py-1.5 text-gray-500 text-sm">{flight.date.toLocaleDateString()}</td>
+    <td className="px-4 py-1.5 text-gray-500 text-sm">
+      {flight.date.toLocaleDateString()}
+    </td>
     <td className="px-4 py-1.5" />
     <td className="px-4 py-1.5">
       <a
@@ -137,13 +147,20 @@ const LadderResultEntry = ({
             ? `${result.key} (${result.pilots.map(formatPilotName).join(", ")})`
             : formatPilotName(result.key)}
         </td>
-        <td className="px-4 py-2 text-gray-700">{result.totalScore.toFixed(0)} pts</td>
-        <td className="px-4 py-2 text-gray-500 text-sm">{result.flights.length} flights</td>
+        <td className="px-4 py-2 text-gray-700">
+          {result.totalScore.toFixed(0)} pts
+        </td>
+        <td className="px-4 py-2 text-gray-500 text-sm">
+          {result.flights.length} flights
+        </td>
         <td className="px-4 py-2" />
         <td className="px-4 py-2">
           <div className="inline-flex items-center gap-1">
             <CopyButton
-              data={ladderCopyData(result, isSyndicate ? "registration" : "pilot")}
+              data={ladderCopyData(
+                result,
+                isSyndicate ? "registration" : "pilot",
+              )}
             />
             {expanded ? (
               <ChevronUp size={14} className="text-gray-400" />
@@ -172,7 +189,8 @@ const TrophySection = ({
 }) => {
   const [showAll, setShowAll] = useState(false);
   const isLadder = trophy.type === "ladder";
-  const isSyndicate = isLadder && (trophy as LadderTrophy).groupBy === "registration";
+  const isSyndicate =
+    isLadder && (trophy as LadderTrophy).groupBy === "registration";
 
   const results = isLadder
     ? ladderEval(TROPHIES.config, season, flights, trophy as LadderTrophy)
@@ -189,7 +207,10 @@ const TrophySection = ({
     } else {
       const sf = winner as ScoredFlight;
       const { value, unit } = sf.score;
-      const scoreStr = unit === "pts" ? `${value.toFixed(0)} ${unit}` : `${value.toFixed(1)} ${unit}`;
+      const scoreStr =
+        unit === "pts"
+          ? `${value.toFixed(0)} ${unit}`
+          : `${value.toFixed(1)} ${unit}`;
       winnerLabel = `${formatPilotName(sf.pilot)} — ${scoreStr}`;
     }
   }
@@ -216,16 +237,26 @@ const TrophySection = ({
               <table className="w-full table-auto border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="px-4 py-2 text-left font-semibold text-gray-700">#</th>
                     <th className="px-4 py-2 text-left font-semibold text-gray-700">
-                      {isLadder ? (isSyndicate ? "Glider / Pilots" : "Pilot") : "Pilot"}
+                      #
                     </th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-700">Score</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                      {isLadder
+                        ? isSyndicate
+                          ? "Glider / Pilots"
+                          : "Pilot"
+                        : "Pilot"}
+                    </th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                      Score
+                    </th>
                     <th className="px-4 py-2 text-left font-semibold text-gray-700">
                       {isLadder ? "Flights" : "Date"}
                     </th>
                     {!isLadder && (
-                      <th className="px-4 py-2 text-left font-semibold text-gray-700">Task</th>
+                      <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                        Task
+                      </th>
                     )}
                     <th className="px-4 py-2"></th>
                   </tr>

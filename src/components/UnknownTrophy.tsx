@@ -9,7 +9,10 @@ function UnknownTrophy({ trophyId }: { trophyId: string }) {
           Unknown trophy: <em className="text-cambridge-dark">{trophyId}</em>
         </p>
         <p className="mt-2">
-          <Link href="/" className="text-cambridge hover:text-cambridge-dark transition-colors">
+          <Link
+            href="/"
+            className="text-cambridge hover:text-cambridge-dark transition-colors"
+          >
             Return to the main page
           </Link>
         </p>

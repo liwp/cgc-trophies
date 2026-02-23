@@ -1,4 +1,8 @@
-import { flightCopyData, ladderCopyData, ladderFlightDetails } from "../../src/lib/trophyCopyData";
+import {
+  flightCopyData,
+  ladderCopyData,
+  ladderFlightDetails,
+} from "../../src/lib/trophyCopyData";
 import type { FlightDetail } from "../../src/lib/trophyCopyData";
 import type { ScoredFlight, LadderResult } from "../../src/types";
 
@@ -37,7 +41,9 @@ describe("flightCopyData", () => {
     expect(map["Aircraft Reg."]).toBe("G-CKYO");
     expect(map["H/C Distance (kms)"]).toBe("680.00");
     expect(map["H/C Speed (kph)"]).toBe("74.20");
-    expect(map["Ladder"]).toBe("https://www.bgaladder.net/flightdetails/116237");
+    expect(map["Ladder"]).toBe(
+      "https://www.bgaladder.net/flightdetails/116237",
+    );
     expect(map["TP1"]).toBe("SHM");
     expect(map["TP2"]).toBe("CAX");
     expect(map["TP3"]).toBe("BRF");
@@ -67,8 +73,14 @@ describe("ladderCopyData", () => {
     totalScore: 18682,
     pilots: ["Holswilder, Alex"],
     flights: [
-      makeFlight({ id: "116237", task: { ...makeFlight().task, scoringDistanceKm: 400 } }),
-      makeFlight({ id: "116500", task: { ...makeFlight().task, scoringDistanceKm: 350 } }),
+      makeFlight({
+        id: "116237",
+        task: { ...makeFlight().task, scoringDistanceKm: 400 },
+      }),
+      makeFlight({
+        id: "116500",
+        task: { ...makeFlight().task, scoringDistanceKm: 350 },
+      }),
     ],
   };
 
@@ -86,8 +98,12 @@ describe("ladderCopyData", () => {
     const data = ladderCopyData(result, "pilot");
     const map = Object.fromEntries(data);
 
-    expect(map["Flight 1"]).toBe("https://www.bgaladder.net/flightdetails/116237");
-    expect(map["Flight 2"]).toBe("https://www.bgaladder.net/flightdetails/116500");
+    expect(map["Flight 1"]).toBe(
+      "https://www.bgaladder.net/flightdetails/116237",
+    );
+    expect(map["Flight 2"]).toBe(
+      "https://www.bgaladder.net/flightdetails/116500",
+    );
   });
 
   it("uses registration + pilots list for syndicate trophy", () => {
@@ -116,16 +132,18 @@ describe("ladderCopyData", () => {
     const data = ladderCopyData(syndicateResult, "registration");
     const map = Object.fromEntries(data);
 
-    expect(map["Flight 1 (Alex Holswilder)"]).toBe("https://www.bgaladder.net/flightdetails/116237");
-    expect(map["Flight 2 (John Smith)"]).toBe("https://www.bgaladder.net/flightdetails/116500");
+    expect(map["Flight 1 (Alex Holswilder)"]).toBe(
+      "https://www.bgaladder.net/flightdetails/116237",
+    );
+    expect(map["Flight 2 (John Smith)"]).toBe(
+      "https://www.bgaladder.net/flightdetails/116500",
+    );
   });
 });
 
 describe("ladderFlightDetails", () => {
   it("maps flights to FlightDetail objects", () => {
-    const flights = [
-      makeFlight({ id: "116237", pilot: "Holswilder, Alex" }),
-    ];
+    const flights = [makeFlight({ id: "116237", pilot: "Holswilder, Alex" })];
     const result: LadderResult = {
       key: "Holswilder, Alex",
       totalScore: 5000,
@@ -143,7 +161,8 @@ describe("ladderFlightDetails", () => {
       speedKph: 74.2,
       task: "GRL-SHM-CAX-BRF-GRL",
       ladderUrl: "https://www.bgaladder.net/flightdetails/116237",
-      igcUrl: "https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/116237",
+      igcUrl:
+        "https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/116237",
     });
   });
 });

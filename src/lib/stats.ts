@@ -56,7 +56,10 @@ const categories = [
   },
 ];
 
-function updateCategory(stats: CategoryStat | undefined, flight: Flight): CategoryStat {
+function updateCategory(
+  stats: CategoryStat | undefined,
+  flight: Flight,
+): CategoryStat {
   const { isCompleted = false, isDeclared = false } = flight.task || {};
   let { completed, total } = stats || { total: 0, completed: 0, percentage: 0 };
 
@@ -113,4 +116,10 @@ function calculateStats(flights: Flight[]) {
   return flights.reduce(updateStats, {});
 }
 
-export { calculateStats, categories, updateAttemptedDistance, updateCategory, updateStats };
+export {
+  calculateStats,
+  categories,
+  updateAttemptedDistance,
+  updateCategory,
+  updateStats,
+};

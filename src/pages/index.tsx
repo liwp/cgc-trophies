@@ -28,7 +28,9 @@ function formatScore(trophy: any): string {
   const sf = trophy.results[0] as ScoredFlight | undefined;
   if (!sf) return "";
   const { value, unit } = sf.score;
-  return unit === "pts" ? `${value.toFixed(0)} ${unit}` : `${value.toFixed(1)} ${unit}`;
+  return unit === "pts"
+    ? `${value.toFixed(0)} ${unit}`
+    : `${value.toFixed(1)} ${unit}`;
 }
 
 function formatWinner(trophy: any): string {
@@ -43,13 +45,24 @@ function formatWinner(trophy: any): string {
   return sf ? formatPilotName(sf.pilot) : "No qualifying flights";
 }
 
-const TrophyList = ({ flights, season }: { flights: Flight[]; season: number }) => {
+const TrophyList = ({
+  flights,
+  season,
+}: {
+  flights: Flight[];
+  season: number;
+}) => {
   const trophies = TROPHIES.trophies.map((trophy) => {
     const results =
       trophy.type === "ladder"
         ? ladderEval(TROPHIES.config, season, flights, trophy as LadderTrophy)
         : trophyEval(TROPHIES.config, season, flights, trophy as FlightTrophy);
-    return { ...trophy, results, groupBy: (trophy as LadderTrophy).groupBy, season };
+    return {
+      ...trophy,
+      results,
+      groupBy: (trophy as LadderTrophy).groupBy,
+      season,
+    };
   });
 
   return (
@@ -57,16 +70,25 @@ const TrophyList = ({ flights, season }: { flights: Flight[]; season: number }) 
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Trophy</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Winner</th>
-            <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Score</th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+              Trophy
+            </th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+              Winner
+            </th>
+            <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+              Score
+            </th>
           </tr>
         </thead>
         <tbody>
           {trophies.map((trophy) => {
             const hasResults = trophy.results.length > 0;
             return (
-              <tr key={trophy.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              <tr
+                key={trophy.id}
+                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              >
                 <td className="px-4 py-3">
                   <Link
                     href={`/trophy/${trophy.id}?season=${season}`}
@@ -76,8 +98,12 @@ const TrophyList = ({ flights, season }: { flights: Flight[]; season: number }) 
                   </Link>
                 </td>
                 <td className="px-4 py-3 text-gray-700">
-                  {hasResults ? formatWinner(trophy) : (
-                    <span className="text-gray-400 italic">No qualifying flights</span>
+                  {hasResults ? (
+                    formatWinner(trophy)
+                  ) : (
+                    <span className="text-gray-400 italic">
+                      No qualifying flights
+                    </span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-right text-gray-500">
@@ -102,11 +128,16 @@ const TrophiesPage = () => {
     <PageLayout>
       <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">CGC {season} Trophies</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            CGC {season} Trophies
+          </h1>
           <div className="flex items-center gap-4">
             <Season season={season} />
             <Tooltip text="Admin view">
-              <Link href={`/admin?season=${season}`} className="p-2 rounded-lg text-gray-400 hover:text-cambridge hover:bg-cambridge-light transition-colors">
+              <Link
+                href={`/admin?season=${season}`}
+                className="p-2 rounded-lg text-gray-400 hover:text-cambridge hover:bg-cambridge-light transition-colors"
+              >
                 <Settings size={18} />
               </Link>
             </Tooltip>

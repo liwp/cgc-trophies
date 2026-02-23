@@ -6,7 +6,8 @@ function applySpec(spec: any, fields: Record<string, string>) {
   const raw: Record<string, any> = {};
   for (const [key, subspec] of Object.entries(spec.src) as [string, any][]) {
     if (subspec.type === "number") {
-      raw[key] = subspec.src in fields ? parseFloat(fields[subspec.src]) || 0 : 0;
+      raw[key] =
+        subspec.src in fields ? parseFloat(fields[subspec.src]) || 0 : 0;
     } else if (subspec.type === "boolean") {
       const val = fields[subspec.src] || "";
       raw[key] = val.toLowerCase() === "true" || val === "1";
