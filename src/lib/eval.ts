@@ -16,7 +16,7 @@ type Comparator = (x: any, y: any) => boolean;
 const comparators: Record<string, Comparator> = {
   "=": (x, y) => x === y,
   "<=": (x, y) => x <= y,
-  "<=>": (xs, ys) => isEqual(xs, reverse(ys)) || isEqual(xs, ys),
+  "<=>": (xs, ys) => isEqual(xs, [...ys].reverse()) || isEqual(xs, ys),
 };
 
 function configToDate(

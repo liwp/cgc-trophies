@@ -1,5 +1,10 @@
-import { ladderEval } from "../../src/lib/eval";
-import type { Flight, LadderTrophy, TrophyConfig } from "../../src/types";
+import { ladderEval, trophyEval } from "../../src/lib/eval";
+import type {
+  Flight,
+  FlightTrophy,
+  LadderTrophy,
+  TrophyConfig,
+} from "../../src/types";
 
 const defaultConfig: TrophyConfig = {
   default: "5",
