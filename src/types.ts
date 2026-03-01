@@ -54,7 +54,6 @@ export interface LadderTrophy {
   ladderKey: string;
   groupBy: "pilot" | "registration";
   topN: number;
-  minPilots?: number;
 }
 
 export type Trophy = FlightTrophy | LadderTrophy;

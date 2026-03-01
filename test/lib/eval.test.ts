@@ -186,7 +186,6 @@ describe("ladderEval", () => {
       ladderKey: "local2",
       groupBy: "registration",
       topN: 6,
-      minPilots: 2,
     };
 
     it("groups by glider registration", () => {
@@ -211,6 +210,46 @@ describe("ladderEval", () => {
       expect(results[0].key).toBe("G-ABCD");
       expect(results[0].pilots).toContain("Alice");
       expect(results[0].pilots).toContain("Bob");
+    });
+
+    it("swaps in flights from other pilots to meet minPilots", () => {
+      const flights: Flight[] = [
+        // Pilot A has 7 flights, all better than B's
+        ...Array.from({ length: 7 }, (_, i) =>
+          makeFlight({
+            id: `a${i}`,
+            pilot: "Alice",
+            glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" },
+            ladders: ["local2"],
+            task: {
+              ...makeFlight({ id: "", pilot: "" }).task,
+              crossCountryPoints: 100 - i * 10,
+            },
+          }),
+        ),
+        // Pilot B has 1 flight, worse than all of A's
+        makeFlight({
+          id: "b0",
+          pilot: "Bob",
+          glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" },
+          ladders: ["local2"],
+          task: {
+            ...makeFlight({ id: "", pilot: "" }).task,
+            crossCountryPoints: 5,
+          },
+        }),
+      ];
+
+      const results = ladderEval(defaultConfig, 2024, flights, syndicateTrophy);
+
+      // Should include this group — not filter it out
+      expect(results).toHaveLength(1);
+      expect(results[0].key).toBe("G-ABCD");
+      // Top 5 from Alice + best from Bob = 100+90+80+70+60+5 = 405
+      expect(results[0].totalScore).toBe(405);
+      expect(results[0].pilots).toContain("Alice");
+      expect(results[0].pilots).toContain("Bob");
+      expect(results[0].flights).toHaveLength(6);
     });
 
     it("filters groups with fewer than minPilots", () => {

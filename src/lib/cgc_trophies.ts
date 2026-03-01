@@ -81,7 +81,6 @@ const TROPHIES: TrophiesConfig = {
       ladderKey: "local2",
       groupBy: "registration",
       topN: 6,
-      minPilots: 2,
     },
     {
       id: "L6",

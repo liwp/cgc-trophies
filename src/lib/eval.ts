@@ -139,6 +139,30 @@ export function trophyEval(
     .value() as ScoredFlight[];
 }
 
+/**
+ * Select the top N flights by crossCountryPoints, ensuring at least
+ * 2 distinct pilots are represented. If the best N flights are all
+ * from one pilot, the lowest-scoring flight is swapped with the best
+ * available flight from another pilot.
+ *
+ * Returns null if fewer than 2 pilots have flights.
+ */
+function selectTopFlightsMultiPilot(
+  sorted: Flight[],
+  topN: number,
+): Flight[] | null {
+  const selected = sorted.slice(0, topN);
+  const pilots = new Set(selected.map((f) => f.pilot));
+
+  if (pilots.size >= 2) return selected;
+
+  const candidate = sorted.slice(topN).find((f) => !pilots.has(f.pilot));
+  if (!candidate) return null;
+
+  selected[selected.length - 1] = candidate;
+  return selected;
+}
+
 export function ladderEval(
   defaultConfig: TrophyConfig,
   season: number,
@@ -165,28 +189,29 @@ export function ladderEval(
     groups.get(key)!.push(flight);
   }
 
-  // 3. Per group: sort by crossCountryPoints desc, take top N
+  // 3. Per group: sort by crossCountryPoints desc, select top N
   const results: LadderResult[] = [];
   for (const [key, groupFlights] of groups) {
     const sorted = [...groupFlights].sort(
       (a, b) => b.task.crossCountryPoints - a.task.crossCountryPoints,
     );
-    const topFlights = sorted.slice(0, trophy.topN);
+
+    const topFlights = trophy.groupBy === "registration"
+      ? selectTopFlightsMultiPilot(sorted, trophy.topN)
+      : sorted.slice(0, trophy.topN);
+
+    if (!topFlights) continue;
+
     const totalScore = topFlights.reduce(
       (sum, f) => sum + f.task.crossCountryPoints,
       0,
     );
     const pilots = [...new Set(topFlights.map((f) => f.pilot))];
 
-    // 5. For Syndicate: filter groups with < minPilots unique pilots
-    if (trophy.minPilots && pilots.length < trophy.minPilots) {
-      continue;
-    }
-
     results.push({ key, totalScore, pilots, flights: topFlights });
   }
 
-  // 6. Sort groups by totalScore descending
+  // 4. Sort groups by totalScore descending
   results.sort((a, b) => b.totalScore - a.totalScore);
 
   return results;
