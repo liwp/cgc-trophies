@@ -1,6 +1,6 @@
 {
   "database": "dolt",
-  "jsonl_export": "issues.jsonl",
   "backend": "dolt",
-  "dolt_database": "beads_trophies"
+  "dolt_database": "beads_trophies",
+  "project_id": "48cbe8e0-bfa3-4970-9dba-d4bed8b02764"
 }
