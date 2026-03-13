@@ -22,6 +22,7 @@ import Tooltip from "../../components/Tooltip";
 import UnknownTrophy from "../../components/UnknownTrophy";
 import { trophyEval, ladderEval } from "../../lib/eval";
 import { getTrophyNav } from "../../lib/trophyNav";
+import TURNPOINTS from "../../lib/turnpoints";
 import {
   copyDataToClipboard,
   flightCopyData,
@@ -89,8 +90,13 @@ const Task = ({
   task: { start: string; turnpoints: string[]; finish: string };
 }) => {
   const tps = [task.start, ...task.turnpoints, task.finish];
+  const fullNames = tps.map((tp) => TURNPOINTS[tp] || tp).join(" \u2013 ");
 
-  return <span>{tps.join(" - ")}</span>;
+  return (
+    <Tooltip text={fullNames}>
+      <span>{tps.join(" \u2013 ")}</span>
+    </Tooltip>
+  );
 };
 
 const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
