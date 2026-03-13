@@ -38,7 +38,7 @@ function formatWinner(trophy: any): string {
     const lr = trophy.results[0] as LadderResult | undefined;
     if (!lr) return "No qualifying flights";
     return trophy.groupBy === "registration"
-      ? `${lr.key} (${lr.pilots.map(formatPilotName).join(", ")})`
+      ? `${lr.key} (${lr.pilots.map((p: string) => p.split(", ")[1] || p).join(", ")})`
       : formatPilotName(lr.key);
   }
   const sf = trophy.results[0] as ScoredFlight | undefined;
@@ -96,6 +96,9 @@ const TrophyList = ({
                   >
                     {trophy.name}
                   </Link>
+                  <div className="text-xs text-gray-400 mt-0.5">
+                    {trophy.description}
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-gray-700">
                   {hasResults ? (
@@ -106,7 +109,7 @@ const TrophyList = ({
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-right text-gray-500">
+                <td className="px-4 py-3 text-right text-gray-500 whitespace-nowrap">
                   {hasResults ? formatScore(trophy) : ""}
                 </td>
               </tr>
