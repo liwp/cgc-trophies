@@ -18,7 +18,7 @@ const FlightCategory = ({
       <div className="text-2xl font-bold text-gray-900 mt-1">
         {completed || 0}
       </div>
-      <div className="text-xs text-gray-400">of {total || 0} attempts</div>
+      <div className="text-xs text-gray-400">{total || 0} attempts</div>
     </div>
   );
 };
