@@ -5,3 +5,7 @@
 .DS_Store
 *.tsbuildinfo
 .serena/
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
