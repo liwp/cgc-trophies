@@ -56,6 +56,7 @@ export interface LadderTrophy {
   ladderKey: string;
   groupBy: "pilot" | "registration";
   topN: number;
+  gliderFilter?: string[];
   excludePilotsWithMilestone?: string;
 }
 

@@ -53,6 +53,9 @@ import type {
 //                    "registration" groups by glider registration and requires
 //                    at least 2 different pilots to have flown that glider.
 //       topN      — How many top flights to sum for the total score.
+//       gliderFilter — Optional array of case-insensitive regex patterns tested
+//                    against flight.glider.type. Only flights matching at least
+//                    one pattern are included (e.g. ["asw\\s*19", "pegase"]).
 //
 //   FLIGHT TROPHIES (type: "flight" or omitted)
 //     Score individual flights using a DSL of filter/score/sort expressions,
@@ -183,6 +186,7 @@ const config: TrophiesConfig = {
       ladderKey: "local1",
       groupBy: "pilot",
       topN: 6,
+      gliderFilter: ["asw\\s*19", "pegase"],
     },
     {
       id: "L7",

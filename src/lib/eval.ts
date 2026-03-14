@@ -193,7 +193,13 @@ export function ladderEval(
   const qualifying = flights
     .filter(inSeason)
     .filter((f) => f.ladders.includes(trophy.ladderKey))
-    .filter((f) => !excludedPilots.has(f.pilot));
+    .filter((f) => !excludedPilots.has(f.pilot))
+    .filter((f) => {
+      if (!trophy.gliderFilter) return true;
+      return trophy.gliderFilter.some((pattern) =>
+        new RegExp(pattern, "i").test(f.glider.type),
+      );
+    });
 
   // 2. Group by pilot or glider registration
   const groups = new Map<string, Flight[]>();

@@ -294,6 +294,94 @@ describe("ladderEval", () => {
     expect(results[0].totalScore).toBe(100);
   });
 
+  describe("gliderFilter", () => {
+    const bollyTrophy: LadderTrophy = {
+      id: "L6",
+      type: "ladder",
+      name: "Bolly Challenge",
+      description: "Test bolly",
+      ladderKey: "open",
+      groupBy: "pilot",
+      topN: 6,
+      gliderFilter: ["asw\\s*19", "pegase"],
+    };
+
+    it("includes flights matching gliderFilter", () => {
+      const flights: Flight[] = [
+        makeFlight({
+          id: "1",
+          pilot: "Alice",
+          glider: { type: "ASW 19", handicap: 90, registration: "G-ASWN" },
+        }),
+        makeFlight({
+          id: "2",
+          pilot: "Bob",
+          glider: { type: "Pegase", handicap: 86, registration: "G-PEGS" },
+        }),
+      ];
+
+      const results = ladderEval(defaultSeason, 2024, flights, bollyTrophy);
+
+      expect(results).toHaveLength(2);
+      expect(results.map((r) => r.key)).toEqual(
+        expect.arrayContaining(["Alice", "Bob"]),
+      );
+    });
+
+    it("excludes flights not matching gliderFilter", () => {
+      const flights: Flight[] = [
+        makeFlight({
+          id: "1",
+          pilot: "Alice",
+          glider: { type: "ASW19", handicap: 90, registration: "G-ASWN" },
+        }),
+        makeFlight({
+          id: "2",
+          pilot: "Bob",
+          glider: { type: "LS8", handicap: 104, registration: "G-LSEI" },
+        }),
+      ];
+
+      const results = ladderEval(defaultSeason, 2024, flights, bollyTrophy);
+
+      expect(results).toHaveLength(1);
+      expect(results[0].key).toBe("Alice");
+    });
+
+    it("passes all flights when no gliderFilter is set", () => {
+      const flights: Flight[] = [
+        makeFlight({
+          id: "1",
+          pilot: "Alice",
+          glider: { type: "LS8", handicap: 104, registration: "G-LSEI" },
+        }),
+      ];
+
+      const results = ladderEval(defaultSeason, 2024, flights, openTrophy);
+
+      expect(results).toHaveLength(1);
+    });
+
+    it("matches case-insensitively", () => {
+      const flights: Flight[] = [
+        makeFlight({
+          id: "1",
+          pilot: "Alice",
+          glider: { type: "asw 19", handicap: 90, registration: "G-ASWN" },
+        }),
+        makeFlight({
+          id: "2",
+          pilot: "Bob",
+          glider: { type: "PEGASE", handicap: 86, registration: "G-PEGS" },
+        }),
+      ];
+
+      const results = ladderEval(defaultSeason, 2024, flights, bollyTrophy);
+
+      expect(results).toHaveLength(2);
+    });
+  });
+
   describe("milestone exclusions", () => {
     const milestones: PilotMilestones = {
       "300km": { Alice: 2022 },
