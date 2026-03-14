@@ -3,31 +3,119 @@ import type {
   FlightTrophy,
   LadderTrophy,
   Trophy,
-} from "../types";
+} from "./src/types";
 
-// Common base lines for tasks
-const IS_FROM_GRANSDEN_LODGE: any[] = [
-  "filter",
-  "task.launchSite",
-  "=",
-  "Gransden Lodge",
-];
-const IS_COMPLETED: any[] = ["filter", "task.isCompleted"];
-const IS_DECLARED: any[] = ["filter", "task.isDeclared"];
+// =============================================================================
+// TROPHIES CONFIGURATION
+// =============================================================================
+//
+// This file is the single source of truth for all club-specific configuration.
+// To adapt this app for a different gliding club, edit the values below.
+//
+// STRUCTURE
+// ---------
+//
+// club:
+//   name        — Full club name, displayed in headers and metadata.
+//   shortName   — Short abbreviation used in page titles (e.g. "CGC 2025 Trophies").
+//   code        — The club's identifier on the BGA Ladder API. This is the code
+//                  used in the URL: api.bgaladder.net/api/getlogfilescsv/{year}/{code}
+//                  Find your club's code at https://bgaladder.net.
+//   launchSite  — The launch site name as it appears in BGA Ladder flight data.
+//                  Used to filter flights to only those launched from this site.
+//
+// season:
+//   The default competition season date range. Most trophies use the calendar
+//   year (Jan 1 – Dec 31). Individual trophies can override this with their own
+//   season (e.g. the Kelman Clock runs Oct 1 – Mar 31 for winter flights).
+//
+// pilotMilestones:
+//   Maps milestone names (e.g. "300km", "500km") to pilot → year records.
+//   Year is the season the pilot achieved the milestone. Use 0 as a sentinel
+//   for "always ineligible" (milestone achieved before tracking began).
+//   Trophies reference milestones via excludePilotsWithMilestone: a pilot
+//   is excluded if their milestone year < the current season (or year === 0).
+//
+// trophies:
+//   An array of trophy definitions. There are two types:
+//
+//   LADDER TROPHIES (type: "ladder")
+//     Aggregate the best N flights by cross-country points from a specific BGA
+//     ladder. Grouped by pilot or by glider registration (for syndicate trophies).
+//     Fields:
+//       id        — Unique trophy identifier, used in URLs.
+//       name      — Display name of the trophy.
+//       description — Explains the trophy's criteria.
+//       ladderKey — Which BGA ladder to score from (e.g. "open", "weekend",
+//                    "local1"–"local5"). These correspond to the ladder names
+//                    in the BGA flight data.
+//       groupBy   — "pilot" groups flights by pilot name.
+//                    "registration" groups by glider registration and requires
+//                    at least 2 different pilots to have flown that glider.
+//       topN      — How many top flights to sum for the total score.
+//
+//   FLIGHT TROPHIES (type: "flight" or omitted)
+//     Score individual flights using a DSL of filter/score/sort expressions,
+//     evaluated as a lodash chain. Each trophy's `expr` array is a pipeline:
+//
+//       ["filter", field, comparator, value]
+//         Keeps flights where field <comparator> value is true.
+//         Comparators: "=" (equals), "<=" (less/equal), "<=>" (array equality
+//         in either direction, for reversible routes like BUG-MEN or MEN-BUG).
+//         If comparator and value are omitted, filters where field is truthy.
+//
+//       ["score", field, unit]
+//         Sets each flight's score to the value of field, labelled with unit
+//         (e.g. "km", "kph", "pts").
+//
+//       ["sort", field, order]
+//         Sorts by field in the given order ("asc" or "desc").
+//
+//     Additional fields:
+//       season    — Optional override of the default season date range.
+//       exclude   — {flightId: "reason"} map of flights to exclude (e.g.
+//                    pilots who don't qualify for a novice trophy).
+//       include   — {flightId: "reason"} map of flights to force-include
+//                    (e.g. flights with an extra navigational turnpoint that
+//                    would otherwise be filtered out).
+//       img       — Optional array of image URLs for the trophy.
+//
+// =============================================================================
 
-const TROPHIES: TrophiesConfig = {
-  config: {
-    default: "5",
-    exclude: {},
-    season: {
-      start: {
-        month: 1,
-        day: 1,
-      },
-      end: {
-        month: 12,
-        day: 31,
-      },
+const config: TrophiesConfig = {
+  club: {
+    name: "Cambridge Gliding Centre",
+    shortName: "CGC",
+    code: "CAM",
+    launchSite: "Gransden Lodge",
+  },
+  season: {
+    start: {
+      month: 1,
+      day: 1,
+    },
+    end: {
+      month: 12,
+      day: 31,
+    },
+  },
+  pilotMilestones: {
+    "300km": {
+      "Bosanko, Oliver": 0,
+      "Theil, Robert": 0,
+      "Smith, Mike": 0,
+      "Belcher, Peter": 0,
+      "Davies, Jem": 0,
+      "Bonhomme, Paul": 0,
+      "Alexander, James": 2024,
+    },
+    "500km": {
+      "Head, Wendy": 0,
+      "Tew, David": 0,
+      "Gibson, Stephen": 0,
+      "Theil, Robert": 0,
+      "Jeffery, Phil": 0,
+      "Welford, Robert": 0,
     },
   },
   trophies: [
@@ -71,6 +159,7 @@ const TROPHIES: TrophiesConfig = {
       ladderKey: "local5",
       groupBy: "pilot",
       topN: 6,
+      excludePilotsWithMilestone: "300km",
     },
     {
       id: "L5",
@@ -112,9 +201,9 @@ const TROPHIES: TrophiesConfig = {
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Mug-Metal-Machin-1.jpg",
       ],
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_DECLARED,
-        IS_COMPLETED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isDeclared"],
+        ["filter", "task.isCompleted"],
         ["filter", "task.turnpoints.length", "<=", 3],
         ["score", "task.handicappedDistanceKm", "km"],
         ["sort", "score.value", "desc"],
@@ -132,8 +221,8 @@ const TROPHIES: TrophiesConfig = {
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Jubilee-Bowl.jpg",
       ],
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_COMPLETED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isCompleted"],
         ["filter", "task.turnpoints.length", "=", 2],
         ["score", "task.handicappedDistanceKm", "km"],
         ["sort", "score.value", "desc"],
@@ -145,8 +234,8 @@ const TROPHIES: TrophiesConfig = {
       description:
         "For the longest, handicapped, declared, uncompleted flight around up to 3 turning points.",
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_DECLARED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isDeclared"],
         ["filter", "task.isCompleted", "=", false],
         ["filter", "task.turnpoints.length", "<=", 3],
         ["score", "task.handicappedDistanceKm", "km"],
@@ -163,9 +252,9 @@ const TROPHIES: TrophiesConfig = {
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Gransden-Trophy-e1515083987492.jpg",
       ],
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_DECLARED,
-        IS_COMPLETED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isDeclared"],
+        ["filter", "task.isCompleted"],
         ["filter", "task.turnpoints", "<=>", ["BUG", "MEN"]],
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
@@ -177,9 +266,9 @@ const TROPHIES: TrophiesConfig = {
       description:
         "For the fastest, handicapped flight round Soham(SOH), Eastwell(EAW), and Calvert(CAL) – 305.5km. The task can be done either way round.",
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_DECLARED,
-        IS_COMPLETED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isDeclared"],
+        ["filter", "task.isCompleted"],
         ["filter", "task.turnpoints", "<=>", ["SOH", "EAW", "CAL"]],
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
@@ -194,9 +283,9 @@ const TROPHIES: TrophiesConfig = {
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Sanville-Enigma-Trophy.jpg",
       ],
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_DECLARED,
-        IS_COMPLETED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isDeclared"],
+        ["filter", "task.isCompleted"],
         ["filter", "task.turnpoints", "<=>", ["GRM"]],
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
@@ -208,22 +297,13 @@ const TROPHIES: TrophiesConfig = {
       description:
         "For the fastest, handicapped out-and-return flight to Shipston-on-Stour(SHP) – 208.7km, not necessarily declared. For pilots who have not completed a UK 500 km flight at the beginning of the season.",
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_COMPLETED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isCompleted"],
         ["filter", "task.turnpoints", "<=>", ["SHP"]],
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
       ],
-      exclude: {
-        70424: "500km - Wendy Head (2018)",
-        70456: "500km - David Tew (2018)",
-        78319: "500km - Stephen Gibson (2019)",
-        80474: "500km - Stephen Gibson (2019)",
-        87519: "500km - Robert Theil (2020)",
-        90002: "500km - Phil Jeffery (2021)",
-        99094: "500km - Robert Welford (2022)",
-        101828: "500km - David Tew (2022)",
-      },
+      excludePilotsWithMilestone: "500km",
     },
     {
       id: "4",
@@ -234,23 +314,14 @@ const TROPHIES: TrophiesConfig = {
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Double-Century.jpg",
       ],
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_DECLARED,
-        IS_COMPLETED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isDeclared"],
+        ["filter", "task.isCompleted"],
         ["filter", "task.turnpoints", "<=>", ["BIC", "HUS"]],
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
       ],
-      exclude: {
-        78303: "300km - Oliver Bosanko (2019)",
-        78871: "300km - Robert Theil (2019)",
-        89774: "300km - Robert Theil (2021)",
-        89804: "300km - Mike Smith (2021)",
-        94246: "300km - Peter Belcher (2021)",
-        101013: "300km - Jem Davies (2022)",
-        101070: "300km - Jem Davies (2022)",
-        102116: "300km - Paul Bonhomme (2022)",
-      },
+      excludePilotsWithMilestone: "300km",
     },
     {
       id: "11",
@@ -262,17 +333,14 @@ const TROPHIES: TrophiesConfig = {
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Slazenger-Trophy-2.jpg",
       ],
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_DECLARED,
-        IS_COMPLETED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isDeclared"],
+        ["filter", "task.isCompleted"],
         ["filter", "task.turnpoints", "<=>", ["NPT", "RUS"]],
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
       ],
-      exclude: {
-        86545: "300km - Oliver Bosanko",
-        86543: "300km - Oliver Bosanko",
-      },
+      excludePilotsWithMilestone: "300km",
     },
     {
       id: "7",
@@ -283,8 +351,8 @@ const TROPHIES: TrophiesConfig = {
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Kelman-Clock.jpg",
       ],
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
-        IS_COMPLETED,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
+        ["filter", "task.isCompleted"],
         ["filter", "task.turnpoints.length", "<=", 3],
         ["score", "task.handicappedDistanceKm", "km"],
         ["sort", "score.value", "desc"],
@@ -309,7 +377,7 @@ const TROPHIES: TrophiesConfig = {
       description:
         "For the highest scoring flight on the BGA ladder flown in a glider with a handicap of 95 or less, launched from Gransden Lodge.",
       expr: [
-        IS_FROM_GRANSDEN_LODGE,
+        ["filter", "task.launchSite", "=", "Gransden Lodge"],
         ["filter", "glider.handicap", "<=", 95],
         ["score", "task.crossCountryPoints", "pts"],
         ["sort", "score.value", "desc"],
@@ -318,4 +386,4 @@ const TROPHIES: TrophiesConfig = {
   ] as Trophy[],
 };
 
-export default TROPHIES;
+export default config;

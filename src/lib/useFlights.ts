@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import useSWR from "swr";
+import config from "../../trophies.config";
 import type { Flight } from "../types";
 
 const THIS_YEAR = new Date().getFullYear();
@@ -52,7 +53,7 @@ function useFlights(): {
   const flights =
     !isLoading && !error
       ? data.flights.filter(
-          (f: Flight) => f.task.launchSite === "Gransden Lodge",
+          (f: Flight) => f.task.launchSite === config.club.launchSite,
         )
       : undefined;
 

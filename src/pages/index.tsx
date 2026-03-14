@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Settings } from "lucide-react";
 
-import TROPHIES from "../lib/cgc_trophies";
+import CONFIG from "../../trophies.config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";
@@ -52,11 +52,11 @@ const TrophyList = ({
   flights: Flight[];
   season: number;
 }) => {
-  const trophies = TROPHIES.trophies.map((trophy) => {
+  const trophies = CONFIG.trophies.map((trophy) => {
     const results =
       trophy.type === "ladder"
-        ? ladderEval(TROPHIES.config, season, flights, trophy as LadderTrophy)
-        : trophyEval(TROPHIES.config, season, flights, trophy as FlightTrophy);
+        ? ladderEval(CONFIG.season, season, flights, trophy as LadderTrophy, CONFIG.pilotMilestones)
+        : trophyEval(CONFIG.season, season, flights, trophy as FlightTrophy, CONFIG.pilotMilestones);
     return {
       ...trophy,
       results,
@@ -132,7 +132,7 @@ const TrophiesPage = () => {
       <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">
-            CGC {season} Trophies
+            {CONFIG.club.shortName} {season} Trophies
           </h1>
           <div className="flex items-center gap-4">
             <Season season={season} />

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 
+import config from "../../../trophies.config";
 import { parseCsv } from "./csv";
 import { SPEC } from "./flightCsvSpec";
 
@@ -10,7 +11,7 @@ function parseFlights(csv: string) {
 
 const URL = `https://api.bgaladder.net/api/getlogfilescsv`;
 
-const CLUB = "CAM";
+const CLUB = config.club.code;
 
 async function getFlights(req: NextApiRequest, res: NextApiResponse) {
   const start = parseInt(req.query.start as string);

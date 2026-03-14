@@ -9,7 +9,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-import TROPHIES from "../lib/cgc_trophies";
+import CONFIG from "../../trophies.config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";
@@ -183,7 +183,7 @@ const TrophySection = ({
   flights,
   season,
 }: {
-  trophy: (typeof TROPHIES.trophies)[number];
+  trophy: (typeof CONFIG.trophies)[number];
   flights: Flight[];
   season: number;
 }) => {
@@ -193,8 +193,8 @@ const TrophySection = ({
     isLadder && (trophy as LadderTrophy).groupBy === "registration";
 
   const results = isLadder
-    ? ladderEval(TROPHIES.config, season, flights, trophy as LadderTrophy)
-    : trophyEval(TROPHIES.config, season, flights, trophy as FlightTrophy);
+    ? ladderEval(CONFIG.season, season, flights, trophy as LadderTrophy, CONFIG.pilotMilestones)
+    : trophyEval(CONFIG.season, season, flights, trophy as FlightTrophy, CONFIG.pilotMilestones);
 
   const winner = results[0];
   let winnerLabel = "No qualifying flights";
@@ -302,7 +302,7 @@ const AdminPage = () => {
               <ArrowLeft size={16} /> Public view
             </Link>
             <h1 className="text-2xl font-bold text-gray-900">
-              CGC {season} Trophies — Admin
+              {CONFIG.club.shortName} {season} Trophies — Admin
             </h1>
           </div>
           <Season season={season} />
@@ -311,7 +311,7 @@ const AdminPage = () => {
         <Stats flights={flights!} season={season} />
 
         <nav className="flex flex-wrap gap-2">
-          {TROPHIES.trophies.map((t) => (
+          {CONFIG.trophies.map((t) => (
             <a
               key={t.id}
               href={`#trophy-${t.id}`}
@@ -323,7 +323,7 @@ const AdminPage = () => {
         </nav>
 
         <div className="flex flex-col gap-10">
-          {TROPHIES.trophies.map((trophy) => (
+          {CONFIG.trophies.map((trophy) => (
             <TrophySection
               key={trophy.id}
               trophy={trophy}

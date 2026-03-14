@@ -26,7 +26,7 @@ npm test -- test/lib/eval.test.ts  # Run a single test file
 2. **API Route** (`src/pages/api/flights.ts`): Fetches CSV for year range, parses via `parseCsv()` with a field spec (`flightCsvSpec.ts`), returns JSON
 3. **Client**: `useFlights()` hook (SWR) fetches `/api/flights?start=Y&end=Y`, filters to Gransden Lodge flights, resolves season from URL query
 4. **Evaluation**: `trophyEval()` for flight trophies, `ladderEval()` for ladder trophies (`src/lib/eval.ts`)
-5. **Config**: All 18 trophies defined in `src/lib/cgc_trophies.ts` as a `TrophiesConfig` object
+5. **Config**: All club-specific config (club info, season, trophies) in `trophies.config.ts` at project root
 
 ### Trophy Types
 
@@ -44,7 +44,7 @@ npm test -- test/lib/eval.test.ts  # Run a single test file
 
 - `src/types.ts` — All shared types (Flight, Trophy, LadderResult, ScoredFlight, etc.)
 - `src/lib/eval.ts` — Core scoring logic
-- `src/lib/cgc_trophies.ts` — Trophy definitions and config
+- `trophies.config.ts` — Club config (name, code, launch site) and trophy definitions
 - `src/pages/api/csv.ts` — CSV parser (papaparse + custom spec-based field parsing)
 - `src/lib/trophyCopyData.ts` — Clipboard copy formatting for trophy results
 - `src/lib/stats.ts` — Season statistics (completion rates, distance calculations)

@@ -13,7 +13,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-import CGC_TROPHIES from "../../lib/cgc_trophies";
+import CONFIG from "../../../trophies.config";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
 import Loading from "../../components/Loading";
 import PageLayout from "../../components/PageLayout";
@@ -38,8 +38,7 @@ import type {
   ScoredFlight,
 } from "../../types";
 
-const CONFIG = CGC_TROPHIES.config;
-const TROPHIES = keyBy(CGC_TROPHIES.trophies, "id");
+const TROPHIES_BY_ID = keyBy(CONFIG.trophies, "id");
 
 const CopyButton = ({ data }: { data: [string, string][] }) => {
   const [copied, setCopied] = React.useState(false);
@@ -427,7 +426,7 @@ const TrophyPage = () => {
   if (error) return <FlightLoadFailure />;
   if (isLoading) return <Loading />;
 
-  const config = TROPHIES[trophyId];
+  const config = TROPHIES_BY_ID[trophyId];
   if (!config) return <UnknownTrophy trophyId={trophyId} />;
 
   const isLadder = config.type === "ladder";
@@ -448,10 +447,11 @@ const TrophyPage = () => {
           {isLadder ? (
             <LadderResultsList
               results={ladderEval(
-                CONFIG,
+                CONFIG.season,
                 season,
                 flights!,
                 config as LadderTrophy,
+                CONFIG.pilotMilestones,
               )}
               season={season}
               trophy={config.name}
@@ -460,10 +460,11 @@ const TrophyPage = () => {
           ) : (
             <ResultsList
               results={trophyEval(
-                CONFIG,
+                CONFIG.season,
                 season,
                 flights!,
                 config as FlightTrophy,
+                CONFIG.pilotMilestones,
               )}
               season={season}
               trophy={config.name}

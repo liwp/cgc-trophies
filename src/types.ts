@@ -27,10 +27,11 @@ export interface SeasonConfig {
   end: { month: number; day: number };
 }
 
-export interface TrophyConfig {
-  default: string;
-  exclude: Record<string, string>;
-  season: SeasonConfig;
+export interface ClubConfig {
+  name: string;
+  shortName: string;
+  code: string;
+  launchSite: string;
 }
 
 export interface FlightTrophy {
@@ -43,6 +44,7 @@ export interface FlightTrophy {
   season?: SeasonConfig;
   exclude?: Record<string, string>;
   include?: Record<string, string>;
+  excludePilotsWithMilestone?: string;
 }
 
 export interface LadderTrophy {
@@ -54,7 +56,10 @@ export interface LadderTrophy {
   ladderKey: string;
   groupBy: "pilot" | "registration";
   topN: number;
+  excludePilotsWithMilestone?: string;
 }
+
+export type PilotMilestones = Record<string, Record<string, number>>;
 
 export type Trophy = FlightTrophy | LadderTrophy;
 
@@ -72,6 +77,8 @@ export interface LadderResult {
 }
 
 export interface TrophiesConfig {
-  config: TrophyConfig;
+  club: ClubConfig;
+  season: SeasonConfig;
+  pilotMilestones?: PilotMilestones;
   trophies: Trophy[];
 }

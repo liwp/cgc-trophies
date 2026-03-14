@@ -1,18 +1,15 @@
-import { ladderEval, trophyEval } from "../../src/lib/eval";
+import { ladderEval, milestoneExcludedPilots, trophyEval } from "../../src/lib/eval";
 import type {
   Flight,
   FlightTrophy,
   LadderTrophy,
-  TrophyConfig,
+  PilotMilestones,
+  SeasonConfig,
 } from "../../src/types";
 
-const defaultConfig: TrophyConfig = {
-  default: "5",
-  exclude: {},
-  season: {
-    start: { month: 1, day: 1 },
-    end: { month: 12, day: 31 },
-  },
+const defaultSeason: SeasonConfig = {
+  start: { month: 1, day: 1 },
+  end: { month: 12, day: 31 },
 };
 
 function makeFlight(
@@ -78,7 +75,7 @@ describe("ladderEval", () => {
       }),
     ];
 
-    const results = ladderEval(defaultConfig, 2024, flights, openTrophy);
+    const results = ladderEval(defaultSeason, 2024, flights, openTrophy);
 
     expect(results).toHaveLength(2);
     expect(results[0].key).toBe("Alice");
@@ -100,7 +97,7 @@ describe("ladderEval", () => {
       }),
     );
 
-    const results = ladderEval(defaultConfig, 2024, flights, openTrophy);
+    const results = ladderEval(defaultSeason, 2024, flights, openTrophy);
 
     expect(results).toHaveLength(1);
     expect(results[0].flights).toHaveLength(6);
@@ -114,7 +111,7 @@ describe("ladderEval", () => {
       makeFlight({ id: "2", pilot: "Alice", ladders: ["weekend"] }),
     ];
 
-    const results = ladderEval(defaultConfig, 2024, flights, openTrophy);
+    const results = ladderEval(defaultSeason, 2024, flights, openTrophy);
 
     expect(results).toHaveLength(1);
     expect(results[0].flights).toHaveLength(1);
@@ -127,7 +124,7 @@ describe("ladderEval", () => {
       makeFlight({ id: "2", pilot: "Alice", date: new Date("2023-06-15") }),
     ];
 
-    const results = ladderEval(defaultConfig, 2024, flights, openTrophy);
+    const results = ladderEval(defaultSeason, 2024, flights, openTrophy);
 
     expect(results).toHaveLength(1);
     expect(results[0].flights).toHaveLength(1);
@@ -139,7 +136,7 @@ describe("ladderEval", () => {
       makeFlight({ id: "1", pilot: "Alice", ladders: ["weekend"] }),
     ];
 
-    const results = ladderEval(defaultConfig, 2024, flights, openTrophy);
+    const results = ladderEval(defaultSeason, 2024, flights, openTrophy);
 
     expect(results).toHaveLength(0);
   });
@@ -172,7 +169,7 @@ describe("ladderEval", () => {
       }),
     ];
 
-    const results = ladderEval(defaultConfig, 2024, flights, openTrophy);
+    const results = ladderEval(defaultSeason, 2024, flights, openTrophy);
 
     expect(results.map((r) => r.key)).toEqual(["Bob", "Charlie", "Alice"]);
   });
@@ -204,7 +201,7 @@ describe("ladderEval", () => {
         }),
       ];
 
-      const results = ladderEval(defaultConfig, 2024, flights, syndicateTrophy);
+      const results = ladderEval(defaultSeason, 2024, flights, syndicateTrophy);
 
       expect(results).toHaveLength(1);
       expect(results[0].key).toBe("G-ABCD");
@@ -240,7 +237,7 @@ describe("ladderEval", () => {
         }),
       ];
 
-      const results = ladderEval(defaultConfig, 2024, flights, syndicateTrophy);
+      const results = ladderEval(defaultSeason, 2024, flights, syndicateTrophy);
 
       // Should include this group — not filter it out
       expect(results).toHaveLength(1);
@@ -272,7 +269,7 @@ describe("ladderEval", () => {
         }),
       ];
 
-      const results = ladderEval(defaultConfig, 2024, flights, syndicateTrophy);
+      const results = ladderEval(defaultSeason, 2024, flights, syndicateTrophy);
 
       expect(results).toHaveLength(0);
     });
@@ -290,10 +287,154 @@ describe("ladderEval", () => {
       }),
     ];
 
-    const results = ladderEval(defaultConfig, 2024, flights, openTrophy);
+    const results = ladderEval(defaultSeason, 2024, flights, openTrophy);
 
     expect(results).toHaveLength(1);
     expect(results[0].flights).toHaveLength(1);
     expect(results[0].totalScore).toBe(100);
+  });
+
+  describe("milestone exclusions", () => {
+    const milestones: PilotMilestones = {
+      "300km": { Alice: 2022 },
+    };
+
+    const trophyWithMilestone: LadderTrophy = {
+      ...openTrophy,
+      excludePilotsWithMilestone: "300km",
+    };
+
+    it("excludes pilots who achieved milestone before season", () => {
+      const flights: Flight[] = [
+        makeFlight({ id: "1", pilot: "Alice" }),
+        makeFlight({ id: "2", pilot: "Bob" }),
+      ];
+
+      const results = ladderEval(
+        defaultSeason,
+        2024,
+        flights,
+        trophyWithMilestone,
+        milestones,
+      );
+
+      expect(results).toHaveLength(1);
+      expect(results[0].key).toBe("Bob");
+    });
+
+    it("sentinel 0 always excludes", () => {
+      const ms: PilotMilestones = { "300km": { Alice: 0 } };
+      const flights: Flight[] = [
+        makeFlight({ id: "1", pilot: "Alice" }),
+        makeFlight({ id: "2", pilot: "Bob" }),
+      ];
+
+      const results = ladderEval(
+        defaultSeason,
+        2024,
+        flights,
+        trophyWithMilestone,
+        ms,
+      );
+
+      expect(results).toHaveLength(1);
+      expect(results[0].key).toBe("Bob");
+    });
+  });
+});
+
+describe("trophyEval milestone exclusions", () => {
+  const boomerangTrophy: FlightTrophy = {
+    id: "3",
+    name: "The Boomerang",
+    description: "Test",
+    expr: [
+      ["filter", "task.launchSite", "=", "Gransden Lodge"],
+      ["filter", "task.isCompleted"],
+      ["filter", "task.turnpoints", "<=>", ["SHP"]],
+      ["score", "task.handicappedSpeedKph", "kph"],
+      ["sort", "score.value", "desc"],
+    ],
+    excludePilotsWithMilestone: "500km",
+  };
+
+  const milestones: PilotMilestones = {
+    "500km": { Alice: 2022 },
+  };
+
+  it("excludes pilot flights via milestone", () => {
+    const flights: Flight[] = [
+      makeFlight({ id: "1", pilot: "Alice" }),
+      makeFlight({ id: "2", pilot: "Bob" }),
+    ];
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      boomerangTrophy,
+      milestones,
+    );
+
+    const nonExcluded = results.filter((r) => !r.exclude);
+    expect(nonExcluded).toHaveLength(1);
+    expect(nonExcluded[0].pilot).toBe("Bob");
+  });
+
+  it("sentinel 0 always excludes", () => {
+    const ms: PilotMilestones = { "500km": { Alice: 0 } };
+    const flights: Flight[] = [
+      makeFlight({ id: "1", pilot: "Alice" }),
+      makeFlight({ id: "2", pilot: "Bob" }),
+    ];
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      boomerangTrophy,
+      ms,
+    );
+
+    const nonExcluded = results.filter((r) => !r.exclude);
+    expect(nonExcluded).toHaveLength(1);
+    expect(nonExcluded[0].pilot).toBe("Bob");
+  });
+
+  it("milestone year = season means NOT excluded", () => {
+    const ms: PilotMilestones = { "500km": { Alice: 2024 } };
+    const flights: Flight[] = [
+      makeFlight({ id: "1", pilot: "Alice" }),
+    ];
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      boomerangTrophy,
+      ms,
+    );
+
+    expect(results.filter((r) => !r.exclude)).toHaveLength(1);
+  });
+
+  it("no milestone on trophy means no exclusions", () => {
+    const trophyNoMilestone: FlightTrophy = {
+      ...boomerangTrophy,
+      excludePilotsWithMilestone: undefined,
+    };
+    const flights: Flight[] = [
+      makeFlight({ id: "1", pilot: "Alice" }),
+    ];
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      trophyNoMilestone,
+      milestones,
+    );
+
+    expect(results.filter((r) => !r.exclude)).toHaveLength(1);
   });
 });

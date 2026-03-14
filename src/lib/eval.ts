@@ -6,9 +6,9 @@ import type {
   FlightTrophy,
   LadderTrophy,
   LadderResult,
+  PilotMilestones,
   SeasonConfig,
   ScoredFlight,
-  TrophyConfig,
 } from "../types";
 
 type Comparator = (x: any, y: any) => boolean;
@@ -43,41 +43,53 @@ function inSeasonPredicate(
   };
 }
 
-/**
- * defaultConfig: {season: ..., exclude: ...}
- * trophy: {season: ..., exclude: ..., include: ...}
- *
- * where
- * season: {start: {month: ..., day: ...}, end: {month: ..., day: ...}}
- * exclude: {<id>: "<reason>"} (a set of ignored flights)
- * include: {<id>: "<reason>"} (a set of included flights)
- *
- * Some flights are either ignored, eg airspace issues or pilot doesn't qualify
- * for the trophy, and others are included, eg the use of an extra navigational
- * TP
- */
+export function milestoneExcludedPilots(
+  pilotMilestones: PilotMilestones | undefined,
+  milestone: string | undefined,
+  season: number,
+): Set<string> {
+  if (!pilotMilestones || !milestone) return new Set();
+  const milestoneMap = pilotMilestones[milestone] || {};
+  const excluded = new Set<string>();
+  for (const [pilot, year] of Object.entries(milestoneMap)) {
+    if (year === 0 || year < season) {
+      excluded.add(pilot);
+    }
+  }
+  return excluded;
+}
+
 export function trophyEval(
-  defaultConfig: TrophyConfig,
+  defaultSeason: SeasonConfig,
   season: number,
   flights: Flight[],
   trophy: FlightTrophy,
+  pilotMilestones?: PilotMilestones,
 ): ScoredFlight[] {
   const inSeason = inSeasonPredicate(
     season,
-    trophy.season || defaultConfig.season,
+    trophy.season || defaultSeason,
   );
 
   const excludedIds: Record<string, string> = {
-    ...defaultConfig.exclude,
     ...trophy.exclude,
   };
   const includedIds: Record<string, string> = trophy.include || {};
+  const excludedPilots = milestoneExcludedPilots(
+    pilotMilestones,
+    trophy.excludePilotsWithMilestone,
+    season,
+  );
 
   let chain_ = chain(flights)
     .filter(inSeason)
     .map((flight) => ({
       ...flight,
-      exclude: excludedIds[flight.id],
+      exclude:
+        excludedIds[flight.id] ||
+        (excludedPilots.has(flight.pilot)
+          ? `${trophy.excludePilotsWithMilestone} milestone`
+          : undefined),
       include: includedIds[flight.id],
     }));
 
@@ -164,17 +176,24 @@ function selectTopFlightsMultiPilot(
 }
 
 export function ladderEval(
-  defaultConfig: TrophyConfig,
+  defaultSeason: SeasonConfig,
   season: number,
   flights: Flight[],
   trophy: LadderTrophy,
+  pilotMilestones?: PilotMilestones,
 ): LadderResult[] {
-  const inSeason = inSeasonPredicate(season, defaultConfig.season);
+  const inSeason = inSeasonPredicate(season, defaultSeason);
+  const excludedPilots = milestoneExcludedPilots(
+    pilotMilestones,
+    trophy.excludePilotsWithMilestone,
+    season,
+  );
 
   // 1. Filter to in-season flights qualifying for this ladder
   const qualifying = flights
     .filter(inSeason)
-    .filter((f) => f.ladders.includes(trophy.ladderKey));
+    .filter((f) => f.ladders.includes(trophy.ladderKey))
+    .filter((f) => !excludedPilots.has(f.pilot));
 
   // 2. Group by pilot or glider registration
   const groups = new Map<string, Flight[]>();

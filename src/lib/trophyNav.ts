@@ -1,4 +1,4 @@
-import TROPHIES from "./cgc_trophies";
+import CONFIG from "../../trophies.config";
 import type { Trophy } from "../types";
 
 export interface TrophyNav {
@@ -8,7 +8,7 @@ export interface TrophyNav {
 }
 
 export function getTrophyNav(trophyId: string): TrophyNav {
-  const list = TROPHIES.trophies;
+  const list = CONFIG.trophies;
   const index = list.findIndex((t) => t.id === trophyId);
 
   if (index === -1) {
