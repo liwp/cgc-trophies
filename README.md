@@ -18,9 +18,9 @@ we've so far run into:
 - Some trophies are aimed at novice pilots. They have criteria like "for
   novices" or "hasn't flown a 300km/500km/... flight before the seasons starts"
   attached to them. The BGA Ladder does not know if a pilot is a novice, or if
-  they have a gold or diamond badge or not. As a result a pilot show by the app
-  as winning (or having won) a given trophy might not be eligible for that
-  trophy.
+  they have a gold or diamond badge or not. We maintain a `pilotMilestones` list
+  in `trophies.config.ts` to handle this (see "Managing pilot milestones"
+  below), but it requires manual upkeep.
 - Some trophies are restricted to eg "up to 3 turnpoints" and the scoring
   algorithm implements this rule without exceptions. But some times more
   turnpoints might be acceptable, eg a pilot added turnpoint to their task as a
@@ -38,12 +38,46 @@ reason, we would not show their next best, valid flight in the results. This
 probably won't cause issue in practise, but might still be surprising / annoying
 to users.
 
-I think the solution will be to:
+Some remaining ideas for improvement:
 
 1. Explicitly state the historical winners. This way we avoid losing winners if
    they or their flight vanishes from the BGA Ladder export, and we can override
    the algorithm and its idiosyncrasies.
-2. Implement trophy-specific pilot and flight block lists. This would avoid
-   non-eligible pilots from showing up in the results (eg exclude gold pilots),
-   and would also address the issue of showing only one flight per pilot in the
-   results.
+
+# Managing pilot milestones
+
+Some trophies are restricted to pilots who haven't yet achieved a distance
+milestone (300km or 500km). The `pilotMilestones` section in
+`trophies.config.ts` tracks which pilots have achieved which milestones and
+when. Trophies reference a milestone via `excludePilotsWithMilestone`, and all
+flights from excluded pilots are automatically filtered out.
+
+The current trophies with milestone exclusions:
+
+| Trophy | Milestone | Rule |
+|--------|-----------|------|
+| The Boomerang | 500km | Excludes pilots who've completed a 500km flight |
+| Double Century | 300km | Excludes pilots who've flown a 300km |
+| Slazenger Trophy | 300km | Excludes pilots who've flown a 300km |
+| Ted Warner Trophy | 300km | Excludes pilots who've flown a 300km |
+
+A pilot is excluded from a season if their milestone year is **before** that
+season (e.g. achieving 300km in 2024 means excluded from 2025 onwards, but
+still eligible for 2024). A year of `0` means "always ineligible" — use this
+when the milestone was achieved before we started tracking.
+
+## Adding a pilot milestone
+
+Use the helper script:
+
+```bash
+# Achieved 300km in 2025
+npx ts-node scripts/add-milestone.ts "Last, First" 300km 2025
+
+# Always ineligible (year defaults to 0)
+npx ts-node scripts/add-milestone.ts "Last, First" 500km
+```
+
+The script adds the entry to `trophies.config.ts` and runs prettier. It will
+error if the pilot already exists in that milestone. Pilot names use
+`"Last, First"` format, matching the BGA Ladder flight data.

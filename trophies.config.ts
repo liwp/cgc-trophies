@@ -108,6 +108,7 @@ const config: TrophiesConfig = {
       "Davies, Jem": 0,
       "Bonhomme, Paul": 0,
       "Alexander, James": 2024,
+      "Pesonen, Lauri": 2020,
     },
     "500km": {
       "Head, Wendy": 0,
@@ -116,6 +117,8 @@ const config: TrophiesConfig = {
       "Theil, Robert": 0,
       "Jeffery, Phil": 0,
       "Welford, Robert": 0,
+      "Alexander, James": 2024,
+      "Pesonen, Lauri": 2025,
     },
   },
   trophies: [
@@ -153,7 +156,7 @@ const config: TrophiesConfig = {
     {
       id: "L4",
       type: "ladder",
-      name: "Wed Warner Trophy",
+      name: "Ted Warner Trophy",
       description:
         "Fastrackers ladder: aggregate of best 6 cross-country point scores on the Fastrackers Ladder.",
       ladderKey: "local5",
