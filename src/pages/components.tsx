@@ -1,14 +1,16 @@
 import dynamic from "next/dynamic";
 import { useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Flight } from "../types";
-import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
+import type { Flight, LadderResult, ScoredFlight } from "../types";
 import Tooltip from "../components/Tooltip";
 import Stats from "../components/Stats";
 import Loading from "../components/Loading";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import UnknownTrophy from "../components/UnknownTrophy";
-import WinnerDetails from "../components/WinnerDetails";
+import {
+  ResultsList,
+  LadderResultsList,
+} from "./trophy/[trophyId]";
 
 // ---------------------------------------------------------------------------
 // Dummy data
@@ -21,6 +23,10 @@ function makeFlight(overrides: {
   isCompleted?: boolean;
   isDeclared?: boolean;
   scoringDistanceKm?: number;
+  heightLoss?: number;
+  start?: string;
+  finish?: string;
+  turnpoints?: string[];
 }): Flight {
   const {
     id = "000000",
@@ -29,6 +35,10 @@ function makeFlight(overrides: {
     isCompleted = true,
     isDeclared = true,
     scoringDistanceKm = taskDistanceKm * 0.95,
+    heightLoss = 0,
+    start = "GRL",
+    finish = "GRL",
+    turnpoints = ["DID", "BUC"],
   } = overrides;
   return {
     id,
@@ -47,10 +57,36 @@ function makeFlight(overrides: {
       handicappedDistanceKm: scoringDistanceKm * 1.08,
       handicappedSpeedKph: 85.3,
       launchSite: "Gransden Lodge",
-      start: "Gransden Lodge",
-      finish: "Gransden Lodge",
-      turnpoints: ["Didcot", "Buckingham"],
-      heightLoss: 0,
+      start,
+      finish,
+      turnpoints,
+      heightLoss,
+    },
+  };
+}
+
+function makeScoredFlight(overrides: {
+  id?: string;
+  pilot?: string;
+  taskDistanceKm: number;
+  scoreValue?: number;
+  scoreUnit?: string;
+  heightLoss?: number;
+  start?: string;
+  finish?: string;
+  turnpoints?: string[];
+}): ScoredFlight {
+  const {
+    scoreValue,
+    scoreUnit = "km",
+    ...flightOverrides
+  } = overrides;
+  const flight = makeFlight(flightOverrides);
+  return {
+    ...flight,
+    score: {
+      value: scoreValue ?? flight.task.handicappedDistanceKm,
+      unit: scoreUnit,
     },
   };
 }
@@ -74,77 +110,98 @@ const DUMMY_FLIGHTS: Flight[] = [
   makeFlight({ taskDistanceKm: 780, pilot: "Lane, Laura" }),
 ];
 
-const DUMMY_FLIGHT_DETAILS: FlightDetail[] = [
+const SCORED_FLIGHTS: ScoredFlight[] = [
+  makeScoredFlight({
+    id: "100001",
+    pilot: "Lane, Laura",
+    taskDistanceKm: 780,
+    start: "GRL",
+    finish: "GRL",
+    turnpoints: ["DID", "BUC", "ELY"],
+  }),
+  makeScoredFlight({
+    id: "100002",
+    pilot: "King, Keith",
+    taskDistanceKm: 520,
+    start: "GRL",
+    finish: "GRL",
+    turnpoints: ["BIC", "RYS"],
+  }),
+  makeScoredFlight({
+    id: "100003",
+    pilot: "Jones, Jane",
+    taskDistanceKm: 510,
+    start: "GRL",
+    finish: "GRL",
+    turnpoints: ["PTB", "NMK"],
+  }),
+  makeScoredFlight({
+    id: "100004",
+    pilot: "Hill, Helen",
+    taskDistanceKm: 450,
+    start: "GRL",
+    finish: "GRL",
+    turnpoints: ["DID"],
+  }),
+];
+
+const LADDER_RESULTS: LadderResult[] = [
   {
-    pilot: "John Smith",
-    date: new Date("2024-07-15"),
-    points: 412,
-    distanceKm: 325.4,
-    speedKph: 89.2,
-    task: "Gransden Lodge-Didcot-Buckingham-Gransden Lodge",
-    ladderUrl: "https://www.bgaladder.net/flightdetails/100001",
-    igcUrl: "https://igcviewer.bgaladder.net/?igc=example1",
+    key: "Lane, Laura",
+    totalScore: 4200,
+    totalDistance: 1560,
+    pilots: ["Lane, Laura"],
+    flights: [
+      makeFlight({ id: "100001", pilot: "Lane, Laura", taskDistanceKm: 780 }),
+      makeFlight({ id: "100005", pilot: "Lane, Laura", taskDistanceKm: 520 }),
+      makeFlight({ id: "100006", pilot: "Lane, Laura", taskDistanceKm: 260 }),
+    ],
   },
   {
-    pilot: "Alice Adams",
-    date: new Date("2024-08-03"),
-    points: 387,
-    distanceKm: 298.1,
-    speedKph: 76.5,
-    task: "Gransden Lodge-Bicester-Ely-Gransden Lodge",
-    ladderUrl: "https://www.bgaladder.net/flightdetails/100002",
-    igcUrl: "https://igcviewer.bgaladder.net/?igc=example2",
+    key: "King, Keith",
+    totalScore: 3100,
+    totalDistance: 1200,
+    pilots: ["King, Keith"],
+    flights: [
+      makeFlight({ id: "100002", pilot: "King, Keith", taskDistanceKm: 520 }),
+      makeFlight({ id: "100007", pilot: "King, Keith", taskDistanceKm: 410 }),
+      makeFlight({ id: "100008", pilot: "King, Keith", taskDistanceKm: 270 }),
+    ],
   },
   {
-    pilot: "Bob Brown",
-    date: new Date("2024-06-22"),
-    points: 356,
-    distanceKm: 278.9,
-    speedKph: 82.1,
-    task: "Gransden Lodge-Royston-Peterborough-Gransden Lodge",
-    ladderUrl: "https://www.bgaladder.net/flightdetails/100003",
-    igcUrl: "https://igcviewer.bgaladder.net/?igc=example3",
+    key: "Jones, Jane",
+    totalScore: 2800,
+    totalDistance: 1050,
+    pilots: ["Jones, Jane"],
+    flights: [
+      makeFlight({ id: "100003", pilot: "Jones, Jane", taskDistanceKm: 510 }),
+      makeFlight({ id: "100009", pilot: "Jones, Jane", taskDistanceKm: 350 }),
+    ],
   },
 ];
 
-const DUMMY_SINGLE_FLIGHTS: Record<string, SingleFlightDetail> = {
-  km: {
-    date: new Date("2024-07-15"),
-    gliderType: "ASG 29",
-    gliderReg: "G-ABCD",
-    handicappedDistanceKm: 351.2,
-    scoringDistanceKm: 325.4,
-    handicappedSpeedKph: 89.2,
-    task: "Gransden Lodge-Didcot-Buckingham-Gransden Lodge",
-    score: { value: 351.2, unit: "km" },
-    ladderUrl: "https://www.bgaladder.net/flightdetails/100001",
-    igcUrl: "https://igcviewer.bgaladder.net/?igc=example1",
+const SYNDICATE_RESULTS: LadderResult[] = [
+  {
+    key: "G-ABCD",
+    totalScore: 3500,
+    totalDistance: 1300,
+    pilots: ["Lane, Laura", "King, Keith"],
+    flights: [
+      makeFlight({ id: "100001", pilot: "Lane, Laura", taskDistanceKm: 780 }),
+      makeFlight({ id: "100002", pilot: "King, Keith", taskDistanceKm: 520 }),
+    ],
   },
-  kph: {
-    date: new Date("2024-07-15"),
-    gliderType: "LS 8",
-    gliderReg: "G-EFGH",
-    handicappedDistanceKm: 310.5,
-    scoringDistanceKm: 287.5,
-    handicappedSpeedKph: 95.7,
-    task: "Gransden Lodge-Bicester-Ely-Gransden Lodge",
-    score: { value: 95.7, unit: "kph" },
-    ladderUrl: "https://www.bgaladder.net/flightdetails/100002",
-    igcUrl: "https://igcviewer.bgaladder.net/?igc=example2",
+  {
+    key: "G-EFGH",
+    totalScore: 2100,
+    totalDistance: 860,
+    pilots: ["Jones, Jane", "Hill, Helen"],
+    flights: [
+      makeFlight({ id: "100003", pilot: "Jones, Jane", taskDistanceKm: 510 }),
+      makeFlight({ id: "100004", pilot: "Hill, Helen", taskDistanceKm: 350 }),
+    ],
   },
-  pts: {
-    date: new Date("2024-07-15"),
-    gliderType: "Discus 2",
-    gliderReg: "G-IJKL",
-    handicappedDistanceKm: 290.8,
-    scoringDistanceKm: 269.3,
-    handicappedSpeedKph: 78.4,
-    task: "Gransden Lodge-Royston-Peterborough-Gransden Lodge",
-    score: { value: 412, unit: "pts" },
-    ladderUrl: "https://www.bgaladder.net/flightdetails/100003",
-    igcUrl: "https://igcviewer.bgaladder.net/?igc=example3",
-  },
-};
+];
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -344,33 +401,38 @@ const UnknownTrophyShowcase = () => {
   );
 };
 
-const WinnerDetailsShowcase = () => {
-  const [mode, setMode] = useState<"table" | "summary">("table");
-  const [unit, setUnit] = useState<"km" | "kph" | "pts">("km");
+const FlightResultsShowcase = () => (
+  <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+    <ResultsList results={SCORED_FLIGHTS} season={2024} trophy="Example Trophy" />
+  </div>
+);
+
+const LadderResultsShowcase = () => {
+  const [mode, setMode] = useState<"pilot" | "syndicate">("pilot");
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
-        <ToggleGroup
-          label="Mode"
-          value={mode}
-          options={["table", "summary"]}
-          onChange={setMode as (v: string) => void}
-        />
-        {mode === "summary" && (
-          <ToggleGroup
-            label="Score unit"
-            value={unit}
-            options={["km", "kph", "pts"]}
-            onChange={setUnit as (v: string) => void}
+      <ToggleGroup
+        label="Group by"
+        value={mode}
+        options={["pilot", "syndicate"]}
+        onChange={setMode as (v: string) => void}
+      />
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+        {mode === "pilot" ? (
+          <LadderResultsList
+            results={LADDER_RESULTS}
+            season={2024}
+            trophy="Example Ladder"
+            isSyndicate={false}
           />
-        )}
-      </div>
-      <div className="rounded border border-gray-200">
-        {mode === "table" ? (
-          <WinnerDetails flights={DUMMY_FLIGHT_DETAILS} />
         ) : (
-          <WinnerDetails flightDetail={DUMMY_SINGLE_FLIGHTS[unit]} />
+          <LadderResultsList
+            results={SYNDICATE_RESULTS}
+            season={2024}
+            trophy="Example Syndicate"
+            isSyndicate={true}
+          />
         )}
       </div>
     </div>
@@ -385,15 +447,16 @@ const SECTIONS = [
   { id: "tooltip", title: "Tooltip" },
   { id: "season", title: "Season" },
   { id: "stats", title: "Stats" },
+  { id: "flight-results", title: "Flight Results" },
+  { id: "ladder-results", title: "Ladder Results" },
   { id: "loading", title: "Loading" },
   { id: "flight-load-failure", title: "FlightLoadFailure" },
   { id: "unknown-trophy", title: "UnknownTrophy" },
-  { id: "winner-details", title: "WinnerDetails" },
 ];
 
 function ComponentsPage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-8 p-8">
+    <div className="mx-auto max-w-4xl space-y-8 p-8">
       <h1 className="text-2xl font-bold">Components</h1>
 
       <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
@@ -429,6 +492,22 @@ function ComponentsPage() {
       </Section>
 
       <Section
+        id="flight-results"
+        title="Flight Results"
+        description="Scored flight results table with one-per-pilot toggle, copy button, and links"
+      >
+        <FlightResultsShowcase />
+      </Section>
+
+      <Section
+        id="ladder-results"
+        title="Ladder Results"
+        description="Ladder trophy results with expandable flight details. Toggle between pilot and syndicate grouping."
+      >
+        <LadderResultsShowcase />
+      </Section>
+
+      <Section
         id="loading"
         title="Loading"
         description="Full-screen loading spinner (shown in a constrained box)"
@@ -450,14 +529,6 @@ function ComponentsPage() {
         description="404-style page for unknown trophy IDs"
       >
         <UnknownTrophyShowcase />
-      </Section>
-
-      <Section
-        id="winner-details"
-        title="WinnerDetails"
-        description="Flight details table or single flight summary"
-      >
-        <WinnerDetailsShowcase />
       </Section>
     </div>
   );

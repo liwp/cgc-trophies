@@ -174,7 +174,7 @@ const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
   );
 };
 
-const ResultsList = ({
+export const ResultsList = ({
   results,
   season,
   trophy,
@@ -355,7 +355,7 @@ const LadderResultRow = ({
   );
 };
 
-const LadderResultsList = ({
+export const LadderResultsList = ({
   results,
   season,
   trophy,
