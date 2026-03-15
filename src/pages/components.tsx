@@ -50,6 +50,7 @@ function makeFlight(overrides: {
       start: "Gransden Lodge",
       finish: "Gransden Lodge",
       turnpoints: ["Didcot", "Buckingham"],
+      heightLoss: 0,
     },
   };
 }

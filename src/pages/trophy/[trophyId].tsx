@@ -3,6 +3,7 @@ import { keyBy, uniqBy } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import {
+  AlertTriangle,
   ArrowLeft,
   BarChart3,
   Check,
@@ -31,6 +32,7 @@ import {
   ladderCopyData,
 } from "../../lib/trophyCopyData";
 import useFlights from "../../lib/useFlights";
+import { useHeightLoss } from "../../lib/useHeightLoss";
 import type {
   Flight,
   FlightTrophy,
@@ -99,6 +101,28 @@ const Task = ({
   );
 };
 
+const HeightLossWarning = ({
+  flightId,
+  reportedHeightLoss,
+}: {
+  flightId: string;
+  reportedHeightLoss: number;
+}) => {
+  const { result, isLoading } = useHeightLoss(flightId);
+
+  if (isLoading || !result) return null;
+  if (result.heightLoss <= 1000) return null;
+  if (reportedHeightLoss > 1000) return null;
+
+  return (
+    <Tooltip
+      text={`Computed height loss: ${Math.round(result.heightLoss)}m (reported: ${Math.round(reportedHeightLoss)}m)`}
+    >
+      <AlertTriangle size={16} className="text-red-500" />
+    </Tooltip>
+  );
+};
+
 const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
   const {
     date,
@@ -141,6 +165,9 @@ const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
             </a>
           </Tooltip>
           {rank === 1 && <CopyButton data={flightCopyData(result)} />}
+          {rank === 1 && (
+            <HeightLossWarning flightId={id} reportedHeightLoss={task.heightLoss} />
+          )}
         </div>
       </td>
     </tr>
@@ -214,9 +241,11 @@ const ResultsList = ({
 const LadderFlightRow = ({
   flight,
   isSyndicate,
+  showHeightLoss,
 }: {
   flight: Flight;
   isSyndicate: boolean;
+  showHeightLoss?: boolean;
 }) => {
   return (
     <tr className="bg-gray-50">
@@ -257,6 +286,9 @@ const LadderFlightRow = ({
               <Map size={16} className="inline" />
             </a>
           </Tooltip>
+          {showHeightLoss && (
+            <HeightLossWarning flightId={flight.id} reportedHeightLoss={flight.task.heightLoss} />
+          )}
         </div>
       </td>
       <td></td>
@@ -317,7 +349,7 @@ const LadderResultRow = ({
       </tr>
       {expanded &&
         result.flights.map((flight) => (
-          <LadderFlightRow key={flight.id} flight={flight} isSyndicate={isSyndicate} />
+          <LadderFlightRow key={flight.id} flight={flight} isSyndicate={isSyndicate} showHeightLoss={rank === 1} />
         ))}
     </>
   );
