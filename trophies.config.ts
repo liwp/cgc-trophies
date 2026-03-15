@@ -152,7 +152,7 @@ const config: TrophiesConfig = {
       name: "Presidents Trophy",
       description:
         "Club Fleet ladder: aggregate of best 6 cross-country point scores flown in club fleet gliders.",
-      ladderKey: "local3",
+      ladderKey: "local1",
       groupBy: "pilot",
       topN: 6,
     },
@@ -183,7 +183,7 @@ const config: TrophiesConfig = {
       name: "Bottle of Bolly Challenge",
       description:
         "Bolly/ASW19 ladder: aggregate of best 6 cross-country point scores on the Bolly Ladder.",
-      ladderKey: "local1",
+      ladderKey: "local3",
       groupBy: "pilot",
       topN: 6,
       gliderFilter: ["asw\\s*19", "pegase"],

@@ -28,27 +28,22 @@ const LADDERS_SPEC = {
       src: "Junior Ladder",
       type: "boolean",
     },
-    // bolly
     local1: {
       src: "Local Ladder 1",
       type: "boolean",
     },
-    // syndicate
     local2: {
       src: "Local  Ladder 2",
       type: "boolean",
     },
-    // club fleet
     local3: {
       src: "Local  Ladder 3",
       type: "boolean",
     },
-    // shark
     local4: {
       src: "Local  Ladder 4",
       type: "boolean",
     },
-    // fastrackers
     local5: {
       src: "Local  Ladder 5",
       type: "boolean",
