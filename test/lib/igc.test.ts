@@ -260,6 +260,52 @@ describe("computeHeightLoss", () => {
     expect(result).toBeNull();
   });
 
+  it("returns null when start and first TP are the same point", () => {
+    const data = {
+      task: [
+        { lat: 0, lon: 0, name: "TAKEOFF" },
+        { lat: grl.lat, lon: grl.lon, name: "GRL" },
+        { lat: grl.lat, lon: grl.lon, name: "GRL" },
+        { lat: grl.lat, lon: grl.lon, name: "GRL" },
+        { lat: 0, lon: 0, name: "LANDING" },
+      ],
+      track: [
+        { time: "100000", lat: 52.19, lon: -0.1, baroAlt: 500, gpsAlt: 500 },
+        { time: "110000", lat: 52.17, lon: -0.12, baroAlt: 400, gpsAlt: 400 },
+      ],
+    };
+    const result = computeHeightLoss(data);
+    expect(result).toBeNull();
+  });
+
+  it("returns null when start crossing only in second half of track", () => {
+    // Many points far from start, crossing only happens late
+    const far = { time: "100000", lat: 51.0, lon: -1.0, baroAlt: 500, gpsAlt: 500 };
+    const data = {
+      task: [
+        { lat: 0, lon: 0, name: "TAKEOFF" },
+        { lat: grl.lat, lon: grl.lon, name: "GRL" },
+        { lat: tp.lat, lon: tp.lon, name: "TP1" },
+        { lat: grl.lat, lon: grl.lon, name: "GRL" },
+        { lat: 0, lon: 0, name: "LANDING" },
+      ],
+      track: [
+        // Many points far from start line in first half
+        { ...far, time: "100000" },
+        { ...far, time: "100100" },
+        { ...far, time: "100200" },
+        { ...far, time: "100300" },
+        { ...far, time: "100400" },
+        { ...far, time: "100500" },
+        // Cross start line only well past midpoint
+        { time: "120000", lat: 52.19, lon: -0.1, baroAlt: 500, gpsAlt: 500 },
+        { time: "130000", lat: 52.175, lon: -0.12, baroAlt: 400, gpsAlt: 400 },
+      ],
+    };
+    const result = computeHeightLoss(data);
+    expect(result).toBeNull();
+  });
+
   it("uses GPS altitude when baro is zero", () => {
     const data = makeIgcData(0, 0);
     data.track = data.track.map((pt, i) => ({
