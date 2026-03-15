@@ -1,4 +1,4 @@
-import { ExternalLink, Eye } from "lucide-react";
+import { BarChart3, Map } from "lucide-react";
 import type { FlightDetail, SingleFlightDetail } from "../lib/trophyCopyData";
 import Tooltip from "./Tooltip";
 
@@ -32,7 +32,7 @@ const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
               >
-                <ExternalLink size={12} className="align-middle" />
+                <BarChart3 size={12} className="align-middle" />
               </a>
               <a
                 href={f.igcUrl}
@@ -40,7 +40,7 @@ const FlightTable = ({ flights }: { flights: FlightDetail[] }) => (
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Eye size={12} className="align-middle" />
+                <Map size={12} className="align-middle" />
               </a>
             </span>
           </td>
@@ -97,7 +97,7 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
         >
-          <ExternalLink size={12} className="align-middle" />
+          <BarChart3 size={12} className="align-middle" />
         </a>
         <a
           href={flight.igcUrl}
@@ -105,7 +105,7 @@ const FlightSummary = ({ flight }: { flight: SingleFlightDetail }) => {
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
         >
-          <Eye size={12} className="align-middle" />
+          <Map size={12} className="align-middle" />
         </a>
       </span>
     </span>

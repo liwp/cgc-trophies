@@ -4,13 +4,14 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import {
   ArrowLeft,
+  BarChart3,
   Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
   Copy,
-  ExternalLink,
+  Map,
 } from "lucide-react";
 
 import CONFIG from "../../../trophies.config";
@@ -117,17 +118,29 @@ const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
       <td className="px-4 py-3 text-gray-500">
         <Task task={task} />
       </td>
-      <td className="px-4 py-3 text-center">
+      <td className="px-4 py-3">
         <div className="inline-flex items-center gap-1">
+          <Tooltip text="BGA Ladder">
+            <a
+              href={`https://www.bgaladder.net/flightdetails/${id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-cambridge transition-colors"
+            >
+              <BarChart3 size={16} />
+            </a>
+          </Tooltip>
+          <Tooltip text="IGC Viewer">
+            <a
+              href={`https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-cambridge transition-colors"
+            >
+              <Map size={16} />
+            </a>
+          </Tooltip>
           {rank === 1 && <CopyButton data={flightCopyData(result)} />}
-          <a
-            href={`https://www.bgaladder.net/flightdetails/${id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-cambridge transition-colors"
-          >
-            <ExternalLink size={16} />
-          </a>
         </div>
       </td>
     </tr>
@@ -182,7 +195,7 @@ const ResultsList = ({
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
                 Task
               </th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
                 Links
               </th>
             </tr>
@@ -223,14 +236,28 @@ const LadderFlightRow = ({
         {flight.task.scoringDistanceKm.toFixed(0)} km
       </td>
       <td className="px-4 py-2 text-gray-500">
-        <a
-          href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-gray-400 hover:text-cambridge transition-colors"
-        >
-          <ExternalLink size={16} className="inline" />
-        </a>
+        <div className="inline-flex items-center gap-1">
+          <Tooltip text="BGA Ladder">
+            <a
+              href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-cambridge transition-colors"
+            >
+              <BarChart3 size={16} className="inline" />
+            </a>
+          </Tooltip>
+          <Tooltip text="IGC Viewer">
+            <a
+              href={`https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${flight.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-cambridge transition-colors"
+            >
+              <Map size={16} className="inline" />
+            </a>
+          </Tooltip>
+        </div>
       </td>
       <td></td>
     </tr>
@@ -272,6 +299,11 @@ const LadderResultRow = ({
         <td className="px-4 py-3 text-gray-500">{result.flights.length}</td>
         <td className="px-4 py-3">
           <div className="inline-flex items-center gap-1">
+            {expanded ? (
+              <ChevronUp size={16} className="text-gray-400" />
+            ) : (
+              <ChevronDown size={16} className="text-gray-400" />
+            )}
             {rank === 1 && (
               <CopyButton
                 data={ladderCopyData(
@@ -279,11 +311,6 @@ const LadderResultRow = ({
                   isSyndicate ? "registration" : "pilot",
                 )}
               />
-            )}
-            {expanded ? (
-              <ChevronUp size={16} className="text-gray-400" />
-            ) : (
-              <ChevronDown size={16} className="text-gray-400" />
             )}
           </div>
         </td>

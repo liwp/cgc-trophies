@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
+  BarChart3,
   Check,
   ChevronDown,
   ChevronUp,
   Copy,
-  ExternalLink,
+  Map,
 } from "lucide-react";
 
 import CONFIG from "../../trophies.config";
@@ -83,15 +84,27 @@ const FlightResultEntry = ({
       <td className="px-4 py-2 text-gray-500 text-sm">{tps}</td>
       <td className="px-4 py-2">
         <div className="inline-flex items-center gap-1">
+          <Tooltip text="BGA Ladder">
+            <a
+              href={`https://www.bgaladder.net/flightdetails/${id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-cambridge transition-colors"
+            >
+              <BarChart3 size={14} />
+            </a>
+          </Tooltip>
+          <Tooltip text="IGC Viewer">
+            <a
+              href={`https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-cambridge transition-colors"
+            >
+              <Map size={14} />
+            </a>
+          </Tooltip>
           <CopyButton data={flightCopyData(result)} />
-          <a
-            href={`https://www.bgaladder.net/flightdetails/${id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-cambridge transition-colors"
-          >
-            <ExternalLink size={14} />
-          </a>
         </div>
       </td>
     </tr>
@@ -112,14 +125,28 @@ const LadderFlightRow = ({ flight }: { flight: Flight }) => (
     </td>
     <td className="px-4 py-1.5" />
     <td className="px-4 py-1.5">
-      <a
-        href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-gray-400 hover:text-cambridge transition-colors"
-      >
-        <ExternalLink size={14} />
-      </a>
+      <div className="inline-flex items-center gap-1">
+        <Tooltip text="BGA Ladder">
+          <a
+            href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-cambridge transition-colors"
+          >
+            <BarChart3 size={14} className="inline" />
+          </a>
+        </Tooltip>
+        <Tooltip text="IGC Viewer">
+          <a
+            href={`https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${flight.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-cambridge transition-colors"
+          >
+            <Map size={14} className="inline" />
+          </a>
+        </Tooltip>
+      </div>
     </td>
   </tr>
 );
