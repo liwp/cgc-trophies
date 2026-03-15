@@ -112,9 +112,10 @@ const DUMMY_FLIGHTS: Flight[] = [
 
 const SCORED_FLIGHTS: ScoredFlight[] = [
   makeScoredFlight({
-    id: "100001",
+    id: "126718",
     pilot: "Lane, Laura",
     taskDistanceKm: 780,
+    heightLoss: 1000,
     start: "GRL",
     finish: "GRL",
     turnpoints: ["DID", "BUC", "ELY"],
