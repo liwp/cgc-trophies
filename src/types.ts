@@ -19,6 +19,7 @@ export interface Flight {
     finish: string;
     turnpoints: string[];
     tps?: { id: string; lat: number; lon: number }[];
+    heightLoss: number;
   };
 }
 
@@ -76,6 +77,31 @@ export interface LadderResult {
   totalDistance: number;
   pilots: string[];
   flights: Flight[];
+}
+
+export interface IgcTrackPoint {
+  time: string;
+  lat: number;
+  lon: number;
+  baroAlt: number;
+  gpsAlt: number;
+}
+
+export interface IgcTaskPoint {
+  lat: number;
+  lon: number;
+  name: string;
+}
+
+export interface IgcData {
+  task: IgcTaskPoint[];
+  track: IgcTrackPoint[];
+}
+
+export interface HeightLossResult {
+  startAltitude: number;
+  finishAltitude: number;
+  heightLoss: number;
 }
 
 export interface TrophiesConfig {

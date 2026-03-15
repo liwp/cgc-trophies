@@ -133,6 +133,10 @@ const TASK_SPEC = {
       src: "Task Achievement",
       type: "string",
     },
+    heightLoss: {
+      src: "Height loss",
+      type: "number",
+    },
   },
   type: "object",
   xform: (task: Record<string, any>) => {
