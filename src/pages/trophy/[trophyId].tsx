@@ -198,19 +198,31 @@ const ResultsList = ({
   );
 };
 
-const LadderFlightRow = ({ flight }: { flight: Flight }) => {
+const LadderFlightRow = ({
+  flight,
+  isSyndicate,
+}: {
+  flight: Flight;
+  isSyndicate: boolean;
+}) => {
   return (
     <tr className="bg-gray-50">
-      <td className="px-4 py-2 pl-10 text-gray-500">
-        {formatPilotName(flight.pilot)}
-      </td>
+      <td></td>
       <td className="px-4 py-2 text-gray-500">
         {flight.date.toLocaleDateString()}
       </td>
+      {isSyndicate && (
+        <td className="px-4 py-2 text-gray-500">
+          {formatPilotName(flight.pilot)}
+        </td>
+      )}
       <td className="px-4 py-2 text-gray-500">
         {flight.task.crossCountryPoints.toFixed(0)} pts
       </td>
-      <td className="px-4 py-2 text-center">
+      <td className="px-4 py-2 text-gray-500">
+        {flight.task.scoringDistanceKm.toFixed(0)} km
+      </td>
+      <td className="px-4 py-2 text-gray-500">
         <a
           href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
           target="_blank"
@@ -220,6 +232,7 @@ const LadderFlightRow = ({ flight }: { flight: Flight }) => {
           <ExternalLink size={16} className="inline" />
         </a>
       </td>
+      <td></td>
     </tr>
   );
 };
@@ -253,6 +266,9 @@ const LadderResultRow = ({
         <td className="px-4 py-3 text-gray-700">
           {result.totalScore.toFixed(0)} pts
         </td>
+        <td className="px-4 py-3 text-gray-500">
+          {result.totalDistance.toFixed(0)} km
+        </td>
         <td className="px-4 py-3 text-gray-500">{result.flights.length}</td>
         <td className="px-4 py-3">
           <div className="inline-flex items-center gap-1">
@@ -274,7 +290,7 @@ const LadderResultRow = ({
       </tr>
       {expanded &&
         result.flights.map((flight) => (
-          <LadderFlightRow key={flight.id} flight={flight} />
+          <LadderFlightRow key={flight.id} flight={flight} isSyndicate={isSyndicate} />
         ))}
     </>
   );
@@ -317,6 +333,9 @@ const LadderResultsList = ({
             )}
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
               Score
+            </th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+              Distance
             </th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
               Flights

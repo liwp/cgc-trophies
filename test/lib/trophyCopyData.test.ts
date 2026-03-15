@@ -71,6 +71,7 @@ describe("ladderCopyData", () => {
   const result: LadderResult = {
     key: "Holswilder, Alex",
     totalScore: 18682,
+    totalDistance: 750,
     pilots: ["Holswilder, Alex"],
     flights: [
       makeFlight({
@@ -110,6 +111,7 @@ describe("ladderCopyData", () => {
     const syndicateResult: LadderResult = {
       key: "G-CKYO",
       totalScore: 12000,
+      totalDistance: 680,
       pilots: ["Holswilder, Alex", "Smith, John"],
       flights: [makeFlight()],
     };
@@ -123,6 +125,7 @@ describe("ladderCopyData", () => {
     const syndicateResult: LadderResult = {
       key: "G-CKYO",
       totalScore: 12000,
+      totalDistance: 680,
       pilots: ["Holswilder, Alex", "Smith, John"],
       flights: [
         makeFlight({ id: "116237", pilot: "Holswilder, Alex" }),
@@ -147,6 +150,7 @@ describe("ladderFlightDetails", () => {
     const result: LadderResult = {
       key: "Holswilder, Alex",
       totalScore: 5000,
+      totalDistance: 680,
       pilots: ["Holswilder, Alex"],
       flights,
     };

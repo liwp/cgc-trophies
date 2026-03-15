@@ -231,9 +231,13 @@ export function ladderEval(
       (sum, f) => sum + f.task.crossCountryPoints,
       0,
     );
+    const totalDistance = topFlights.reduce(
+      (sum, f) => sum + f.task.scoringDistanceKm,
+      0,
+    );
     const pilots = [...new Set(topFlights.map((f) => f.pilot))];
 
-    results.push({ key, totalScore, pilots, flights: topFlights });
+    results.push({ key, totalScore, totalDistance, pilots, flights: topFlights });
   }
 
   // 4. Sort groups by totalScore descending

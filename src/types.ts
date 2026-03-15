@@ -73,6 +73,7 @@ export interface ScoredFlight extends Flight {
 export interface LadderResult {
   key: string;
   totalScore: number;
+  totalDistance: number;
   pilots: string[];
   flights: Flight[];
 }

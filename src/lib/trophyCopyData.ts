@@ -98,15 +98,11 @@ export function ladderCopyData(
     groupBy === "registration"
       ? `${result.key} (${result.pilots.map(formatPilotName).join(", ")})`
       : formatPilotName(result.key);
-  const totalDistance = result.flights.reduce(
-    (sum, f) => sum + f.task.scoringDistanceKm,
-    0,
-  );
   const pairs: [string, string][] = [
     ["Pilot Name", pilotName],
     ["Points", result.totalScore.toLocaleString("en-GB")],
     ["No. Of Flights", String(result.flights.length)],
-    ["Scoring Distance (kms)", totalDistance.toFixed(2)],
+    ["Scoring Distance (kms)", result.totalDistance.toFixed(2)],
   ];
   result.flights.forEach((f, i) => {
     const label =
