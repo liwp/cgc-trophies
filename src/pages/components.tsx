@@ -137,7 +137,7 @@ const LADDER_RESULTS: LadderResult[] = [
     totalDistance: 1560,
     pilots: ["Lane, Laura"],
     flights: [
-      makeFlight({ id: "100001", pilot: "Lane, Laura", taskDistanceKm: 780 }),
+      makeFlight({ id: "126718", pilot: "Lane, Laura", taskDistanceKm: 780, heightLoss: 1000 }),
       makeFlight({ id: "100005", pilot: "Lane, Laura", taskDistanceKm: 520 }),
       makeFlight({ id: "100006", pilot: "Lane, Laura", taskDistanceKm: 260 }),
     ],
