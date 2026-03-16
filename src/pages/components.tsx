@@ -112,31 +112,13 @@ const DUMMY_FLIGHTS: Flight[] = [
 
 const SCORED_FLIGHTS: ScoredFlight[] = [
   makeScoredFlight({
-    id: "115630",
-    pilot: "Baker, Peter",
-    taskDistanceKm: 315,
+    id: "126718",
+    pilot: "Lane, Laura",
+    taskDistanceKm: 780,
     heightLoss: 1000,
     start: "GRL",
     finish: "GRL",
-    turnpoints: ["DID", "BUC"],
-  }),
-  makeScoredFlight({
-    id: "115627",
-    pilot: "Theil, Robert",
-    taskDistanceKm: 315,
-    heightLoss: 1000,
-    start: "GRL",
-    finish: "GRL",
-    turnpoints: ["DID", "BUC"],
-  }),
-  makeScoredFlight({
-    id: "115872",
-    pilot: "Atkin, Phil",
-    taskDistanceKm: 306,
-    heightLoss: 1000,
-    start: "GRL",
-    finish: "GRL",
-    turnpoints: ["DID", "BUC"],
+    turnpoints: ["DID", "BUC", "ELY"],
   }),
   makeScoredFlight({
     id: "100004",

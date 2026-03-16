@@ -178,9 +178,10 @@ export function computeHeightLoss(data: IgcData): HeightLossResult | null {
 
   if (startCrossings.length === 0 || finishCrossings.length === 0) return null;
 
-  const midIndex = Math.floor(track.length / 2);
-  const startCrossing = startCrossings.filter((c) => c.index <= midIndex).pop();
-  const finishCrossing = finishCrossings.find((c) => c.index >= midIndex);
+  const q1 = Math.floor(track.length / 4);
+  const q3 = Math.floor((3 * track.length) / 4);
+  const startCrossing = startCrossings.filter((c) => c.index <= q1).pop();
+  const finishCrossing = finishCrossings.find((c) => c.index >= q3);
 
   if (!startCrossing || !finishCrossing) return null;
 
