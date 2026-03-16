@@ -105,6 +105,10 @@ const FlightResultEntry = ({
               <Map size={14} />
             </a>
           </Tooltip>
+          <HeightLossWarning
+            flightId={id}
+            reportedHeightLoss={task.heightLoss}
+          />
           <CopyButton data={flightCopyData(result)} />
         </div>
       </td>
@@ -147,6 +151,10 @@ const LadderFlightRow = ({ flight }: { flight: Flight }) => (
             <Map size={14} className="inline" />
           </a>
         </Tooltip>
+        <HeightLossWarning
+          flightId={flight.id}
+          reportedHeightLoss={flight.task.heightLoss}
+        />
       </div>
     </td>
   </tr>
@@ -171,9 +179,18 @@ const LadderResultEntry = ({
       >
         <td className="px-4 py-2 text-gray-500 text-sm">{rank}</td>
         <td className="px-4 py-2 text-gray-700">
-          {isSyndicate
-            ? `${result.key} (${result.pilots.map(formatPilotName).join(", ")})`
-            : formatPilotName(result.key)}
+          <div className="inline-flex items-center gap-1">
+            {isSyndicate
+              ? `${result.key} (${result.pilots.map(formatPilotName).join(", ")})`
+              : formatPilotName(result.key)}
+            {result.flights.map((f) => (
+              <HeightLossWarning
+                key={f.id}
+                flightId={f.id}
+                reportedHeightLoss={f.task.heightLoss}
+              />
+            ))}
+          </div>
         </td>
         <td className="px-4 py-2 text-gray-700">
           {result.totalScore.toFixed(0)} pts
@@ -226,11 +243,12 @@ const TrophySection = ({
     ? ladderEval(CONFIG.season, season, allFlights, trophy as LadderTrophy, CONFIG.pilotMilestones)
     : trophyEval(CONFIG.season, season, flights, trophy as FlightTrophy, CONFIG.pilotMilestones);
 
-  const allResultFlights = isLadder
-    ? (results as LadderResult[]).flatMap((r) => r.flights)
-    : (results as ScoredFlight[]);
-
   const winner = results[0];
+  const winnerFlights: Flight[] = winner
+    ? isLadder
+      ? (winner as LadderResult).flights
+      : [winner as ScoredFlight]
+    : [];
   let winnerLabel = "No qualifying flights";
   if (winner) {
     if (isLadder) {
@@ -254,7 +272,7 @@ const TrophySection = ({
       <div className="flex items-baseline justify-between gap-4 mb-2">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold text-gray-900">{trophy.name}</h3>
-          {allResultFlights.map((f) => (
+          {winnerFlights.map((f) => (
             <HeightLossWarning
               key={f.id}
               flightId={f.id}
