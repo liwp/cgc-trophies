@@ -12,6 +12,7 @@ import {
 
 import CONFIG from "../../trophies.config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
+import HeightLossWarning from "../components/HeightLossWarning";
 import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
@@ -225,6 +226,10 @@ const TrophySection = ({
     ? ladderEval(CONFIG.season, season, allFlights, trophy as LadderTrophy, CONFIG.pilotMilestones)
     : trophyEval(CONFIG.season, season, flights, trophy as FlightTrophy, CONFIG.pilotMilestones);
 
+  const allResultFlights = isLadder
+    ? (results as LadderResult[]).flatMap((r) => r.flights)
+    : (results as ScoredFlight[]);
+
   const winner = results[0];
   let winnerLabel = "No qualifying flights";
   if (winner) {
@@ -247,7 +252,16 @@ const TrophySection = ({
   return (
     <div id={`trophy-${trophy.id}`} className="scroll-mt-4">
       <div className="flex items-baseline justify-between gap-4 mb-2">
-        <h3 className="text-lg font-semibold text-gray-900">{trophy.name}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-900">{trophy.name}</h3>
+          {allResultFlights.map((f) => (
+            <HeightLossWarning
+              key={f.id}
+              flightId={f.id}
+              reportedHeightLoss={f.task.heightLoss}
+            />
+          ))}
+        </div>
         <span className="text-sm text-gray-500 shrink-0">{winnerLabel}</span>
       </div>
       <p className="text-sm text-gray-400 mb-3">{trophy.description}</p>

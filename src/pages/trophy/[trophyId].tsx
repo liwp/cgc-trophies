@@ -3,7 +3,6 @@ import { keyBy, uniqBy } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import {
-  AlertTriangle,
   ArrowLeft,
   BarChart3,
   Check,
@@ -17,6 +16,7 @@ import {
 
 import CONFIG from "../../../trophies.config";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
+import HeightLossWarning from "../../components/HeightLossWarning";
 import Loading from "../../components/Loading";
 import PageLayout from "../../components/PageLayout";
 import Season from "../../components/Season";
@@ -32,7 +32,6 @@ import {
   ladderCopyData,
 } from "../../lib/trophyCopyData";
 import useFlights from "../../lib/useFlights";
-import { useHeightLoss } from "../../lib/useHeightLoss";
 import type {
   Flight,
   FlightTrophy,
@@ -101,27 +100,6 @@ const Task = ({
   );
 };
 
-const HeightLossWarning = ({
-  flightId,
-  reportedHeightLoss,
-}: {
-  flightId: string;
-  reportedHeightLoss: number;
-}) => {
-  const { result, isLoading } = useHeightLoss(flightId);
-
-  if (isLoading || !result) return null;
-  if (result.heightLoss <= 1000) return null;
-  if (reportedHeightLoss > 1000) return null;
-
-  return (
-    <Tooltip
-      text={`Computed height loss: ${Math.round(result.heightLoss)}m (reported: ${Math.round(reportedHeightLoss)}m)`}
-    >
-      <AlertTriangle size={16} className="text-red-500" />
-    </Tooltip>
-  );
-};
 
 const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
   const {
