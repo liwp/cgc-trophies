@@ -208,10 +208,12 @@ const LadderResultEntry = ({
 const TrophySection = ({
   trophy,
   flights,
+  allFlights,
   season,
 }: {
   trophy: (typeof CONFIG.trophies)[number];
   flights: Flight[];
+  allFlights: Flight[];
   season: number;
 }) => {
   const [showAll, setShowAll] = useState(false);
@@ -220,7 +222,7 @@ const TrophySection = ({
     isLadder && (trophy as LadderTrophy).groupBy === "registration";
 
   const results = isLadder
-    ? ladderEval(CONFIG.season, season, flights, trophy as LadderTrophy, CONFIG.pilotMilestones)
+    ? ladderEval(CONFIG.season, season, allFlights, trophy as LadderTrophy, CONFIG.pilotMilestones)
     : trophyEval(CONFIG.season, season, flights, trophy as FlightTrophy, CONFIG.pilotMilestones);
 
   const winner = results[0];
@@ -312,7 +314,7 @@ const TrophySection = ({
 };
 
 const AdminPage = () => {
-  const { error, flights, isLoading, season } = useFlights();
+  const { error, flights, allFlights, isLoading, season } = useFlights();
 
   if (error) return <FlightLoadFailure />;
   if (isLoading) return <Loading />;
@@ -355,6 +357,7 @@ const AdminPage = () => {
               key={trophy.id}
               trophy={trophy}
               flights={flights!}
+              allFlights={allFlights!}
               season={season}
             />
           ))}

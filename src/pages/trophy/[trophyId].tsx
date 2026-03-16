@@ -499,7 +499,7 @@ const TrophyNavBar = ({
 const TrophyPage = () => {
   const router = useRouter();
   const trophyId = router.query.trophyId as string;
-  const { error, flights, isLoading, season } = useFlights();
+  const { error, flights, allFlights, isLoading, season } = useFlights();
 
   if (error) return <FlightLoadFailure />;
   if (isLoading) return <Loading />;
@@ -527,7 +527,7 @@ const TrophyPage = () => {
               results={ladderEval(
                 CONFIG.season,
                 season,
-                flights!,
+                allFlights!,
                 config as LadderTrophy,
                 CONFIG.pilotMilestones,
               )}

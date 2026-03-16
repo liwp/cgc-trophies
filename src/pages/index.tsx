@@ -47,15 +47,17 @@ function formatWinner(trophy: any): string {
 
 const TrophyList = ({
   flights,
+  allFlights,
   season,
 }: {
   flights: Flight[];
+  allFlights: Flight[];
   season: number;
 }) => {
   const trophies = CONFIG.trophies.map((trophy) => {
     const results =
       trophy.type === "ladder"
-        ? ladderEval(CONFIG.season, season, flights, trophy as LadderTrophy, CONFIG.pilotMilestones)
+        ? ladderEval(CONFIG.season, season, allFlights, trophy as LadderTrophy, CONFIG.pilotMilestones)
         : trophyEval(CONFIG.season, season, flights, trophy as FlightTrophy, CONFIG.pilotMilestones);
     return {
       ...trophy,
@@ -122,7 +124,7 @@ const TrophyList = ({
 };
 
 const TrophiesPage = () => {
-  const { error, flights, isLoading, season } = useFlights();
+  const { error, flights, allFlights, isLoading, season } = useFlights();
 
   if (error) return <FlightLoadFailure />;
   if (isLoading) return <Loading />;
@@ -147,7 +149,7 @@ const TrophiesPage = () => {
           </div>
         </div>
         <Stats flights={flights!} season={season} />
-        <TrophyList flights={flights!} season={season} />
+        <TrophyList flights={flights!} allFlights={allFlights!} season={season} />
       </div>
     </PageLayout>
   );

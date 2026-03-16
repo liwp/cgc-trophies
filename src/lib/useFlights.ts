@@ -27,6 +27,7 @@ function currentSeason(): number {
 function useFlights(): {
   error: any;
   flights: Flight[] | undefined;
+  allFlights: Flight[] | undefined;
   isLoading: boolean;
   season: number;
 } {
@@ -50,16 +51,15 @@ function useFlights(): {
     fetcher,
   );
 
-  const flights =
-    !isLoading && !error
-      ? data.flights.filter(
-          (f: Flight) => f.task.launchSite === config.club.launchSite,
-        )
-      : undefined;
+  const allFlights = !isLoading && !error ? (data.flights as Flight[]) : undefined;
+  const flights = allFlights?.filter(
+    (f) => f.task.launchSite === config.club.launchSite,
+  );
 
   return {
     error,
     flights,
+    allFlights,
     isLoading,
     season,
   };
