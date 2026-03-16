@@ -51,7 +51,11 @@ function useFlights(): {
     fetcher,
   );
 
-  const allFlights = !isLoading && !error ? (data.flights as Flight[]) : undefined;
+  const allFlights = !isLoading && !error
+    ? (data.flights as Flight[]).filter(
+        (f) => f.clubName === config.club.name,
+      )
+    : undefined;
   const flights = allFlights?.filter(
     (f) => f.task.launchSite === config.club.launchSite,
   );

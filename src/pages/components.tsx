@@ -43,6 +43,7 @@ function makeFlight(overrides: {
   return {
     id,
     date: new Date("2024-07-15"),
+    clubName: "Cambridge Gliding Centre",
     pilot,
     glider: { type: "ASG 29", handicap: 108, registration: "G-ABCD" },
     ladders: ["open"],

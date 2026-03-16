@@ -1,6 +1,7 @@
 export interface Flight {
   id: string;
   date: Date;
+  clubName: string;
   pilot: string;
   glider: { type: string; handicap: number; registration: string };
   ladders: string[];

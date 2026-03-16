@@ -160,6 +160,10 @@ const SPEC = {
       src: "Flight Date",
       type: "date",
     },
+    clubName: {
+      src: "Club Name",
+      type: "string",
+    },
     pilot: {
       src: {
         first: {
