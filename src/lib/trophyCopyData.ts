@@ -1,4 +1,5 @@
 import type { ScoredFlight, LadderResult } from "../types";
+import TURNPOINTS from "./turnpoints";
 
 export interface FlightDetail {
   pilot: string;
@@ -65,9 +66,9 @@ export function flightFlightDetails(result: ScoredFlight): SingleFlightDetail {
   };
 }
 
-export function flightCopyData(result: ScoredFlight): [string, string][] {
+export function flightCopyData(result: ScoredFlight): string[][] {
   const { id, date, pilot, glider, task } = result;
-  const pairs: [string, string][] = [
+  const rows: string[][] = [
     ["Pilot Name", formatPilotName(pilot)],
     [
       "Date of Flight",
@@ -85,9 +86,13 @@ export function flightCopyData(result: ScoredFlight): [string, string][] {
     ["Ladder", flightUrl(id)],
   ];
   task.turnpoints.forEach((tp, i) => {
-    pairs.push([`TP${i + 1}`, tp]);
+    const row = rows[i + 1];
+    if (row) {
+      const fullName = TURNPOINTS[tp] || tp;
+      row.push("", `TP${i + 1}`, `${tp} ${fullName}`);
+    }
   });
-  return pairs;
+  return rows;
 }
 
 export function ladderCopyData(
@@ -114,8 +119,8 @@ export function ladderCopyData(
   return pairs;
 }
 
-export function copyDataToClipboard(data: [string, string][]): Promise<void> {
-  const text = data.map(([k, v]) => `${k}\t${v}`).join("\n");
+export function copyDataToClipboard(data: string[][]): Promise<void> {
+  const text = data.map((row) => row.join("\t")).join("\n");
   if (navigator.clipboard?.writeText) {
     return navigator.clipboard.writeText(text);
   }

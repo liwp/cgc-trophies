@@ -32,9 +32,9 @@ const makeFlight = (overrides?: Partial<ScoredFlight>): ScoredFlight => ({
 });
 
 describe("flightCopyData", () => {
-  it("produces correct label-value pairs", () => {
+  it("produces correct label-value pairs with turnpoints alongside", () => {
     const data = flightCopyData(makeFlight());
-    const map = Object.fromEntries(data);
+    const map = Object.fromEntries(data.map((row) => [row[0], row[1]]));
 
     expect(map["Pilot Name"]).toBe("Alex Holswilder");
     expect(map["Aircraft Type"]).toBe("Ventus 3");
@@ -44,26 +44,31 @@ describe("flightCopyData", () => {
     expect(map["Ladder"]).toBe(
       "https://www.bgaladder.net/flightdetails/116237",
     );
-    expect(map["TP1"]).toBe("SHM");
-    expect(map["TP2"]).toBe("CAX");
-    expect(map["TP3"]).toBe("BRF");
+    // Turnpoints appear in columns 3-5 starting from row 1, with full names
+    expect(data[0]).toHaveLength(2); // Pilot Name row has no turnpoints
+    expect(data[1].slice(2)).toEqual(["", "TP1", "SHM Shepton Mallett"]);
+    expect(data[2].slice(2)).toEqual(["", "TP2", "CAX Caxton Gibbet"]);
+    expect(data[3].slice(2)).toEqual(["", "TP3", "BRF Bradford-on-avon"]);
+    // Remaining rows have no turnpoint columns
+    expect(data[4]).toHaveLength(2);
   });
 
   it("formats date as long weekday format", () => {
     const data = flightCopyData(makeFlight());
-    const map = Object.fromEntries(data);
+    const dateValue = data[1][1];
     // Date formatting is locale-dependent; just check it contains the key parts
-    expect(map["Date of Flight"]).toMatch(/26/);
-    expect(map["Date of Flight"]).toMatch(/2024/);
+    expect(dateValue).toMatch(/26/);
+    expect(dateValue).toMatch(/2024/);
   });
 
   it("omits empty turnpoints", () => {
     const flight = makeFlight();
     flight.task.turnpoints = ["SHM"];
     const data = flightCopyData(flight);
-    const keys = data.map(([k]) => k);
-    expect(keys).toContain("TP1");
-    expect(keys).not.toContain("TP2");
+    expect(data[0]).toHaveLength(2); // Pilot Name row has no turnpoints
+    expect(data[1].slice(2)).toEqual(["", "TP1", "SHM Shepton Mallett"]);
+    // No TP2 anywhere
+    expect(data[2]).toHaveLength(2);
   });
 });
 

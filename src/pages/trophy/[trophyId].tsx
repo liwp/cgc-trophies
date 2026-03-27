@@ -42,7 +42,7 @@ import type {
 
 const TROPHIES_BY_ID = keyBy(CONFIG.trophies, "id");
 
-const CopyButton = ({ data }: { data: [string, string][] }) => {
+const CopyButton = ({ data }: { data: string[][] }) => {
   const [copied, setCopied] = React.useState(false);
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
