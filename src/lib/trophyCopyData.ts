@@ -109,13 +109,6 @@ export function ladderCopyData(
     ["No. Of Flights", String(result.flights.length)],
     ["Scoring Distance (kms)", result.totalDistance.toFixed(2)],
   ];
-  result.flights.forEach((f, i) => {
-    const label =
-      groupBy === "registration"
-        ? `Flight ${i + 1} (${formatPilotName(f.pilot)})`
-        : `Flight ${i + 1}`;
-    pairs.push([label, flightUrl(f.id)]);
-  });
   return pairs;
 }
 

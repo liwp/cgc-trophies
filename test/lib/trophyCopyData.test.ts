@@ -100,18 +100,6 @@ describe("ladderCopyData", () => {
     expect(map["Scoring Distance (kms)"]).toBe("750.00");
   });
 
-  it("includes BGA ladder links for each flight", () => {
-    const data = ladderCopyData(result, "pilot");
-    const map = Object.fromEntries(data);
-
-    expect(map["Flight 1"]).toBe(
-      "https://www.bgaladder.net/flightdetails/116237",
-    );
-    expect(map["Flight 2"]).toBe(
-      "https://www.bgaladder.net/flightdetails/116500",
-    );
-  });
-
   it("uses registration + pilots list for syndicate trophy", () => {
     const syndicateResult: LadderResult = {
       key: "G-CKYO",
@@ -126,26 +114,12 @@ describe("ladderCopyData", () => {
     expect(map["Pilot Name"]).toBe("G-CKYO (Alex Holswilder, John Smith)");
   });
 
-  it("includes pilot name in flight labels for syndicate trophy", () => {
-    const syndicateResult: LadderResult = {
-      key: "G-CKYO",
-      totalScore: 12000,
-      totalDistance: 680,
-      pilots: ["Holswilder, Alex", "Smith, John"],
-      flights: [
-        makeFlight({ id: "116237", pilot: "Holswilder, Alex" }),
-        makeFlight({ id: "116500", pilot: "Smith, John" }),
-      ],
-    };
-    const data = ladderCopyData(syndicateResult, "registration");
-    const map = Object.fromEntries(data);
+  it("does not include flight URLs", () => {
+    const data = ladderCopyData(result, "pilot");
+    const keys = data.map(([k]) => k);
 
-    expect(map["Flight 1 (Alex Holswilder)"]).toBe(
-      "https://www.bgaladder.net/flightdetails/116237",
-    );
-    expect(map["Flight 2 (John Smith)"]).toBe(
-      "https://www.bgaladder.net/flightdetails/116500",
-    );
+    expect(keys).not.toContain("Flight 1");
+    expect(keys).not.toContain("Flight 2");
   });
 });
 
