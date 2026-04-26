@@ -112,6 +112,8 @@ const config: TrophiesConfig = {
       "Bonhomme, Paul": 0,
       "Alexander, James": 2024,
       "Pesonen, Lauri": 2020,
+      "Brand, Tom": 2022,
+      "Brooker, Charlie": 2022,
     },
     "500km": {
       "Head, Wendy": 0,
