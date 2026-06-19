@@ -1,6 +1,10 @@
 # Dolt database (managed by Dolt, not git)
 dolt/
 dolt-access.lock
+embeddeddolt/
+
+# Credential key (machine-local secret, must never be committed)
+.beads-credential-key
 
 # Runtime files
 bd.sock

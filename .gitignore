@@ -5,6 +5,7 @@
 .DS_Store
 *.tsbuildinfo
 .serena/
+/docs/superpowers/
 
 # Dolt database files (added by bd init)
 .dolt/
