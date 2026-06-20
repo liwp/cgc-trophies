@@ -7,6 +7,12 @@
 .serena/
 /docs/superpowers/
 
+# Local env files (per-developer, not for publishing)
+.env*.local
+
+# Beads tooling state (issue tracker — local only)
+/.beads/
+
 # Dolt database files (added by bd init)
 .dolt/
 *.db
