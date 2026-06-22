@@ -3,7 +3,7 @@
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!**/*.css"]
+    "includes": ["**", "!**/*.css", "!.beads", "!.agents", "!.codex"]
   },
   "formatter": {
     "enabled": true,

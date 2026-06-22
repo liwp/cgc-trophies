@@ -12,6 +12,8 @@
 
 # Beads: tracked files (config, issues.jsonl, skills) are shared; the
 # local DB, runtime state, and credential key stay ignored via .beads/.gitignore
+# interactions.jsonl is a per-machine audit log — churns constantly, not shared
+.beads/interactions.jsonl
 
 # Dolt database files (added by bd init)
 .dolt/
