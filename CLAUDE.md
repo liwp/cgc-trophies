@@ -8,15 +8,21 @@ Cambridge Gliding Centre annual trophies app. Fetches BGA Ladder flight data, sc
 
 ## Commands
 
+This project uses **bun** as the package manager and script runner.
+
 ```bash
-npm run dev          # Start dev server
-npm run build        # Production build
-npm run lint         # Biome check (lint + format + import sorting, read-only)
-npm run format       # Biome check --write (apply fixes)
-npm test             # Run all tests (Jest)
-npm test -- --watch  # Watch mode
-npm test -- test/lib/eval.test.ts  # Run a single test file
+bun install                          # Install dependencies (uses bun.lock)
+bun run dev                          # Start dev server
+bun run build                        # Production build
+bun run lint                         # Biome check (lint + format + import sorting, read-only)
+bun run format                       # Biome check --write (apply fixes)
+bun run test                         # Run all tests (Jest) — use `bun run test`, NOT `bun test`
+bun run test --watch                 # Watch mode
+bun run test test/lib/eval.test.ts   # Run a single test file
 ```
+
+Note: `bun test` invokes bun's native test runner, which bypasses Jest and its
+config — always use `bun run test` to run the Jest suite.
 
 ## Architecture
 
