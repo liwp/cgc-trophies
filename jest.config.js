@@ -3,8 +3,10 @@ module.exports = {
     "**/*.{js,jsx,ts,tsx}",
     "!**/node_modules/**",
     "!**/test/**",
+    "!**/e2e/**",
     "!**/coverage/**",
     "!jest.config.js",
+    "!playwright.config.ts",
   ],
   coverageThreshold: {
     global: {
@@ -20,7 +22,7 @@ module.exports = {
   },
   setupFiles: ["<rootDir>/test/setup.ts"],
   testMatch: ["**/?(*.)+(spec|test).[jt]s?(x)"],
-  testPathIgnorePatterns: ["/.next/", "/node_modules/", "/coverage/"],
+  testPathIgnorePatterns: ["/.next/", "/node_modules/", "/coverage/", "/e2e/"],
   transform: {
     "^.+\\.(js|jsx|ts|tsx)$": ["babel-jest", { presets: ["next/babel"] }],
   },
