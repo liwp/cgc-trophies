@@ -1,9 +1,9 @@
-#!/usr/bin/env npx ts-node
+#!/usr/bin/env bun
 /**
  * Add a pilot milestone entry to trophies.config.ts.
  *
  * Usage:
- *   npx ts-node scripts/add-milestone.ts "Last, First" 300km [year]
+ *   bun scripts/add-milestone.ts "Last, First" 300km [year]
  *
  * If year is omitted, uses 0 (always ineligible sentinel).
  * Errors if the pilot already exists in that milestone.
@@ -62,11 +62,11 @@ content = content.replace(match[0], updatedBlock);
 
 fs.writeFileSync(configPath, content, "utf-8");
 
-// Run prettier on the file
+// Format the file with Biome
 try {
-  execSync(`npx prettier --write "${configPath}"`, { stdio: "inherit" });
+  execSync(`bunx biome format --write "${configPath}"`, { stdio: "inherit" });
 } catch {
-  // prettier is optional
+  // formatting is optional
 }
 
 console.log(

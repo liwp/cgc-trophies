@@ -1,83 +1,115 @@
 # Cambridge Gliding Centre Annual Trophies
 
-This is a next.js / Raect app with a backend API is tries to read flight
-information for a given gliding season from the [BGA
-ladder](https://www.bgaladder.net/), score flights based on the various CGC
-trophy rules, and render the trophy winners.
+A web app that works out the winners of [Cambridge Gliding
+Centre](https://www.glide.co.uk/)'s annual cross-country trophies. It pulls
+flight data for the season from the [BGA Ladder](https://www.bgaladder.net/),
+scores each flight against the club's trophy rules, and shows the winners.
 
-# Caveats
+![Trophy winners page](docs/screenshot.png)
 
-This is all automatic, and based on the data provided by the BGA Ladder.
-Therefore the software will not always give the correct results. Issues that
-we've so far run into:
+## How it works
 
-- A pilot changed clubs. They updated their profile on the BGA Ladder, which
-  then applied to all their past flights as well. Therefore they no longer show
-  up in the CGC flights and their past trophy wins no longer show up on this app
-  either.
-- Some trophies are aimed at novice pilots. They have criteria like "for
-  novices" or "hasn't flown a 300km/500km/... flight before the seasons starts"
-  attached to them. The BGA Ladder does not know if a pilot is a novice, or if
-  they have a gold or diamond badge or not. We maintain a `pilotMilestones` list
-  in `trophies.config.ts` to handle this (see "Managing pilot milestones"
-  below), but it requires manual upkeep.
-- Some trophies are restricted to eg "up to 3 turnpoints" and the scoring
-  algorithm implements this rule without exceptions. But some times more
-  turnpoints might be acceptable, eg a pilot added turnpoint to their task as a
-  navigational aid to avoid airspace, and the algorithm excluded them from the
-  trophy (they were awarded the trophy in the end).
-- Not all the flights that should be considered for a trophy are uploaded to the
-  BGA Ladder, and those flights will clearly not show up in the results.
+1. The BGA Ladder publishes club flight data as CSV at `api.bgaladder.net`.
+2. An API route (`src/pages/api/flights.ts`) fetches and parses it into JSON.
+3. The client (`useFlights` + SWR) loads that data and filters to the club's
+   home site.
+4. The scoring engine (`src/lib/eval.ts`) evaluates each trophy's rules and
+   produces the winners shown on the page.
 
-These are just a few complications that we run into when trying to automate
-awarding trophies.
+All club-specific configuration — club details, season handling, and every
+trophy definition — lives in **`trophies.config.ts`** at the project root, so
+the app can be adapted to another gliding club by editing that one file.
 
-Related to invalid flights: we show only the best qualifying flight for a given
-pilot for each trophy. That means that if that flight is invalid for some
-reason, we would not show their next best, valid flight in the results. This
-probably won't cause issue in practise, but might still be surprising / annoying
-to users.
+### Trophy types
 
-Some remaining ideas for improvement:
+- **Flight trophies** — scored from a small DSL of `[op, ...args]` expressions
+  (`filter` / `project` / `score` / `sort`) evaluated over the season's flights.
+- **Ladder trophies** — group flights by pilot (or glider registration), take
+  the top N by cross-country points, and sum the scores.
 
-1. Explicitly state the historical winners. This way we avoid losing winners if
-   they or their flight vanishes from the BGA Ladder export, and we can override
-   the algorithm and its idiosyncrasies.
+## Tech stack
 
-# Managing pilot milestones
+Next.js (Pages Router) · React · TypeScript · Tailwind CSS v4 · SWR · Jest.
+Tooling: **bun** (package manager + scripts), **Biome** (lint + format), and
+**Node 24 LTS** pinned via `mise`.
+
+## Getting started
+
+Prerequisites: [bun](https://bun.sh) and [mise](https://mise.jdx.dev) (mise
+provides the pinned Node version; see `mise.toml`).
+
+```bash
+bun install          # install dependencies
+bun run dev          # start the dev server at http://localhost:3000
+bun run build        # production build
+bun run test         # run the test suite (Jest) — note: not `bun test`
+bun run lint         # Biome check (lint + format + import sorting)
+bun run format       # Biome auto-fix
+```
+
+## Caveats
+
+Results are automatic and derived entirely from the BGA Ladder, so they aren't
+always the final word. Things we've run into:
+
+- **Pilots changing clubs.** Updating a club on the BGA Ladder applies
+  retroactively to all of that pilot's past flights, so they (and their past
+  trophy wins) can disappear from the club's results.
+- **"Novice"-type trophies.** Some trophies are restricted to pilots who
+  haven't yet flown a given distance. The BGA Ladder has no notion of this, so
+  we maintain a `pilotMilestones` list in `trophies.config.ts` (see below) —
+  which needs manual upkeep.
+- **Strict task rules.** A trophy limited to, say, "up to 3 turning points" is
+  enforced exactly, even though an extra turnpoint added as a navigational aid
+  might be acceptable in practice.
+- **Missing uploads.** Flights that were never uploaded to the BGA Ladder
+  can't be scored.
+
+We also show only the **best qualifying flight per pilot** for each trophy — if
+that flight turns out to be invalid, the next-best valid flight isn't shown.
+
+Idea for the future: record historical winners explicitly, so results survive
+flights vanishing from the BGA Ladder export and can override the algorithm's
+idiosyncrasies.
+
+## Managing pilot milestones
 
 Some trophies are restricted to pilots who haven't yet achieved a distance
 milestone (300km or 500km). The `pilotMilestones` section in
-`trophies.config.ts` tracks which pilots have achieved which milestones and
-when. Trophies reference a milestone via `excludePilotsWithMilestone`, and all
-flights from excluded pilots are automatically filtered out.
+`trophies.config.ts` tracks which pilots achieved which milestones and when.
+Trophies reference a milestone via `excludePilotsWithMilestone`, and all flights
+from excluded pilots are filtered out.
 
-The current trophies with milestone exclusions:
+Trophies with milestone exclusions:
 
-| Trophy | Milestone | Rule |
-|--------|-----------|------|
-| The Boomerang | 500km | Excludes pilots who've completed a 500km flight |
-| Double Century | 300km | Excludes pilots who've flown a 300km |
-| Slazenger Trophy | 300km | Excludes pilots who've flown a 300km |
-| Ted Warner Trophy | 300km | Excludes pilots who've flown a 300km |
+| Trophy            | Milestone | Rule                                            |
+| ----------------- | --------- | ----------------------------------------------- |
+| The Boomerang     | 500km     | Excludes pilots who've completed a 500km flight |
+| Double Century    | 300km     | Excludes pilots who've flown a 300km            |
+| Slazenger Trophy  | 300km     | Excludes pilots who've flown a 300km            |
+| Ted Warner Trophy | 300km     | Excludes pilots who've flown a 300km            |
 
 A pilot is excluded from a season if their milestone year is **before** that
-season (e.g. achieving 300km in 2024 means excluded from 2025 onwards, but
-still eligible for 2024). A year of `0` means "always ineligible" — use this
-when the milestone was achieved before we started tracking.
+season (e.g. achieving 300km in 2024 means excluded from 2025 onwards, but still
+eligible for 2024). A year of `0` means "always ineligible" — use this when the
+milestone was achieved before we started tracking.
 
-## Adding a pilot milestone
+### Adding a pilot milestone
 
-Use the helper script:
+Use the helper script (run with bun):
 
 ```bash
 # Achieved 300km in 2025
-npx ts-node scripts/add-milestone.ts "Last, First" 300km 2025
+bun scripts/add-milestone.ts "Last, First" 300km 2025
 
 # Always ineligible (year defaults to 0)
-npx ts-node scripts/add-milestone.ts "Last, First" 500km
+bun scripts/add-milestone.ts "Last, First" 500km
 ```
 
-The script adds the entry to `trophies.config.ts` and runs prettier. It will
-error if the pilot already exists in that milestone. Pilot names use
-`"Last, First"` format, matching the BGA Ladder flight data.
+It adds the entry to `trophies.config.ts` and reformats it with Biome. It errors
+if the pilot already exists in that milestone. Pilot names use `"Last, First"`
+format, matching the BGA Ladder flight data.
+
+## License
+
+[MIT](LICENSE)
