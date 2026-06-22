@@ -1,16 +1,13 @@
-import dynamic from "next/dynamic";
-import { useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Flight, LadderResult, ScoredFlight } from "../types";
-import Tooltip from "../components/Tooltip";
-import Stats from "../components/Stats";
-import Loading from "../components/Loading";
+import dynamic from "next/dynamic";
+import { type ReactNode, useState } from "react";
 import FlightLoadFailure from "../components/FlightLoadFailure";
+import Loading from "../components/Loading";
+import Stats from "../components/Stats";
+import Tooltip from "../components/Tooltip";
 import UnknownTrophy from "../components/UnknownTrophy";
-import {
-  ResultsList,
-  LadderResultsList,
-} from "./trophy/[trophyId]";
+import type { Flight, LadderResult, ScoredFlight } from "../types";
+import { LadderResultsList, ResultsList } from "./trophy/[trophyId]";
 
 // ---------------------------------------------------------------------------
 // Dummy data
@@ -77,11 +74,7 @@ function makeScoredFlight(overrides: {
   finish?: string;
   turnpoints?: string[];
 }): ScoredFlight {
-  const {
-    scoreValue,
-    scoreUnit = "km",
-    ...flightOverrides
-  } = overrides;
+  const { scoreValue, scoreUnit = "km", ...flightOverrides } = overrides;
   const flight = makeFlight(flightOverrides);
   return {
     ...flight,
@@ -138,7 +131,12 @@ const LADDER_RESULTS: LadderResult[] = [
     totalDistance: 1560,
     pilots: ["Lane, Laura"],
     flights: [
-      makeFlight({ id: "126718", pilot: "Lane, Laura", taskDistanceKm: 780, heightLoss: 1000 }),
+      makeFlight({
+        id: "126718",
+        pilot: "Lane, Laura",
+        taskDistanceKm: 780,
+        heightLoss: 1000,
+      }),
       makeFlight({ id: "100005", pilot: "Lane, Laura", taskDistanceKm: 520 }),
       makeFlight({ id: "100006", pilot: "Lane, Laura", taskDistanceKm: 260 }),
     ],
@@ -230,6 +228,7 @@ function ToggleGroup({
       <div className="flex rounded border border-gray-200">
         {options.map((opt) => (
           <button
+            type="button"
             key={opt}
             className={`px-2 py-0.5 text-xs ${
               value === opt ? "bg-gray-900 text-white" : "hover:bg-gray-100"
@@ -320,6 +319,7 @@ const SeasonShowcase = () => {
       </p>
       <div className="flex flex-row items-center gap-4">
         <button
+          type="button"
           aria-label="Previous season"
           className="rounded p-2 hover:bg-gray-100 disabled:opacity-40"
           disabled={season === 2007}
@@ -329,6 +329,7 @@ const SeasonShowcase = () => {
         </button>
         <span>{season}</span>
         <button
+          type="button"
           aria-label="Next season"
           className="rounded p-2 hover:bg-gray-100 disabled:opacity-40"
           disabled={season === currentYear}
@@ -353,6 +354,7 @@ const LoadingShowcase = () => {
   return (
     <div className="space-y-3">
       <button
+        type="button"
         className="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-100"
         onClick={() => setShow((s) => !s)}
       >
@@ -389,7 +391,11 @@ const UnknownTrophyShowcase = () => {
 
 const FlightResultsShowcase = () => (
   <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-    <ResultsList results={SCORED_FLIGHTS} season={2024} trophy="Example Trophy" />
+    <ResultsList
+      results={SCORED_FLIGHTS}
+      season={2024}
+      trophy="Example Trophy"
+    />
   </div>
 );
 

@@ -1,6 +1,6 @@
 import { AlertTriangle } from "lucide-react";
-import Tooltip from "./Tooltip";
 import { useHeightLoss } from "../lib/useHeightLoss";
+import Tooltip from "./Tooltip";
 
 const HeightLossWarning = ({
   flightId,

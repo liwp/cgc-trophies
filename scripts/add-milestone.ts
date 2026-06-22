@@ -10,9 +10,9 @@
  */
 
 /* eslint-disable @typescript-eslint/no-require-imports */
-const fs = require("fs");
-const path = require("path");
-const { execSync } = require("child_process");
+const fs = require("node:fs");
+const path = require("node:path");
+const { execSync } = require("node:child_process");
 
 const [pilotName, milestone, yearArg] = process.argv.slice(2);
 
@@ -24,7 +24,7 @@ if (!pilotName || !milestone) {
 }
 
 const year = yearArg ? parseInt(yearArg, 10) : 0;
-if (isNaN(year)) {
+if (Number.isNaN(year)) {
   console.error(`Invalid year: ${yearArg}`);
   process.exit(1);
 }
@@ -57,7 +57,7 @@ if (existingBlock.includes(`"${pilotName}"`)) {
 
 // Insert the new entry before the closing brace
 const newEntry = `      "${pilotName}": ${year},\n`;
-const updatedBlock = match[1] + existingBlock + newEntry + "    " + match[3];
+const updatedBlock = `${match[1] + existingBlock + newEntry}    ${match[3]}`;
 content = content.replace(match[0], updatedBlock);
 
 fs.writeFileSync(configPath, content, "utf-8");

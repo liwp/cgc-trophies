@@ -1,8 +1,8 @@
 import type {
-  IgcTrackPoint,
-  IgcTaskPoint,
-  IgcData,
   HeightLossResult,
+  IgcData,
+  IgcTaskPoint,
+  IgcTrackPoint,
 } from "../types";
 
 function parseLat(s: string): number {
@@ -86,7 +86,11 @@ function perpendicularLine(
   const dx = tx - cx;
   const dy = ty - cy;
   const mag = Math.sqrt(dx * dx + dy * dy);
-  if (mag === 0) return [[cx, cy], [cx, cy]];
+  if (mag === 0)
+    return [
+      [cx, cy],
+      [cx, cy],
+    ];
 
   const px = -dy / mag;
   const py = dx / mag;

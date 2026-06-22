@@ -3,8 +3,7 @@ import {
   ladderCopyData,
   ladderFlightDetails,
 } from "../../src/lib/trophyCopyData";
-import type { FlightDetail } from "../../src/lib/trophyCopyData";
-import type { ScoredFlight, LadderResult } from "../../src/types";
+import type { LadderResult, ScoredFlight } from "../../src/types";
 
 const makeFlight = (overrides?: Partial<ScoredFlight>): ScoredFlight => ({
   id: "116237",
@@ -41,9 +40,7 @@ describe("flightCopyData", () => {
     expect(map["Aircraft Reg."]).toBe("G-CKYO");
     expect(map["H/C Distance (kms)"]).toBe("680.00");
     expect(map["H/C Speed (kph)"]).toBe("74.20");
-    expect(map["Ladder"]).toBe(
-      "https://www.bgaladder.net/flightdetails/116237",
-    );
+    expect(map.Ladder).toBe("https://www.bgaladder.net/flightdetails/116237");
     // Turnpoints appear in columns 3-5 starting from row 1, with full names
     expect(data[0]).toHaveLength(2); // Pilot Name row has no turnpoints
     expect(data[1].slice(2)).toEqual(["", "TP1", "SHM Shepton Mallett"]);
@@ -95,7 +92,7 @@ describe("ladderCopyData", () => {
     const map = Object.fromEntries(data);
 
     expect(map["Pilot Name"]).toBe("Alex Holswilder");
-    expect(map["Points"]).toBe("18,682");
+    expect(map.Points).toBe("18,682");
     expect(map["No. Of Flights"]).toBe("2");
     expect(map["Scoring Distance (kms)"]).toBe("750.00");
   });

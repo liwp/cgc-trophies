@@ -1,4 +1,4 @@
-import { parseIgc, computeHeightLoss } from "../../src/lib/igc";
+import { computeHeightLoss, parseIgc } from "../../src/lib/igc";
 
 describe("parseIgc", () => {
   describe("B-record parsing", () => {
@@ -193,9 +193,9 @@ describe("computeHeightLoss", () => {
     const result = computeHeightLoss(data);
 
     expect(result).not.toBeNull();
-    expect(result!.heightLoss).toBeCloseTo(100, -1);
-    expect(result!.startAltitude).toBeCloseTo(500, -1);
-    expect(result!.finishAltitude).toBeCloseTo(400, -1);
+    expect(result?.heightLoss).toBeCloseTo(100, -1);
+    expect(result?.startAltitude).toBeCloseTo(500, -1);
+    expect(result?.finishAltitude).toBeCloseTo(400, -1);
   });
 
   it("returns negative height loss when finish is higher", () => {
@@ -203,7 +203,7 @@ describe("computeHeightLoss", () => {
     const result = computeHeightLoss(data);
 
     expect(result).not.toBeNull();
-    expect(result!.heightLoss).toBeLessThan(0);
+    expect(result?.heightLoss).toBeLessThan(0);
   });
 
   it("returns null when task has no turnpoints", () => {
@@ -280,7 +280,13 @@ describe("computeHeightLoss", () => {
 
   it("returns null when start crossing only in second half of track", () => {
     // Many points far from start, crossing only happens late
-    const far = { time: "100000", lat: 51.0, lon: -1.0, baroAlt: 500, gpsAlt: 500 };
+    const far = {
+      time: "100000",
+      lat: 51.0,
+      lon: -1.0,
+      baroAlt: 500,
+      gpsAlt: 500,
+    };
     const data = {
       task: [
         { lat: 0, lon: 0, name: "TAKEOFF" },
@@ -316,6 +322,6 @@ describe("computeHeightLoss", () => {
 
     const result = computeHeightLoss(data);
     expect(result).not.toBeNull();
-    expect(result!.heightLoss).toBeCloseTo(100, -1);
+    expect(result?.heightLoss).toBeCloseTo(100, -1);
   });
 });

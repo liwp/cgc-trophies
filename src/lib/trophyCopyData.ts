@@ -1,4 +1,4 @@
-import type { ScoredFlight, LadderResult } from "../types";
+import type { LadderResult, ScoredFlight } from "../types";
 import TURNPOINTS from "./turnpoints";
 
 export interface FlightDetail {

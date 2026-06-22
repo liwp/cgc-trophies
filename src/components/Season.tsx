@@ -10,6 +10,7 @@ const Season = ({ season }: { season: number }) => {
   return (
     <div className="flex items-center gap-2">
       <button
+        type="button"
         aria-label="Previous season"
         className="p-1.5 rounded-lg hover:bg-cambridge-light hover:text-cambridge-dark disabled:opacity-30 transition-colors"
         disabled={season === firstYear}
@@ -23,6 +24,7 @@ const Season = ({ season }: { season: number }) => {
         {season}
       </span>
       <button
+        type="button"
         aria-label="Next season"
         className="p-1.5 rounded-lg hover:bg-cambridge-light hover:text-cambridge-dark disabled:opacity-30 transition-colors"
         disabled={season === currentYear}

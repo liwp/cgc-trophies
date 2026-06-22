@@ -1,4 +1,4 @@
-import { ladderEval, milestoneExcludedPilots, trophyEval } from "../../src/lib/eval";
+import { ladderEval, trophyEval } from "../../src/lib/eval";
 import type {
   Flight,
   FlightTrophy,
@@ -491,9 +491,7 @@ describe("trophyEval milestone exclusions", () => {
 
   it("milestone year = season means NOT excluded", () => {
     const ms: PilotMilestones = { "500km": { Alice: 2024 } };
-    const flights: Flight[] = [
-      makeFlight({ id: "1", pilot: "Alice" }),
-    ];
+    const flights: Flight[] = [makeFlight({ id: "1", pilot: "Alice" })];
 
     const results = trophyEval(
       defaultSeason,
@@ -511,9 +509,7 @@ describe("trophyEval milestone exclusions", () => {
       ...boomerangTrophy,
       excludePilotsWithMilestone: undefined,
     };
-    const flights: Flight[] = [
-      makeFlight({ id: "1", pilot: "Alice" }),
-    ];
+    const flights: Flight[] = [makeFlight({ id: "1", pilot: "Alice" })];
 
     const results = trophyEval(
       defaultSeason,

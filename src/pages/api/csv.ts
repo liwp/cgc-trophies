@@ -1,5 +1,5 @@
-import Papa from "papaparse";
 import { identity, zipObject } from "lodash";
+import Papa from "papaparse";
 
 const MONTHS = [
   "Jan",
@@ -27,7 +27,7 @@ function parseDate(val: string): Date {
   }
 
   const [day, monthName, year] = match.slice(1);
-  if (parseInt(day) > 31) {
+  if (parseInt(day, 10) > 31) {
     throw new Error(`Invalid date format: ${val}`);
   }
   const month = MONTHS.indexOf(monthName);
@@ -35,7 +35,7 @@ function parseDate(val: string): Date {
     throw new Error(`Invalid date format: ${val}`);
   }
 
-  return new Date(Date.UTC(parseInt(year), month, parseInt(day)));
+  return new Date(Date.UTC(parseInt(year, 10), month, parseInt(day, 10)));
 }
 
 function parseNumber(val: string): number {
@@ -95,4 +95,4 @@ function parseSpec(spec: any, obj: Record<string, string>): any {
   return xform(val);
 }
 
-export { parseCsv, parseBoolean, parseDate, parseNumber };
+export { parseBoolean, parseCsv, parseDate, parseNumber };

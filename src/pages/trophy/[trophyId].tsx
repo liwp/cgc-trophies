@@ -1,7 +1,4 @@
-import React, { useState } from "react";
 import { keyBy, uniqBy } from "lodash";
-import NextLink from "next/link";
-import { useRouter } from "next/router";
 import {
   ArrowLeft,
   BarChart3,
@@ -11,8 +8,11 @@ import {
   ChevronRight,
   ChevronUp,
   Copy,
-  Map,
+  Map as MapIcon,
 } from "lucide-react";
+import NextLink from "next/link";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 
 import CONFIG from "../../../trophies.config";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
@@ -22,21 +22,21 @@ import PageLayout from "../../components/PageLayout";
 import Season from "../../components/Season";
 import Tooltip from "../../components/Tooltip";
 import UnknownTrophy from "../../components/UnknownTrophy";
-import { trophyEval, ladderEval } from "../../lib/eval";
-import { getTrophyNav } from "../../lib/trophyNav";
-import TURNPOINTS from "../../lib/turnpoints";
+import { ladderEval, trophyEval } from "../../lib/eval";
 import {
   copyDataToClipboard,
   flightCopyData,
   formatPilotName,
   ladderCopyData,
 } from "../../lib/trophyCopyData";
+import { getTrophyNav } from "../../lib/trophyNav";
+import TURNPOINTS from "../../lib/turnpoints";
 import useFlights from "../../lib/useFlights";
 import type {
   Flight,
   FlightTrophy,
-  LadderTrophy,
   LadderResult,
+  LadderTrophy,
   ScoredFlight,
 } from "../../types";
 
@@ -54,6 +54,7 @@ const CopyButton = ({ data }: { data: string[][] }) => {
   return (
     <Tooltip text={copied ? "Copied!" : "Copy for spreadsheet"} align="right">
       <button
+        type="button"
         aria-label="Copy to clipboard"
         className={`p-1 rounded hover:bg-gray-100 ${copied ? "text-green-600" : "text-gray-400"}`}
         onClick={handleCopy}
@@ -100,7 +101,6 @@ const Task = ({
   );
 };
 
-
 const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
   const {
     date,
@@ -139,12 +139,15 @@ const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-cambridge transition-colors"
             >
-              <Map size={16} />
+              <MapIcon size={16} />
             </a>
           </Tooltip>
           {rank === 1 && <CopyButton data={flightCopyData(result)} />}
           {rank === 1 && (
-            <HeightLossWarning flightId={id} reportedHeightLoss={task.heightLoss} />
+            <HeightLossWarning
+              flightId={id}
+              reportedHeightLoss={task.heightLoss}
+            />
           )}
         </div>
       </td>
@@ -261,11 +264,14 @@ const LadderFlightRow = ({
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-cambridge transition-colors"
             >
-              <Map size={16} className="inline" />
+              <MapIcon size={16} className="inline" />
             </a>
           </Tooltip>
           {showHeightLoss && (
-            <HeightLossWarning flightId={flight.id} reportedHeightLoss={flight.task.heightLoss} />
+            <HeightLossWarning
+              flightId={flight.id}
+              reportedHeightLoss={flight.task.heightLoss}
+            />
           )}
         </div>
       </td>
@@ -327,7 +333,12 @@ const LadderResultRow = ({
       </tr>
       {expanded &&
         result.flights.map((flight) => (
-          <LadderFlightRow key={flight.id} flight={flight} isSyndicate={isSyndicate} showHeightLoss={rank === 1} />
+          <LadderFlightRow
+            key={flight.id}
+            flight={flight}
+            isSyndicate={isSyndicate}
+            showHeightLoss={rank === 1}
+          />
         ))}
     </>
   );
@@ -408,10 +419,14 @@ const Toggle = ({
 }) => {
   return (
     <div className="flex items-center justify-end gap-2">
-      <label htmlFor={id} className="text-sm text-gray-500 select-none cursor-pointer">
+      <label
+        htmlFor={id}
+        className="text-sm text-gray-500 select-none cursor-pointer"
+      >
         {label}
       </label>
       <button
+        type="button"
         id={id}
         role="switch"
         aria-checked={checked}

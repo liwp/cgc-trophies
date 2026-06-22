@@ -1,5 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 import config from "../../../trophies.config";
 import { parseCsv } from "./csv";
@@ -14,11 +14,11 @@ const URL = `https://api.bgaladder.net/api/getlogfilescsv`;
 const CLUB = config.club.code;
 
 async function getFlights(req: NextApiRequest, res: NextApiResponse) {
-  const start = parseInt(req.query.start as string);
-  const end = parseInt(req.query.end as string);
-  if (isNaN(start) || isNaN(end)) {
+  const start = parseInt(req.query.start as string, 10);
+  const end = parseInt(req.query.end as string, 10);
+  if (Number.isNaN(start) || Number.isNaN(end)) {
     res.status(400).json({
-      error: `missing query params: ${isNaN(start) ? "start" : "end"}`,
+      error: `missing query params: ${Number.isNaN(start) ? "start" : "end"}`,
     });
     return;
   }
@@ -31,9 +31,9 @@ async function getFlights(req: NextApiRequest, res: NextApiResponse) {
     return axios.get(`${URL}/${year}/${CLUB}`);
   });
 
-  const flights = (await Promise.all(responses))
-    .map(({ data }) => parseFlights(data))
-    .flat();
+  const flights = (await Promise.all(responses)).flatMap(({ data }) =>
+    parseFlights(data),
+  );
 
   console.log("ALL flights", flights.length);
 

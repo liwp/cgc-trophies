@@ -1,9 +1,4 @@
-import type {
-  TrophiesConfig,
-  FlightTrophy,
-  LadderTrophy,
-  Trophy,
-} from "./src/types";
+import type { TrophiesConfig, Trophy } from "./src/types";
 
 // =============================================================================
 // TROPHIES CONFIGURATION

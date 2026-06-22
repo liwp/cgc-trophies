@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-import Link from "next/link";
 import {
   ArrowLeft,
   BarChart3,
@@ -7,8 +5,10 @@ import {
   ChevronDown,
   ChevronUp,
   Copy,
-  Map,
+  Map as MapIcon,
 } from "lucide-react";
+import Link from "next/link";
+import React, { useState } from "react";
 
 import CONFIG from "../../trophies.config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
@@ -18,7 +18,7 @@ import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Tooltip from "../components/Tooltip";
-import { trophyEval, ladderEval } from "../lib/eval";
+import { ladderEval, trophyEval } from "../lib/eval";
 import {
   copyDataToClipboard,
   flightCopyData,
@@ -29,8 +29,8 @@ import useFlights from "../lib/useFlights";
 import type {
   Flight,
   FlightTrophy,
-  LadderTrophy,
   LadderResult,
+  LadderTrophy,
   ScoredFlight,
 } from "../types";
 
@@ -46,6 +46,7 @@ const CopyButton = ({ data }: { data: string[][] }) => {
   return (
     <Tooltip text={copied ? "Copied!" : "Copy for spreadsheet"} align="right">
       <button
+        type="button"
         aria-label="Copy to clipboard"
         className={`p-1 rounded hover:bg-gray-100 ${copied ? "text-green-600" : "text-gray-400"}`}
         onClick={handleCopy}
@@ -102,7 +103,7 @@ const FlightResultEntry = ({
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-cambridge transition-colors"
             >
-              <Map size={14} />
+              <MapIcon size={14} />
             </a>
           </Tooltip>
           <HeightLossWarning
@@ -148,7 +149,7 @@ const LadderFlightRow = ({ flight }: { flight: Flight }) => (
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-cambridge transition-colors"
           >
-            <Map size={14} className="inline" />
+            <MapIcon size={14} className="inline" />
           </a>
         </Tooltip>
         <HeightLossWarning
@@ -240,8 +241,20 @@ const TrophySection = ({
     isLadder && (trophy as LadderTrophy).groupBy === "registration";
 
   const results = isLadder
-    ? ladderEval(CONFIG.season, season, allFlights, trophy as LadderTrophy, CONFIG.pilotMilestones)
-    : trophyEval(CONFIG.season, season, flights, trophy as FlightTrophy, CONFIG.pilotMilestones);
+    ? ladderEval(
+        CONFIG.season,
+        season,
+        allFlights,
+        trophy as LadderTrophy,
+        CONFIG.pilotMilestones,
+      )
+    : trophyEval(
+        CONFIG.season,
+        season,
+        flights,
+        trophy as FlightTrophy,
+        CONFIG.pilotMilestones,
+      );
 
   const winner = results[0];
   const winnerFlights: Flight[] = winner
@@ -287,6 +300,7 @@ const TrophySection = ({
       {results.length > 0 && (
         <>
           <button
+            type="button"
             className="text-sm text-cambridge hover:text-cambridge-dark transition-colors mb-2"
             onClick={() => setShowAll(!showAll)}
           >

@@ -7,8 +7,8 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "prettier": "prettier --write .",
+    "lint": "biome check .",
+    "format": "biome check --write .",
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
@@ -33,13 +33,12 @@
     "@babel/preset-env": "^7.29.2",
     "@babel/preset-react": "^7.28.5",
     "@babel/runtime": "^7.29.2",
+    "@biomejs/biome": "^2.5.0",
     "@types/lodash": "^4.17.24",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "babel-jest": "^30.3.0",
-    "eslint-config-next": "^16.2.4",
     "jest": "^30.3.0",
-    "prettier": "3.8.3",
     "typescript": "^6.0.3"
   }
 }

@@ -1,6 +1,5 @@
-import React from "react";
-import Link from "next/link";
 import { Settings } from "lucide-react";
+import Link from "next/link";
 
 import CONFIG from "../../trophies.config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
@@ -9,14 +8,14 @@ import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Tooltip from "../components/Tooltip";
-import { trophyEval, ladderEval } from "../lib/eval";
+import { ladderEval, trophyEval } from "../lib/eval";
 import { formatPilotName } from "../lib/trophyCopyData";
 import useFlights from "../lib/useFlights";
 import type {
   Flight,
   FlightTrophy,
-  LadderTrophy,
   LadderResult,
+  LadderTrophy,
   ScoredFlight,
 } from "../types";
 
@@ -57,8 +56,20 @@ const TrophyList = ({
   const trophies = CONFIG.trophies.map((trophy) => {
     const results =
       trophy.type === "ladder"
-        ? ladderEval(CONFIG.season, season, allFlights, trophy as LadderTrophy, CONFIG.pilotMilestones)
-        : trophyEval(CONFIG.season, season, flights, trophy as FlightTrophy, CONFIG.pilotMilestones);
+        ? ladderEval(
+            CONFIG.season,
+            season,
+            allFlights,
+            trophy as LadderTrophy,
+            CONFIG.pilotMilestones,
+          )
+        : trophyEval(
+            CONFIG.season,
+            season,
+            flights,
+            trophy as FlightTrophy,
+            CONFIG.pilotMilestones,
+          );
     return {
       ...trophy,
       results,
@@ -149,7 +160,11 @@ const TrophiesPage = () => {
           </div>
         </div>
         <Stats flights={flights!} season={season} />
-        <TrophyList flights={flights!} allFlights={allFlights!} season={season} />
+        <TrophyList
+          flights={flights!}
+          allFlights={allFlights!}
+          season={season}
+        />
       </div>
     </PageLayout>
   );

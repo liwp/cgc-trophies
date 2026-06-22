@@ -4,7 +4,7 @@ import useSWR from "swr";
 import config from "../../trophies.config";
 import type { Flight } from "../types";
 
-const THIS_YEAR = new Date().getFullYear();
+const _THIS_YEAR = new Date().getFullYear();
 
 function fetcher(url: string) {
   return fetch(url)
@@ -32,13 +32,16 @@ function useFlights(): {
   season: number;
 } {
   const router = useRouter();
-  let season = parseInt(router.query.season as string);
-  if (isNaN(season)) {
+  let season = parseInt(router.query.season as string, 10);
+  if (Number.isNaN(season)) {
     season = currentSeason();
   }
 
   useEffect(() => {
-    if (router.isReady && isNaN(parseInt(router.query.season as string))) {
+    if (
+      router.isReady &&
+      Number.isNaN(parseInt(router.query.season as string, 10))
+    ) {
       router.replace({
         query: { ...router.query, season },
       });
@@ -51,11 +54,12 @@ function useFlights(): {
     fetcher,
   );
 
-  const allFlights = !isLoading && !error
-    ? (data.flights as Flight[]).filter(
-        (f) => f.clubName === config.club.name,
-      )
-    : undefined;
+  const allFlights =
+    !isLoading && !error
+      ? (data.flights as Flight[]).filter(
+          (f) => f.clubName === config.club.name,
+        )
+      : undefined;
   const flights = allFlights?.filter(
     (f) => f.task.launchSite === config.club.launchSite,
   );

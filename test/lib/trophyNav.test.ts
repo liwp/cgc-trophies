@@ -5,9 +5,9 @@ describe("getTrophyNav", () => {
     const nav = getTrophyNav("L2");
     expect(nav.current.id).toBe("L2");
     expect(nav.prev).not.toBeNull();
-    expect(nav.prev!.id).toBe("L1");
+    expect(nav.prev?.id).toBe("L1");
     expect(nav.next).not.toBeNull();
-    expect(nav.next!.id).toBe("L3");
+    expect(nav.next?.id).toBe("L3");
   });
 
   it("returns null prev for the first trophy", () => {

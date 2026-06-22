@@ -1,14 +1,15 @@
 import _ from "lodash";
 
-const { chain, get, isEqual, isFunction, reverse } = _;
+const { chain, get, isEqual, isFunction } = _;
+
 import type {
   Flight,
   FlightTrophy,
-  LadderTrophy,
   LadderResult,
+  LadderTrophy,
   PilotMilestones,
-  SeasonConfig,
   ScoredFlight,
+  SeasonConfig,
 } from "../types";
 
 type Comparator = (x: any, y: any) => boolean;
@@ -66,10 +67,7 @@ export function trophyEval(
   trophy: FlightTrophy,
   pilotMilestones?: PilotMilestones,
 ): ScoredFlight[] {
-  const inSeason = inSeasonPredicate(
-    season,
-    trophy.season || defaultSeason,
-  );
+  const inSeason = inSeasonPredicate(season, trophy.season || defaultSeason);
 
   const excludedIds: Record<string, string> = {
     ...trophy.exclude,
@@ -104,10 +102,10 @@ export function trophyEval(
           );
         }
         chain_ = chain_.filter((flight: any) => {
-          if (!!flight.exclude) {
+          if (flight.exclude) {
             console.log(`flight excluded - ${flight.id}: ${flight.exclude}`);
             return false;
-          } else if (!!flight.include) {
+          } else if (flight.include) {
             return true;
           } else {
             return pred(get(flight, field), value);
@@ -143,7 +141,7 @@ export function trophyEval(
 
   return chain_
     .map((flight: any) => {
-      if (!!flight.include) {
+      if (flight.include) {
         console.log(`flight included - ${flight.id}: ${flight.include}`);
       }
       return flight;
@@ -211,7 +209,7 @@ export function ladderEval(
     if (!groups.has(key)) {
       groups.set(key, []);
     }
-    groups.get(key)!.push(flight);
+    groups.get(key)?.push(flight);
   }
 
   // 3. Per group: sort by crossCountryPoints desc, select top N
@@ -221,9 +219,10 @@ export function ladderEval(
       (a, b) => b.task.crossCountryPoints - a.task.crossCountryPoints,
     );
 
-    const topFlights = trophy.groupBy === "registration"
-      ? selectTopFlightsMultiPilot(sorted, trophy.topN)
-      : sorted.slice(0, trophy.topN);
+    const topFlights =
+      trophy.groupBy === "registration"
+        ? selectTopFlightsMultiPilot(sorted, trophy.topN)
+        : sorted.slice(0, trophy.topN);
 
     if (!topFlights) continue;
 
@@ -237,7 +236,13 @@ export function ladderEval(
     );
     const pilots = [...new Set(topFlights.map((f) => f.pilot))];
 
-    results.push({ key, totalScore, totalDistance, pilots, flights: topFlights });
+    results.push({
+      key,
+      totalScore,
+      totalDistance,
+      pilots,
+      flights: topFlights,
+    });
   }
 
   // 4. Sort groups by totalScore descending
