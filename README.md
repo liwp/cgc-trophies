@@ -1,7 +1,7 @@
 # Cambridge Gliding Centre Annual Trophies
 
 A web app that works out the winners of [Cambridge Gliding
-Centre](https://www.glide.co.uk/)'s annual cross-country trophies. It pulls
+Centre](https://www.camgliding.uk/)'s annual cross-country trophies. It pulls
 flight data for the season from the [BGA Ladder](https://www.bgaladder.net/),
 scores each flight against the club's trophy rules, and shows the winners.
 
