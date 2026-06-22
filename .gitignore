@@ -10,8 +10,8 @@
 # Local env files (per-developer, not for publishing)
 .env*.local
 
-# Beads tooling state (issue tracker — local only)
-/.beads/
+# Beads: tracked files (config, issues.jsonl, skills) are shared; the
+# local DB, runtime state, and credential key stay ignored via .beads/.gitignore
 
 # Dolt database files (added by bd init)
 .dolt/
