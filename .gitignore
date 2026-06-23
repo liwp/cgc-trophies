@@ -10,6 +10,9 @@
 # Local env files (per-developer, not for publishing)
 .env*.local
 
+# Claude Code: shared settings.json is committed; local overrides stay per-developer
+.claude/settings.local.json
+
 # Beads: tracked files (config, issues.jsonl, skills) are shared; the
 # local DB, runtime state, and credential key stay ignored via .beads/.gitignore
 # interactions.jsonl is a per-machine audit log — churns constantly, not shared
