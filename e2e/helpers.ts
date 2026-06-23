@@ -23,7 +23,10 @@ function csvForYear(year: string): string {
  */
 export async function mockFlights(page: Page) {
   await page.route("**/getlogfilescsv/**", async (route) => {
-    const year = route.request().url().match(/getlogfilescsv\/(\d+)\//)?.[1];
+    const year = route
+      .request()
+      .url()
+      .match(/getlogfilescsv\/(\d+)\//)?.[1];
     await route.fulfill({
       contentType: "text/csv",
       body: csvForYear(year ?? ""),
