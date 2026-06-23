@@ -10,9 +10,10 @@ scores each flight against the club's trophy rules, and shows the winners.
 ## How it works
 
 1. The BGA Ladder publishes club flight data as CSV at `api.bgaladder.net`.
-2. An API route (`src/pages/api/flights.ts`) fetches and parses it into JSON.
-3. The client (`useFlights` + SWR) loads that data and filters to the club's
-   home site.
+2. The client fetches and parses that CSV directly in the browser
+   (`src/lib/fetchFlights.ts`) — there's no backend; it's a pure single-page app.
+3. `useFlights` (+ SWR) loads the parsed data and filters to the club's home
+   site.
 4. The scoring engine (`src/lib/eval.ts`) evaluates each trophy's rules and
    produces the winners shown on the page.
 
@@ -29,7 +30,7 @@ the app can be adapted to another gliding club by editing that one file.
 
 ## Tech stack
 
-Next.js (Pages Router) · React · TypeScript · Tailwind CSS v4 · SWR · Jest.
+Vite · React 19 · React Router · TypeScript · Tailwind CSS v4 · SWR · Vitest.
 Tooling: **bun** (package manager + scripts), **Biome** (lint + format), and
 **Node 24 LTS** pinned via `mise`.
 
@@ -42,7 +43,7 @@ provides the pinned Node version; see `mise.toml`).
 bun install          # install dependencies
 bun run dev          # start the dev server at http://localhost:3000
 bun run build        # production build
-bun run test         # run the test suite (Jest) — note: not `bun test`
+bun run test         # run the test suite (Vitest) — note: not `bun test`
 bun run lint         # Biome check (lint + format + import sorting)
 bun run format       # Biome auto-fix
 ```

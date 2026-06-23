@@ -16,13 +16,15 @@ bun run dev                          # Start dev server
 bun run build                        # Production build
 bun run lint                         # Biome check (lint + format + import sorting, read-only)
 bun run format                       # Biome check --write (apply fixes)
-bun run test                         # Run all tests (Jest) — use `bun run test`, NOT `bun test`
+bun run test                         # Run all tests (Vitest) — use `bun run test`, NOT `bun test`
 bun run test --watch                 # Watch mode
 bun run test test/lib/eval.test.ts   # Run a single test file
+bun run test:coverage                # Run tests with v8 coverage report
+bun run test:e2e                     # Run Playwright end-to-end tests
 ```
 
-Note: `bun test` invokes bun's native test runner, which bypasses Jest and its
-config — always use `bun run test` to run the Jest suite.
+Note: `bun test` invokes bun's native test runner, which bypasses Vitest and its
+config — always use `bun run test` to run the Vitest suite.
 
 ## Architecture
 
@@ -81,10 +83,10 @@ Lodash may be imported either as a default import (`import _ from "lodash"`, the
 
 ### Testing
 
-- Jest 30 with `babel-jest` using `@babel/preset-env` + `preset-react` + `preset-typescript` (configured inline in `jest.config.js`, no `.babelrc`)
+- Vitest 4, configured in the `test` block of `vite.config.ts` (`environment: "node"`, `globals: true`, setup in `test/setup.ts`)
 - Tests in `test/` directory (excluded from `tsconfig.json` compilation)
 - Tests import from `../../src/` paths (not aliases)
-- Coverage thresholds set to 100% for all metrics
+- Coverage via `@vitest/coverage-v8` (`bun run test:coverage`); `src/main.tsx`, `src/App.tsx`, and `*.d.ts` are excluded. No thresholds are currently enforced (see `trophies-3qv`)
 
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:6cd5cc61 -->
