@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import { shouldWarnHeightLoss } from "../lib/heightLoss";
 import { useHeightLoss } from "../lib/useHeightLoss";
 import Tooltip from "./Tooltip";
 
@@ -12,8 +13,7 @@ const HeightLossWarning = ({
   const { result, isLoading } = useHeightLoss(flightId);
 
   if (isLoading || !result) return null;
-  if (result.heightLoss <= 1000) return null;
-  if (reportedHeightLoss > 1000) return null;
+  if (!shouldWarnHeightLoss(result.heightLoss, reportedHeightLoss)) return null;
 
   return (
     <Tooltip
