@@ -3,7 +3,7 @@ import {
   parseCsv,
   parseDate,
   parseNumber,
-} from "../../../../src/pages/api/csv";
+} from "../../src/lib/csv";
 
 const csv = { parseCsv, parseBoolean, parseDate, parseNumber };
 

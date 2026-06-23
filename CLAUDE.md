@@ -28,9 +28,9 @@ config — always use `bun run test` to run the Jest suite.
 
 ### Data Flow
 
-1. **External API**: `api.bgaladder.net/api/getlogfilescsv/{year}/{club}` returns CSV flight data
-2. **API Route** (`src/pages/api/flights.ts`): Fetches CSV for year range, parses via `parseCsv()` with a field spec (`flightCsvSpec.ts`), returns JSON
-3. **Client**: `useFlights()` hook (SWR) fetches `/api/flights?start=Y&end=Y`, filters to Gransden Lodge flights, resolves season from URL query
+1. **External API**: `api.bgaladder.net/api/getlogfilescsv/{year}/{club}` returns CSV flight data (CORS-enabled)
+2. **Client fetch** (`src/lib/fetchFlights.ts`): `fetchFlights(start, end)` fetches the CSV for the year range directly from the BGA API (no backend proxy) and parses it via `parseCsv()` (`src/lib/csv.ts`) with a field spec (`src/lib/flightCsvSpec.ts`)
+3. **Client**: `useFlights()` hook (SWR) calls `fetchFlights()`, filters to Gransden Lodge flights, resolves season from URL query. The app has no API routes — it's purely client-side.
 4. **Evaluation**: `trophyEval()` for flight trophies, `ladderEval()` for ladder trophies (`src/lib/eval.ts`)
 5. **Config**: All club-specific config (club info, season, trophies) in `trophies.config.ts` at project root
 
@@ -51,7 +51,8 @@ config — always use `bun run test` to run the Jest suite.
 - `src/types.ts` — All shared types (Flight, Trophy, LadderResult, ScoredFlight, etc.)
 - `src/lib/eval.ts` — Core scoring logic
 - `trophies.config.ts` — Club config (name, code, launch site) and trophy definitions
-- `src/pages/api/csv.ts` — CSV parser (papaparse + custom spec-based field parsing)
+- `src/lib/csv.ts` — CSV parser (papaparse + custom spec-based field parsing)
+- `src/lib/fetchFlights.ts` — fetches + parses BGA CSV directly from the client
 - `src/lib/trophyCopyData.ts` — Clipboard copy formatting for trophy results
 - `src/lib/stats.ts` — Season statistics (completion rates, distance calculations)
 

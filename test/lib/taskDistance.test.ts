@@ -1,4 +1,4 @@
-import { TASK_SPEC } from "../../../../src/pages/api/flightCsvSpec";
+import { TASK_SPEC } from "../../src/lib/flightCsvSpec";
 
 // Simulate what parseCsv does for an object spec with xform
 function applySpec(spec: any, fields: Record<string, string>) {

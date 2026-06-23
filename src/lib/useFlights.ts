@@ -3,20 +3,7 @@ import { useEffect } from "react";
 import useSWR from "swr";
 import config from "../../trophies.config";
 import type { Flight } from "../types";
-
-const _THIS_YEAR = new Date().getFullYear();
-
-function fetcher(url: string) {
-  return fetch(url)
-    .then((res) => res.json())
-    .then((data) => ({
-      ...data,
-      flights: data.flights.map((flight: any) => ({
-        ...flight,
-        date: new Date(flight.date),
-      })),
-    }));
-}
+import { fetchFlights } from "./fetchFlights";
 
 function currentSeason(): number {
   const now = new Date();
@@ -50,16 +37,11 @@ function useFlights(): {
 
   const [startYear, endYear] = [season - 1, season + 1];
   const { data, error, isLoading } = useSWR(
-    `/api/flights?start=${startYear}&end=${endYear}`,
-    fetcher,
+    ["flights", startYear, endYear],
+    () => fetchFlights(startYear, endYear),
   );
 
-  const allFlights =
-    !isLoading && !error
-      ? (data.flights as Flight[]).filter(
-          (f) => f.clubName === config.club.name,
-        )
-      : undefined;
+  const allFlights = data?.filter((f) => f.clubName === config.club.name);
   const flights = allFlights?.filter(
     (f) => f.task.launchSite === config.club.launchSite,
   );
