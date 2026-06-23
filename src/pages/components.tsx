@@ -1,5 +1,4 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import dynamic from "next/dynamic";
 import { type ReactNode, useState } from "react";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
@@ -7,7 +6,7 @@ import Stats from "../components/Stats";
 import Tooltip from "../components/Tooltip";
 import UnknownTrophy from "../components/UnknownTrophy";
 import type { Flight, LadderResult, ScoredFlight } from "../types";
-import { LadderResultsList, ResultsList } from "./trophy/[trophyId]";
+import { LadderResultsList, ResultsList } from "./trophy/trophyDetail";
 
 // ---------------------------------------------------------------------------
 // Dummy data
@@ -314,8 +313,8 @@ const SeasonShowcase = () => {
   return (
     <div className="space-y-3">
       <p className="text-xs text-gray-500">
-        This is a local-state replica — the real Season component uses
-        router.replace().
+        This is a local-state replica — the real Season component updates the
+        URL ?season param.
       </p>
       <div className="flex flex-row items-center gap-4">
         <button
@@ -526,4 +525,4 @@ function ComponentsPage() {
   );
 }
 
-export default dynamic(() => Promise.resolve(ComponentsPage), { ssr: false });
+export default ComponentsPage;

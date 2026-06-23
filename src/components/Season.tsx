@@ -1,11 +1,21 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter } from "next/router";
+import { useSearchParams } from "react-router-dom";
 
 const firstYear = 2007;
 
 const Season = ({ season }: { season: number }) => {
-  const router = useRouter();
+  const [, setSearchParams] = useSearchParams();
   const currentYear = new Date().getFullYear();
+
+  const goToSeason = (year: number) =>
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("season", String(year));
+        return next;
+      },
+      { replace: true },
+    );
 
   return (
     <div className="flex items-center gap-2">
@@ -14,9 +24,7 @@ const Season = ({ season }: { season: number }) => {
         aria-label="Previous season"
         className="p-1.5 rounded-lg hover:bg-cambridge-light hover:text-cambridge-dark disabled:opacity-30 transition-colors"
         disabled={season === firstYear}
-        onClick={() =>
-          router.replace({ query: { ...router.query, season: season - 1 } })
-        }
+        onClick={() => goToSeason(season - 1)}
       >
         <ChevronLeft size={18} />
       </button>
@@ -28,9 +36,7 @@ const Season = ({ season }: { season: number }) => {
         aria-label="Next season"
         className="p-1.5 rounded-lg hover:bg-cambridge-light hover:text-cambridge-dark disabled:opacity-30 transition-colors"
         disabled={season === currentYear}
-        onClick={() =>
-          router.replace({ query: { ...router.query, season: season + 1 } })
-        }
+        onClick={() => goToSeason(season + 1)}
       >
         <ChevronRight size={18} />
       </button>

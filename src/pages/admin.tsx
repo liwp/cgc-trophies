@@ -7,8 +7,8 @@ import {
   Copy,
   Map as MapIcon,
 } from "lucide-react";
-import Link from "next/link";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 import CONFIG from "../../trophies.config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
@@ -371,7 +371,7 @@ const AdminPage = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
-              href={`/?season=${season}`}
+              to={`/?season=${season}`}
               className="inline-flex items-center gap-1 text-cambridge hover:text-cambridge-dark transition-colors"
             >
               <ArrowLeft size={16} /> Public view

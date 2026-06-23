@@ -1,5 +1,5 @@
 import { Settings } from "lucide-react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 import CONFIG from "../../trophies.config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
@@ -104,7 +104,7 @@ const TrophyList = ({
               >
                 <td className="px-4 py-3">
                   <Link
-                    href={`/trophy/${trophy.id}?season=${season}`}
+                    to={`/trophy/${trophy.id}?season=${season}`}
                     className="font-medium text-cambridge hover:text-cambridge-dark transition-colors"
                   >
                     {trophy.name}
@@ -151,7 +151,7 @@ const TrophiesPage = () => {
             <Season season={season} />
             <Tooltip text="Admin view">
               <Link
-                href={`/admin?season=${season}`}
+                to={`/admin?season=${season}`}
                 className="p-2 rounded-lg text-gray-400 hover:text-cambridge hover:bg-cambridge-light transition-colors"
               >
                 <Settings size={18} />

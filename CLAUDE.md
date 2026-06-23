@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Cambridge Gliding Centre annual trophies app. Fetches BGA Ladder flight data, scores flights against club trophy rules, and displays winners. Built with Next.js 15 (Pages Router), TypeScript, Tailwind CSS v4, SWR, and React 19.
+Cambridge Gliding Centre annual trophies app. Fetches BGA Ladder flight data, scores flights against club trophy rules, and displays winners. A purely client-side SPA built with Vite, React 19, React Router, TypeScript, Tailwind CSS v4, and SWR.
 
 ## Commands
 
@@ -39,12 +39,15 @@ config — always use `bun run test` to run the Jest suite.
 - **FlightTrophy** (`type?: "flight"`): Uses a DSL of `[op, ...args]` expressions evaluated as a lodash chain. Operations: `filter`, `project`, `score`, `sort`. Each trophy's `expr` array defines its scoring pipeline.
 - **LadderTrophy** (`type: "ladder"`): Groups flights by pilot or glider registration, takes top N by `crossCountryPoints`, sums scores. The Complicity Cup uses `groupBy: "registration"`, which requires at least 2 distinct pilots.
 
-### Pages (Pages Router)
+### Routes (React Router)
 
-- `/` — Trophy winners summary table for current season
-- `/trophy/[trophyId]` — Detailed results for a single trophy
-- `/season/[season]/trophy/[trophy]` — Season+trophy combo route
+Defined in `src/App.tsx`; the season is a `?season=` query param.
+
+- `/` — Trophy winners summary table for the season
+- `/trophy/:trophyId` — Detailed results for a single trophy
+- `/admin` — Admin view (copy-to-clipboard, expanded results)
 - `/components` — Component showcase page
+- `*` — unknown paths redirect to `/`
 
 ### Key Files
 
@@ -67,18 +70,18 @@ config — always use `bun run test` to run the Jest suite.
 
 ### Lodash
 
-Import lodash as `import _ from "lodash"` (default import), then destructure. Do NOT use `import { chain } from "lodash"` or import from `lodash/chain` — Next.js 15 `optimizePackageImports` breaks standalone lodash modules.
+Lodash may be imported either as a default import (`import _ from "lodash"`, then destructure) or named (`import { chain } from "lodash"`) — both work under Vite. (The old default-import-only rule was a Next.js `optimizePackageImports` workaround and no longer applies.)
 
 ### Styling
 
-- Tailwind CSS v4 via `@tailwindcss/postcss` plugin (PostCSS config in `postcss.config.mjs`)
+- Tailwind CSS v4 via the `@tailwindcss/vite` plugin (configured in `vite.config.ts`)
 - Global CSS at `src/styles/globals.css` with just `@import "tailwindcss"`
 - No component library — plain HTML + Tailwind utility classes
 - Icons from `lucide-react` without prefix: `Check`, `Copy`, `ExternalLink`, etc.
 
 ### Testing
 
-- Jest 30 with `babel-jest` using `next/babel` preset (configured inline in `jest.config.js`, no `.babelrc`)
+- Jest 30 with `babel-jest` using `@babel/preset-env` + `preset-react` + `preset-typescript` (configured inline in `jest.config.js`, no `.babelrc`)
 - Tests in `test/` directory (excluded from `tsconfig.json` compilation)
 - Tests import from `../../src/` paths (not aliases)
 - Coverage thresholds set to 100% for all metrics

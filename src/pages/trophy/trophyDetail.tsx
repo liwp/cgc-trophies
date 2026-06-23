@@ -10,9 +10,8 @@ import {
   Copy,
   Map as MapIcon,
 } from "lucide-react";
-import NextLink from "next/link";
-import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { Link as NextLink, useParams } from "react-router-dom";
 
 import CONFIG from "../../../trophies.config";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
@@ -457,7 +456,7 @@ const TrophyNavBar = ({
   return (
     <div className="flex items-center justify-between">
       <NextLink
-        href={`/?season=${season}`}
+        to={`/?season=${season}`}
         className="inline-flex items-center gap-1 text-cambridge hover:text-cambridge-dark transition-colors"
       >
         <ArrowLeft size={16} /> <span>All Trophies</span>
@@ -465,7 +464,7 @@ const TrophyNavBar = ({
       <div className="flex items-center gap-3 text-sm">
         {prev ? (
           <NextLink
-            href={`/trophy/${prev.id}?season=${season}`}
+            to={`/trophy/${prev.id}?season=${season}`}
             className="inline-flex items-center gap-1 text-gray-500 hover:text-cambridge transition-colors"
           >
             <ChevronLeft size={16} /> {prev.name}
@@ -476,7 +475,7 @@ const TrophyNavBar = ({
         {prev && next && <span className="text-gray-300">|</span>}
         {next ? (
           <NextLink
-            href={`/trophy/${next.id}?season=${season}`}
+            to={`/trophy/${next.id}?season=${season}`}
             className="inline-flex items-center gap-1 text-gray-500 hover:text-cambridge transition-colors"
           >
             {next.name} <ChevronRight size={16} />
@@ -490,8 +489,7 @@ const TrophyNavBar = ({
 };
 
 const TrophyPage = () => {
-  const router = useRouter();
-  const trophyId = router.query.trophyId as string;
+  const { trophyId = "" } = useParams();
   const { error, flights, allFlights, isLoading, season } = useFlights();
 
   if (error) return <FlightLoadFailure />;

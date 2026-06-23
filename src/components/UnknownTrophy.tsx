@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import PageLayout from "./PageLayout";
 
 function UnknownTrophy({ trophyId }: { trophyId: string }) {
@@ -10,7 +10,7 @@ function UnknownTrophy({ trophyId }: { trophyId: string }) {
         </p>
         <p className="mt-2">
           <Link
-            href="/"
+            to="/"
             className="text-cambridge hover:text-cambridge-dark transition-colors"
           >
             Return to the main page

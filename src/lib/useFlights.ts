@@ -1,5 +1,5 @@
-import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import useSWR from "swr";
 import config from "../../trophies.config";
 import type { Flight } from "../types";
@@ -18,22 +18,24 @@ function useFlights(): {
   isLoading: boolean;
   season: number;
 } {
-  const router = useRouter();
-  let season = parseInt(router.query.season as string, 10);
+  const [searchParams, setSearchParams] = useSearchParams();
+  let season = parseInt(searchParams.get("season") ?? "", 10);
   if (Number.isNaN(season)) {
     season = currentSeason();
   }
 
   useEffect(() => {
-    if (
-      router.isReady &&
-      Number.isNaN(parseInt(router.query.season as string, 10))
-    ) {
-      router.replace({
-        query: { ...router.query, season },
-      });
+    if (Number.isNaN(parseInt(searchParams.get("season") ?? "", 10))) {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set("season", String(season));
+          return next;
+        },
+        { replace: true },
+      );
     }
-  }, [router, router.isReady, season]);
+  }, [searchParams, setSearchParams, season]);
 
   const [startYear, endYear] = [season - 1, season + 1];
   const { data, error, isLoading } = useSWR(
