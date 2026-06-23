@@ -36,7 +36,7 @@
     "@biomejs/biome": "^2.5.0",
     "@playwright/test": "^1.61.0",
     "@types/lodash": "^4.17.24",
-    "@types/node": "^25.6.0",
+    "@types/node": "^24",
     "@types/react": "^19.2.14",
     "babel-jest": "^30.3.0",
     "jest": "^30.3.0",
