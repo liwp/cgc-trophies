@@ -5,6 +5,8 @@ Centre](https://www.camgliding.uk/)'s annual cross-country trophies. It pulls
 flight data for the season from the [BGA Ladder](https://www.bgaladder.net/),
 scores each flight against the club's trophy rules, and shows the winners.
 
+Live at **https://cgc-trophies.netlify.app**.
+
 ![Trophy winners page](docs/screenshot.png)
 
 ## How it works
@@ -50,8 +52,9 @@ bun run format       # Biome auto-fix
 
 ## Deployment
 
-The app is a purely static single-page app, hosted on **Netlify** with
-continuous deploys from `main`. Build settings live in
+The app is a purely static single-page app, hosted on **Netlify** at
+[cgc-trophies.netlify.app](https://cgc-trophies.netlify.app), with continuous
+deploys from `main`. Build settings live in
 [`netlify.toml`](netlify.toml): `bun run build` produces `dist/`, which is
 published as-is, with an SPA fallback (`/* → /index.html`) so client-router
 paths like `/admin` and `/trophy/:id` resolve on direct visits and refreshes.
