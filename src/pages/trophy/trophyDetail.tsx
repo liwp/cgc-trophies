@@ -154,15 +154,7 @@ const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
   );
 };
 
-export const ResultsList = ({
-  results,
-  season,
-  trophy,
-}: {
-  results: ScoredFlight[];
-  season: number;
-  trophy: string;
-}) => {
+export const ResultsList = ({ results }: { results: ScoredFlight[] }) => {
   const [unique, setUnique] = useState(true);
 
   const filtered = unique ? uniqBy(results, "pilot") : results;
@@ -345,13 +337,9 @@ const LadderResultRow = ({
 
 export const LadderResultsList = ({
   results,
-  season,
-  trophy,
   isSyndicate,
 }: {
   results: LadderResult[];
-  season: number;
-  trophy: string;
   isSyndicate: boolean;
 }) => {
   if (results.length === 0) {
@@ -522,8 +510,6 @@ const TrophyPage = () => {
                 config as LadderTrophy,
                 CONFIG.pilotMilestones,
               )}
-              season={season}
-              trophy={config.name}
               isSyndicate={(config as LadderTrophy).groupBy === "registration"}
             />
           ) : (
@@ -535,8 +521,6 @@ const TrophyPage = () => {
                 config as FlightTrophy,
                 CONFIG.pilotMilestones,
               )}
-              season={season}
-              trophy={config.name}
             />
           )}
         </div>

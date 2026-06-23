@@ -390,11 +390,7 @@ const UnknownTrophyShowcase = () => {
 
 const FlightResultsShowcase = () => (
   <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-    <ResultsList
-      results={SCORED_FLIGHTS}
-      season={2024}
-      trophy="Example Trophy"
-    />
+    <ResultsList results={SCORED_FLIGHTS} />
   </div>
 );
 
@@ -411,19 +407,9 @@ const LadderResultsShowcase = () => {
       />
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
         {mode === "pilot" ? (
-          <LadderResultsList
-            results={LADDER_RESULTS}
-            season={2024}
-            trophy="Example Ladder"
-            isSyndicate={false}
-          />
+          <LadderResultsList results={LADDER_RESULTS} isSyndicate={false} />
         ) : (
-          <LadderResultsList
-            results={SYNDICATE_RESULTS}
-            season={2024}
-            trophy="Example Syndicate"
-            isSyndicate={true}
-          />
+          <LadderResultsList results={SYNDICATE_RESULTS} isSyndicate={true} />
         )}
       </div>
     </div>
