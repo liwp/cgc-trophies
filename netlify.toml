@@ -1,0 +1,19 @@
+# Netlify deploy config for the trophies SPA.
+# The app is a purely client-side Vite build (static files in dist/), so we just
+# publish the build output and add an SPA fallback so client-router paths
+# (e.g. /admin, /trophy/:id) resolve on direct visits and hard refreshes.
+
+[build]
+  command = "bun run build"
+  publish = "dist"
+
+[build.environment]
+  # Match the Node version pinned in mise.toml. Netlify auto-detects bun from bun.lock.
+  NODE_VERSION = "24"
+
+# SPA fallback: serve index.html for any path that isn't an existing static file.
+# force defaults to false, so real files (e.g. /assets/*) are served before this rule.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
