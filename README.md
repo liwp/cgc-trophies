@@ -48,6 +48,19 @@ bun run lint         # Biome check (lint + format + import sorting)
 bun run format       # Biome auto-fix
 ```
 
+## Deployment
+
+The app is a purely static single-page app, hosted on **Netlify** with
+continuous deploys from `main`. Build settings live in
+[`netlify.toml`](netlify.toml): `bun run build` produces `dist/`, which is
+published as-is, with an SPA fallback (`/* → /index.html`) so client-router
+paths like `/admin` and `/trophy/:id` resolve on direct visits and refreshes.
+
+To set up hosting from scratch: in the Netlify dashboard, **Add new site →
+Import an existing project**, connect this GitHub repo, and deploy — Netlify
+reads `netlify.toml`, so no manual build configuration is needed. Every push to
+`main` then deploys automatically.
+
 ## Caveats
 
 Results are automatic and derived entirely from the BGA Ladder, so they aren't
