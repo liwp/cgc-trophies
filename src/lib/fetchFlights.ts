@@ -1,4 +1,4 @@
-import config from "../../trophies.config";
+import config from "trophies-config";
 import type { Flight } from "../types";
 import { parseCsv } from "./csv";
 import { SPEC } from "./flightCsvSpec";

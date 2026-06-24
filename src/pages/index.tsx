@@ -1,7 +1,7 @@
 import { Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import CONFIG from "../../trophies.config";
+import CONFIG from "trophies-config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";

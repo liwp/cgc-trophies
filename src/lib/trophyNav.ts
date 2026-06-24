@@ -1,4 +1,4 @@
-import CONFIG from "../../trophies.config";
+import CONFIG from "trophies-config";
 import type { Trophy } from "../types";
 
 export interface TrophyNav {

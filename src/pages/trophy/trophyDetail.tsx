@@ -13,7 +13,7 @@ import {
 import React, { useState } from "react";
 import { Link as NextLink, useParams } from "react-router-dom";
 
-import CONFIG from "../../../trophies.config";
+import CONFIG from "trophies-config";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
 import HeightLossWarning from "../../components/HeightLossWarning";
 import Loading from "../../components/Loading";

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
+import config from "trophies-config";
 import { fetchFlights } from "../../src/lib/fetchFlights";
-import config from "../../trophies.config";
 
 const fixtureCsv = readFileSync(
   new URL("../../e2e/fixtures/2025.csv", import.meta.url),

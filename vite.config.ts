@@ -1,9 +1,24 @@
+import { resolve } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
+// The club config is statically bundled into the client. Point the build at a
+// different config file via TROPHIES_CONFIG (absolute, or relative to the
+// project root) to run the app for another club without editing the tracked
+// trophies.config.ts. Consumed app-wide through the "trophies-config" alias.
+const trophiesConfig = resolve(
+  process.cwd(),
+  process.env.TROPHIES_CONFIG ?? "trophies.config.ts",
+);
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      "trophies-config": trophiesConfig,
+    },
+  },
   server: { port: 3000 },
   preview: { port: 3000 },
   test: {

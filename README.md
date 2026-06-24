@@ -23,6 +23,17 @@ All club-specific configuration — club details, season handling, and every
 trophy definition — lives in **`trophies.config.ts`** at the project root, so
 the app can be adapted to another gliding club by editing that one file.
 
+To build for another club **without** editing the tracked config, point the
+`TROPHIES_CONFIG` environment variable at an alternative config file (absolute,
+or relative to the project root). The config is bundled statically, so this is
+resolved at build time via a Vite alias:
+
+```bash
+TROPHIES_CONFIG=clubs/othertown.config.ts bun run build
+```
+
+When unset, it falls back to `trophies.config.ts`.
+
 ### Trophy types
 
 - **Flight trophies** — scored from a small DSL of `[op, ...args]` expressions

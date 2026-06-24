@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import useSWR from "swr";
-import config from "../../trophies.config";
+import config from "trophies-config";
 import type { Flight } from "../types";
 import { fetchFlights } from "./fetchFlights";
 
