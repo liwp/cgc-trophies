@@ -29,7 +29,6 @@
     "wgs84-util": "^3.0.0"
   },
   "devDependencies": {
-    "@babel/runtime": "^7.29.2",
     "@biomejs/biome": "^2.5.0",
     "@playwright/test": "^1.61.0",
     "@tailwindcss/vite": "^4.3.1",
@@ -44,7 +43,6 @@
     "vitest": "^4.1.9"
   },
   "overrides": {
-    "@babel/core": "^7.29.7",
     "postcss": "^8.5.15"
   }
 }
