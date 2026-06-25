@@ -52,3 +52,7 @@ issue-prefix: "trophies"
 # - github.repo
 
 # sync.remote: "git+ssh://git@github.com/liwp/cgc-trophies.git"
+
+dolt.auto-push: false
+
+export.auto: true
