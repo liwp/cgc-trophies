@@ -313,7 +313,7 @@ const config: TrophiesConfig = {
       id: "4",
       name: "Double Century",
       description:
-        "Fastest handicapped flight: Bicester Control Tower (BIC) – Husbands Bosworth (HUS) – 205.0km. For pilots who have not flown a 300km at the start of the ladder season. The task can be done either way round.",
+        "Fastest handicapped flight: Bicester North West (BNW) – Husbands Bosworth (HUS) – 205.2km. For pilots who have not flown a 300km at the start of the ladder season. The task can be done either way round.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Double-Century.jpg",
       ],
@@ -321,11 +321,26 @@ const config: TrophiesConfig = {
         ["filter", "task.launchSite", "=", "Gransden Lodge"],
         ["filter", "task.isDeclared"],
         ["filter", "task.isCompleted"],
-        ["filter", "task.turnpoints", "<=>", ["BIC", "HUS"]],
+        ["filter", "task.turnpoints", "<=>", ["BNW", "HUS"]],
         ["score", "task.handicappedSpeedKph", "kph"],
         ["sort", "score.value", "desc"],
       ],
       excludePilotsWithMilestone: "300km",
+      history: [
+        {
+          untilSeason: 2025,
+          description:
+            "Fastest handicapped flight: Bicester Control Tower (BIC) – Husbands Bosworth (HUS) – 205.0km. For pilots who have not flown a 300km at the start of the ladder season. The task can be done either way round.",
+          expr: [
+            ["filter", "task.launchSite", "=", "Gransden Lodge"],
+            ["filter", "task.isDeclared"],
+            ["filter", "task.isCompleted"],
+            ["filter", "task.turnpoints", "<=>", ["BIC", "HUS"]],
+            ["score", "task.handicappedSpeedKph", "kph"],
+            ["sort", "score.value", "desc"],
+          ],
+        },
+      ],
     },
     {
       id: "11",

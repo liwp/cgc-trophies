@@ -10,6 +10,7 @@ import Stats from "../components/Stats";
 import Tooltip from "../components/Tooltip";
 import { ladderEval, trophyEval } from "../lib/eval";
 import { formatPilotName } from "../lib/trophyCopyData";
+import { resolveTrophies } from "../lib/trophyHistory";
 import useFlights from "../lib/useFlights";
 import type {
   Flight,
@@ -53,7 +54,7 @@ const TrophyList = ({
   allFlights: Flight[];
   season: number;
 }) => {
-  const trophies = CONFIG.trophies.map((trophy) => {
+  const trophies = resolveTrophies(season).map((trophy) => {
     const results =
       trophy.type === "ladder"
         ? ladderEval(

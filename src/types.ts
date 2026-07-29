@@ -36,6 +36,13 @@ export interface ClubConfig {
   launchSite: string;
 }
 
+export interface TrophyVersion
+  extends Required<Pick<FlightTrophy, "description" | "expr">> {
+  /** Inclusive: this version applied through this season (e.g. `untilSeason: 2025`
+   *  means it was in force through the 2025 season and superseded from 2026). */
+  untilSeason: number;
+}
+
 export interface FlightTrophy {
   id: string;
   type?: "flight";
@@ -43,6 +50,7 @@ export interface FlightTrophy {
   description: string;
   img?: string[];
   expr: any[][];
+  history?: TrophyVersion[];
   season?: SeasonConfig;
   exclude?: Record<string, string>;
   include?: Record<string, string>;

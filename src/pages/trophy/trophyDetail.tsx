@@ -28,6 +28,7 @@ import {
   formatPilotName,
   ladderCopyData,
 } from "../../lib/trophyCopyData";
+import { resolveTrophies } from "../../lib/trophyHistory";
 import { getTrophyNav } from "../../lib/trophyNav";
 import TURNPOINTS from "../../lib/turnpoints";
 import useFlights from "../../lib/useFlights";
@@ -38,8 +39,6 @@ import type {
   LadderTrophy,
   ScoredFlight,
 } from "../../types";
-
-const TROPHIES_BY_ID = keyBy(CONFIG.trophies, "id");
 
 const CopyButton = ({ data }: { data: string[][] }) => {
   const [copied, setCopied] = React.useState(false);
@@ -91,7 +90,9 @@ const Task = ({
   task: { start: string; turnpoints: string[]; finish: string };
 }) => {
   const tps = [task.start, ...task.turnpoints, task.finish];
-  const fullNames = tps.map((tp) => TURNPOINTS[tp] || tp).join(" \u2013 ");
+  const fullNames = tps
+    .map((tp) => TURNPOINTS[tp]?.name || tp)
+    .join(" \u2013 ");
 
   return (
     <Tooltip text={fullNames}>
@@ -483,7 +484,7 @@ const TrophyPage = () => {
   if (error) return <FlightLoadFailure />;
   if (isLoading) return <Loading />;
 
-  const config = TROPHIES_BY_ID[trophyId];
+  const config = keyBy(resolveTrophies(season), "id")[trophyId];
   if (!config) return <UnknownTrophy trophyId={trophyId} />;
 
   const isLadder = config.type === "ladder";
