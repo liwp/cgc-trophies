@@ -25,6 +25,7 @@ import {
   formatPilotName,
   ladderCopyData,
 } from "../lib/trophyCopyData";
+import { resolveTrophies } from "../lib/trophyHistory";
 import useFlights from "../lib/useFlights";
 import type {
   Flight,
@@ -398,7 +399,7 @@ const AdminPage = () => {
         </nav>
 
         <div className="flex flex-col gap-10">
-          {CONFIG.trophies.map((trophy) => (
+          {resolveTrophies(season).map((trophy) => (
             <TrophySection
               key={trophy.id}
               trophy={trophy}
