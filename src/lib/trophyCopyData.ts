@@ -88,7 +88,7 @@ export function flightCopyData(result: ScoredFlight): string[][] {
   task.turnpoints.forEach((tp, i) => {
     const row = rows[i + 1];
     if (row) {
-      const fullName = TURNPOINTS[tp] || tp;
+      const fullName = TURNPOINTS[tp]?.name || tp;
       row.push("", `TP${i + 1}`, `${tp} ${fullName}`);
     }
   });

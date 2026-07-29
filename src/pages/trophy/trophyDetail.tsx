@@ -90,7 +90,9 @@ const Task = ({
   task: { start: string; turnpoints: string[]; finish: string };
 }) => {
   const tps = [task.start, ...task.turnpoints, task.finish];
-  const fullNames = tps.map((tp) => TURNPOINTS[tp] || tp).join(" \u2013 ");
+  const fullNames = tps
+    .map((tp) => TURNPOINTS[tp]?.name || tp)
+    .join(" \u2013 ");
 
   return (
     <Tooltip text={fullNames}>
