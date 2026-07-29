@@ -65,11 +65,14 @@ describe("stats", () => {
       ["750km", 749, false],
       ["750km", 750, true],
       ["750km", 2000, true],
-    ])("%s boundary at %dkm -> %s", (key: string, km: number, expected: boolean) => {
-      expect(category(key).pred(makeFlight({ taskDistanceKm: km }))).toBe(
-        expected,
-      );
-    });
+    ])(
+      "%s boundary at %dkm -> %s",
+      (key: string, km: number, expected: boolean) => {
+        expect(category(key).pred(makeFlight({ taskDistanceKm: km }))).toBe(
+          expected,
+        );
+      },
+    );
   });
 
   describe("updateCategory", () => {
