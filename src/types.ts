@@ -36,6 +36,11 @@ export interface ClubConfig {
   launchSite: string;
 }
 
+export interface TrophyVersion
+  extends Partial<Pick<FlightTrophy, "description" | "expr">> {
+  untilSeason: number;
+}
+
 export interface FlightTrophy {
   id: string;
   type?: "flight";
@@ -43,6 +48,7 @@ export interface FlightTrophy {
   description: string;
   img?: string[];
   expr: any[][];
+  history?: TrophyVersion[];
   season?: SeasonConfig;
   exclude?: Record<string, string>;
   include?: Record<string, string>;
