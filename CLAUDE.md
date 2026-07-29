@@ -41,6 +41,21 @@ config — always use `bun run test` to run the Vitest suite.
 - **FlightTrophy** (`type?: "flight"`): Uses a DSL of `[op, ...args]` expressions evaluated as a lodash chain. Operations: `filter`, `project`, `score`, `sort`. Each trophy's `expr` array defines its scoring pipeline.
 - **LadderTrophy** (`type: "ladder"`): Groups flights by pilot or glider registration, takes top N by `crossCountryPoints`, sums scores. The Complicity Cup uses `groupBy: "registration"`, which requires at least 2 distinct pilots.
 
+### Season-scoped trophy history
+
+A trophy's headline `description`/`expr` describe the CURRENT task definition. When a trophy's task changes (e.g. its turnpoints), the OLD `description`/`expr` are preserved as an entry in `history: TrophyVersion[]`, each tagged with an inclusive `untilSeason` (the last season that version applied to). `resolveTrophy`/`resolveTrophies` (`src/lib/trophyHistory.ts`) pick the right version for a given season — the smallest `untilSeason` that is `>= season`, falling back to the headline fields if none match. Anything reading a trophy's `description` or `expr` for a specific season (scoring, UI display) MUST call `resolveTrophy`/`resolveTrophies` first rather than reading the trophy object directly. For example, a turnpoint change from 2026 onward looks like:
+
+```ts
+{
+  id: "4",
+  description: "…Bicester North West (BNW)…",
+  expr: [["filter", "task.turnpoints", "<=>", ["BNW", "HUS"]], ...],
+  history: [
+    { untilSeason: 2025, description: "…Bicester Control Tower (BIC)…", expr: [["filter", "task.turnpoints", "<=>", ["BIC", "HUS"]], ...] },
+  ],
+}
+```
+
 ### Routes (React Router)
 
 Defined in `src/App.tsx`; the season is a `?season=` query param.
