@@ -47,7 +47,7 @@ def parse_existing(path: Path) -> dict[str, dict]:
         if not m:
             continue
         code, name, added, removed = m.groups()
-        entry = {"name": unescape(name)}
+        entry: dict[str, str | int] = {"name": unescape(name)}
         if added is not None:
             entry["added"] = int(added)
         if removed is not None:
