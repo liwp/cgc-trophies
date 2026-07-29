@@ -139,6 +139,13 @@ const TASK_SPEC = {
     },
   },
   type: "object",
+  // Derive the declared task distance from the CSV. The CSV has no TaskDistance
+  // column, so we reverse it out of "X% Completed" in the Task Achievement text:
+  // taskDistance = scoringDistance / (pct/100). This is deliberate — see closed
+  // trophies-ouv. taskDistanceKm only feeds coarse 100km-wide stats buckets
+  // (stats.ts), not trophy scoring, so the rounding error is immaterial and not
+  // worth a per-flight FLIGHT/{id} request to refine. Completed/missing-pct
+  // flights fall back to scoringDistanceKm (≈ task distance when completed).
   xform: (task: Record<string, any>) => {
     const pctMatch = task.taskAchievement?.match(/(\d+\.?\d*)%\s*Completed/);
     const pct = pctMatch ? parseFloat(pctMatch[1]) : null;
