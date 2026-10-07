@@ -522,3 +522,203 @@ describe("trophyEval milestone exclusions", () => {
     expect(results.filter((r) => !r.exclude)).toHaveLength(1);
   });
 });
+
+describe("trophyEval DSL", () => {
+  // Dates are mid-month so these tests don't depend on season-boundary handling.
+  const speedTrophy = (expr: any[][]): FlightTrophy => ({
+    id: "T",
+    name: "Test",
+    description: "Test",
+    expr,
+  });
+
+  beforeEach(() => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("filters with '<=' against a field value", () => {
+    const flights = [
+      makeFlight({
+        id: "1",
+        pilot: "Low",
+        glider: { type: "K-21", handicap: 92, registration: "G-A" },
+      }),
+      makeFlight({
+        id: "2",
+        pilot: "Edge",
+        glider: { type: "LS8", handicap: 95, registration: "G-B" },
+      }),
+      makeFlight({
+        id: "3",
+        pilot: "High",
+        glider: { type: "ASG 29", handicap: 121, registration: "G-C" },
+      }),
+    ];
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      speedTrophy([["filter", "glider.handicap", "<=", 95]]),
+    );
+
+    expect(results.map((r) => r.pilot)).toEqual(["Low", "Edge"]);
+  });
+
+  it("matches '<=>' turnpoint sequences in either direction", () => {
+    const task = makeFlight({ id: "", pilot: "" }).task;
+    const flights = [
+      makeFlight({
+        id: "1",
+        pilot: "Forward",
+        task: { ...task, turnpoints: ["BNW", "HUS"] },
+      }),
+      makeFlight({
+        id: "2",
+        pilot: "Reverse",
+        task: { ...task, turnpoints: ["HUS", "BNW"] },
+      }),
+      makeFlight({
+        id: "3",
+        pilot: "Other",
+        task: { ...task, turnpoints: ["BNW", "SHP"] },
+      }),
+    ];
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      speedTrophy([["filter", "task.turnpoints", "<=>", ["BNW", "HUS"]]]),
+    );
+
+    expect(results.map((r) => r.pilot)).toEqual(["Forward", "Reverse"]);
+  });
+
+  it("scores a field and sorts by score descending", () => {
+    const task = makeFlight({ id: "", pilot: "" }).task;
+    const flights = [
+      makeFlight({
+        id: "1",
+        pilot: "Slow",
+        task: { ...task, handicappedSpeedKph: 70 },
+      }),
+      makeFlight({
+        id: "2",
+        pilot: "Fast",
+        task: { ...task, handicappedSpeedKph: 95 },
+      }),
+    ];
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      speedTrophy([
+        ["score", "task.handicappedSpeedKph", "kph"],
+        ["sort", "score.value", "desc"],
+      ]),
+    );
+
+    expect(results.map((r) => [r.pilot, r.score])).toEqual([
+      ["Fast", { value: 95, unit: "kph" }],
+      ["Slow", { value: 70, unit: "kph" }],
+    ]);
+  });
+
+  it("applies a cross-year season (start month after end month)", () => {
+    const winter: SeasonConfig = {
+      start: { month: 10, day: 1 },
+      end: { month: 3, day: 31 },
+    };
+    const flights = [
+      makeFlight({ id: "1", pilot: "Nov", date: new Date("2024-11-15") }),
+      makeFlight({ id: "2", pilot: "Feb", date: new Date("2025-02-15") }),
+      makeFlight({ id: "3", pilot: "Summer", date: new Date("2024-06-15") }),
+      makeFlight({
+        id: "4",
+        pilot: "NextWinter",
+        date: new Date("2025-11-15"),
+      }),
+      makeFlight({
+        id: "5",
+        pilot: "PrevWinter",
+        date: new Date("2024-02-15"),
+      }),
+    ];
+
+    const results = trophyEval(defaultSeason, 2024, flights, {
+      ...speedTrophy([["filter", "task.isCompleted"]]),
+      season: winter,
+    });
+
+    expect(results.map((r) => r.pilot).sort()).toEqual(["Feb", "Nov"]);
+  });
+
+  it("removes flights listed in exclude", () => {
+    const flights = [
+      makeFlight({ id: "1", pilot: "Kept" }),
+      makeFlight({ id: "2", pilot: "Excluded" }),
+    ];
+
+    const results = trophyEval(defaultSeason, 2024, flights, {
+      ...speedTrophy([["filter", "task.isCompleted"]]),
+      exclude: { 2: "bad trace" },
+    });
+
+    expect(results.map((r) => r.pilot)).toEqual(["Kept"]);
+  });
+
+  it("lets flights listed in include bypass filters", () => {
+    const task = makeFlight({ id: "", pilot: "" }).task;
+    const flights = [
+      makeFlight({ id: "1", pilot: "Qualifies" }),
+      makeFlight({
+        id: "2",
+        pilot: "Included",
+        task: { ...task, isCompleted: false },
+      }),
+      makeFlight({
+        id: "3",
+        pilot: "Fails",
+        task: { ...task, isCompleted: false },
+      }),
+    ];
+
+    const results = trophyEval(defaultSeason, 2024, flights, {
+      ...speedTrophy([["filter", "task.isCompleted"]]),
+      include: { 2: "landed out after finishing, approved by committee" },
+    });
+
+    expect(results.map((r) => [r.pilot, r.include])).toEqual([
+      ["Qualifies", undefined],
+      ["Included", "landed out after finishing, approved by committee"],
+    ]);
+  });
+
+  it("throws on an unknown filter predicate", () => {
+    expect(() =>
+      trophyEval(
+        defaultSeason,
+        2024,
+        [makeFlight({ id: "1", pilot: "A" })],
+        speedTrophy([["filter", "glider.handicap", ">", 95]]),
+      ),
+    ).toThrow("Unknown filter predicate: >");
+  });
+
+  it("throws on an unknown op", () => {
+    expect(() =>
+      trophyEval(
+        defaultSeason,
+        2024,
+        [makeFlight({ id: "1", pilot: "A" })],
+        speedTrophy([["rank", "score.value"]]),
+      ),
+    ).toThrow("Unknown op: rank");
+  });
+});

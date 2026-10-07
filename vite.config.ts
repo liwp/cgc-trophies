@@ -25,6 +25,9 @@ export default defineConfig({
     globals: true,
     environment: "node",
     setupFiles: ["test/setup.ts"],
+    // Pin the timezone so date handling (and golden snapshots) don't depend on
+    // the machine running the tests. The club and its users are in the UK.
+    env: { TZ: "Europe/London" },
     include: ["test/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
