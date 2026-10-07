@@ -78,6 +78,21 @@ const ladderResult = (overrides: Partial<LadderResult>): LadderResult => ({
   ...overrides,
 });
 
+// Narrow evaluateTrophy's result, failing the test if it's the wrong kind.
+function flightResultsOf(evaluated: TrophyResults): ScoredFlight[] {
+  if (evaluated.type !== "flight") {
+    throw new Error(`expected flight results, got ${evaluated.type}`);
+  }
+  return evaluated.results;
+}
+
+function ladderResultsOf(evaluated: TrophyResults): LadderResult[] {
+  if (evaluated.type !== "ladder") {
+    throw new Error(`expected ladder results, got ${evaluated.type}`);
+  }
+  return evaluated.results;
+}
+
 describe("evaluateTrophy", () => {
   it("scores flight trophies from the launch-site flights", () => {
     const flights = [
@@ -95,8 +110,7 @@ describe("evaluateTrophy", () => {
       allFlights: [...flights, elsewhere],
     });
 
-    expect(evaluated.type).toBe("flight");
-    expect(evaluated.results.map((r) => r.id)).toEqual(["2", "1"]);
+    expect(flightResultsOf(evaluated).map((r) => r.id)).toEqual(["2", "1"]);
   });
 
   it("scores ladder trophies from all of the club's flights", () => {
@@ -108,11 +122,11 @@ describe("evaluateTrophy", () => {
       allFlights: [local, elsewhere],
     });
 
-    expect(evaluated.type).toBe("ladder");
-    expect(evaluated.results.map((r) => r.key).sort()).toEqual([
-      "Away, Al",
-      "Home, Hal",
-    ]);
+    expect(
+      ladderResultsOf(evaluated)
+        .map((r) => r.key)
+        .sort(),
+    ).toEqual(["Away, Al", "Home, Hal"]);
   });
 
   it("applies the trophy version in force for the season", () => {
@@ -152,9 +166,9 @@ describe("evaluateTrophy", () => {
     });
 
     expect(in2023.trophy.description).toBe("Old task");
-    expect(in2023.results.map((r) => r.id)).toEqual(["old"]);
+    expect(flightResultsOf(in2023).map((r) => r.id)).toEqual(["old"]);
     expect(in2024.trophy.description).toBe("Current task");
-    expect(in2024.results.map((r) => r.id)).toEqual(["new"]);
+    expect(flightResultsOf(in2024).map((r) => r.id)).toEqual(["new"]);
   });
 });
 
