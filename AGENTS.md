@@ -15,6 +15,7 @@ bun install                          # Install dependencies (uses bun.lock)
 bun run dev                          # Start dev server
 bun run build                        # Production build
 bun run lint                         # Biome check (lint + format + import sorting, read-only)
+bun run typecheck                    # tsc for the app and the tests (CI runs this; vite build doesn't type-check)
 bun run format                       # Biome check --write (apply fixes)
 bun run test                         # Run all tests (Vitest) — use `bun run test`, NOT `bun test`
 bun run test --watch                 # Watch mode
@@ -99,7 +100,7 @@ Lodash may be imported either as a default import (`import _ from "lodash"`, the
 ### Testing
 
 - Vitest 5, configured in the `test` block of `vite.config.ts` (`environment: "node"`, `globals: true`, setup in `test/setup.ts`)
-- Tests in `test/` directory (excluded from `tsconfig.json` compilation)
+- Tests in `test/` directory, excluded from `tsconfig.json` and type-checked separately via `tsconfig.test.json` (adds the `vitest/globals` types); `bun run typecheck` runs both
 - Tests import from `../../src/` paths (not aliases)
 - Coverage via `@vitest/coverage-v8` (`bun run test:coverage`); `src/main.tsx`, `src/App.tsx`, presentational React (`src/pages/**`, `src/components/**`, `src/styles/**`, covered by the Playwright suite instead), and `*.d.ts` are excluded. An 80% threshold (statements, branches, functions, lines) is enforced in `vite.config.ts`; ratchet it upward as coverage improves, never lower it
 
