@@ -2,17 +2,15 @@ import { keyBy, uniqBy } from "lodash";
 import {
   ArrowLeft,
   BarChart3,
-  Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  Copy,
   Map as MapIcon,
 } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link as NextLink, useParams } from "react-router-dom";
-
+import CopyButton from "../../components/CopyButton";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
 import HeightLossWarning from "../../components/HeightLossWarning";
 import Loading from "../../components/Loading";
@@ -22,7 +20,6 @@ import Tooltip from "../../components/Tooltip";
 import UnknownTrophy from "../../components/UnknownTrophy";
 import { evaluateTrophy, formatScore } from "../../lib/results";
 import {
-  copyDataToClipboard,
   flightCopyData,
   formatPilotName,
   ladderCopyData,
@@ -32,29 +29,6 @@ import { getTrophyNav } from "../../lib/trophyNav";
 import TURNPOINTS from "../../lib/turnpoints";
 import useFlights from "../../lib/useFlights";
 import type { Flight, LadderResult, ScoredFlight } from "../../types";
-
-const CopyButton = ({ data }: { data: string[][] }) => {
-  const [copied, setCopied] = React.useState(false);
-  const handleCopy = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    copyDataToClipboard(data).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-  return (
-    <Tooltip text={copied ? "Copied!" : "Copy for spreadsheet"} align="right">
-      <button
-        type="button"
-        aria-label="Copy to clipboard"
-        className={`p-1 rounded hover:bg-gray-100 ${copied ? "text-green-600" : "text-gray-400"}`}
-        onClick={handleCopy}
-      >
-        {copied ? <Check size={14} /> : <Copy size={14} />}
-      </button>
-    </Tooltip>
-  );
-};
 
 const Score = ({ value, unit }: { value: number; unit: string }) => (
   <span>{formatScore({ value, unit })}</span>
