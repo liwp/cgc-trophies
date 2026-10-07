@@ -5,6 +5,7 @@ import type {
   LadderTrophy,
   PilotMilestones,
   SeasonConfig,
+  TrophyExpr,
 } from "../../src/types";
 
 const defaultSeason: SeasonConfig = {
@@ -529,7 +530,7 @@ describe("trophyEval milestone exclusions", () => {
 
 describe("trophyEval DSL", () => {
   // Dates are mid-month so these tests don't depend on season-boundary handling.
-  const speedTrophy = (expr: any[][]): FlightTrophy => ({
+  const speedTrophy = (expr: TrophyExpr[]): FlightTrophy => ({
     id: "T",
     name: "Test",
     description: "Test",
@@ -710,6 +711,7 @@ describe("trophyEval DSL", () => {
         defaultSeason,
         2024,
         [makeFlight({ id: "1", pilot: "A" })],
+        // @ts-expect-error ">" isn't a comparator; the type rejects it too
         speedTrophy([["filter", "glider.handicap", ">", 95]]),
       ),
     ).toThrow("Unknown filter predicate: >");
@@ -721,6 +723,7 @@ describe("trophyEval DSL", () => {
         defaultSeason,
         2024,
         [makeFlight({ id: "1", pilot: "A" })],
+        // @ts-expect-error "rank" isn't an op; the type rejects it too
         speedTrophy([["rank", "score.value"]]),
       ),
     ).toThrow("Unknown op: rank");

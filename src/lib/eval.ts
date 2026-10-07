@@ -93,14 +93,15 @@ export function trophyEval(
       include: includedIds[flight.id],
     }));
 
-  trophy.expr.forEach(([op, ...args]) => {
-    switch (op) {
+  for (const expr of trophy.expr) {
+    switch (expr[0]) {
       case "filter": {
-        const [field, comparator = "=", value = true] = args;
+        const [, field, comparator = "=", value = true] = expr;
         const pred = comparators[comparator];
+        // Unreachable for type-checked configs; guards untyped (cast) ones.
         if (!pred) {
           throw new Error(
-            `Unknown filter predicate: ${comparator} in ${op} ${args}`,
+            `Unknown filter predicate: ${comparator} in ${expr.join(" ")}`,
           );
         }
         chain_ = chain_.filter((flight: any) => {
@@ -116,20 +117,27 @@ export function trophyEval(
         break;
       }
       case "score": {
-        const [field, unit] = args;
+        const [, field, unit] = expr;
         chain_ = chain_.map((f: any) =>
           Object.assign({}, f, { score: { value: get(f, field), unit } }),
         );
       }
+      // Intentional fall-through (see AGENTS.md).
       case "sort": {
-        const [field, order] = args;
-        chain_ = chain_.orderBy(field, order);
+        // When falling through from "score", the third element is the unit,
+        // not an order, so the scored field is sorted ascending (as lodash
+        // does for any order but "desc"). Trophies then apply their own sort.
+        const [, field, order] = expr;
+        chain_ = chain_.orderBy(field, order === "desc" ? "desc" : "asc");
         break;
       }
-      default:
-        throw new Error(`Unknown op: ${op} ${args}`);
+      default: {
+        // Unreachable for type-checked configs; guards untyped (cast) ones.
+        const unknown = expr as unknown[];
+        throw new Error(`Unknown op: ${unknown.join(" ")}`);
+      }
     }
-  });
+  }
 
   return chain_
     .map((flight: any) => {

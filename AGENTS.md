@@ -39,7 +39,7 @@ config — always use `bun run test` to run the Vitest suite.
 
 ### Trophy Types
 
-- **FlightTrophy** (`type?: "flight"`): Uses a DSL of `[op, ...args]` expressions evaluated as a lodash chain. Operations: `filter`, `score`, `sort`. Each trophy's `expr` array defines its scoring pipeline.
+- **FlightTrophy** (`type?: "flight"`): Uses a DSL of `[op, ...args]` expressions evaluated as a lodash chain. Operations: `filter`, `score`, `sort`. Each trophy's `expr` array defines its scoring pipeline. Expressions are typed (`TrophyExpr` in `src/types.ts`, with field paths derived from `Flight`), so a misspelt field, wrong comparator/value type, unit or sort order in `trophies.config.ts` is a compile error; `test/lib/trophyExpr.test.ts` pins down what is rejected.
 - **LadderTrophy** (`type: "ladder"`): Groups flights by pilot or glider registration, takes top N by `crossCountryPoints`, sums scores. The Complicity Cup uses `groupBy: "registration"`, which requires at least 2 distinct pilots.
 
 ### Season-scoped trophy history
@@ -81,7 +81,7 @@ Defined in `src/App.tsx`; the season is a `?season=` query param.
 
 ### Intentional Patterns
 
-- The `score` case in `trophyEval` intentionally falls through to `sort` (no `break` statement)
+- The `score` case in `trophyEval` intentionally falls through to `sort` (no `break` statement). In effect, scoring also sorts flights ascending by the scored field; every trophy then applies its own explicit `sort`, which overrides that
 - The `<=>` comparator checks array equality in both directions (reversible routes like BUG-MEN or MEN-BUG)
 - Season boundary: before March 1 = previous year's season (`useFlights.ts:currentSeason`)
 - Fetches 3 years of data (season-1 to season+1) to handle cross-year trophies like Kelman Clock (Oct-Mar)

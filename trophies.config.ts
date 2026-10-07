@@ -1,4 +1,4 @@
-import type { TrophiesConfig, Trophy } from "./src/types";
+import type { TrophiesConfig } from "./src/types";
 
 // =============================================================================
 // TROPHIES CONFIGURATION
@@ -54,7 +54,9 @@ import type { TrophiesConfig, Trophy } from "./src/types";
 //
 //   FLIGHT TROPHIES (type: "flight" or omitted)
 //     Score individual flights using a DSL of filter/score/sort expressions,
-//     evaluated as a lodash chain. Each trophy's `expr` array is a pipeline:
+//     evaluated as a lodash chain. Each trophy's `expr` array is a pipeline.
+//     Expressions are type-checked (TrophyExpr in src/types.ts): fields must
+//     be real Flight paths and comparators/values/units must fit the field.
 //
 //       ["filter", field, comparator, value]
 //         Keeps flights where field <comparator> value is true.
@@ -402,7 +404,7 @@ const config: TrophiesConfig = {
         ["sort", "score.value", "desc"],
       ],
     },
-  ] as Trophy[],
+  ],
 };
 
 export default config;
