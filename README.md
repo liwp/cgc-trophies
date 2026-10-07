@@ -49,8 +49,10 @@ Tooling: **bun** (package manager + scripts), **Biome** (lint + format), and
 
 ## Getting started
 
-Prerequisites: [bun](https://bun.sh) and [mise](https://mise.jdx.dev) (mise
-provides the pinned Node version; see `mise.toml`).
+Prerequisites: [mise](https://mise.jdx.dev), which provides the pinned Node and
+[bun](https://bun.sh) versions (see `mise.toml`; run `mise install`). The bun
+version is also pinned in `package.json` (`packageManager`), which CI and
+Renovate use, so `bun.lock` is always written by the same bun.
 
 ```bash
 bun install          # install dependencies

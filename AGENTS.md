@@ -8,7 +8,7 @@ Cambridge Gliding Centre annual trophies app. Fetches BGA Ladder flight data, sc
 
 ## Commands
 
-This project uses **bun** as the package manager and script runner.
+This project uses **bun** as the package manager and script runner. Its version is pinned in both `mise.toml` (local, via `mise install`) and `package.json` `packageManager` (CI and Renovate); keep them equal. A different bun can rewrite `bun.lock` in another format and break `bun install --frozen-lockfile`.
 
 ```bash
 bun install                          # Install dependencies (uses bun.lock)
