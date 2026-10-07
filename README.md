@@ -64,16 +64,26 @@ bun run format       # Biome auto-fix
 ## Deployment
 
 The app is a purely static single-page app, hosted on **Netlify** at
-[cgc-trophies.netlify.app](https://cgc-trophies.netlify.app), with continuous
-deploys from `main`. Build settings live in
+[cgc-trophies.netlify.app](https://cgc-trophies.netlify.app), deployed from
+`main`. Build settings live in
 [`netlify.toml`](netlify.toml): `bun run build` produces `dist/`, which is
 published as-is, with an SPA fallback (`/* → /index.html`) so client-router
 paths like `/admin` and `/trophy/:id` resolve on direct visits and refreshes.
 
 To set up hosting from scratch: in the Netlify dashboard, **Add new site →
 Import an existing project**, connect this GitHub repo, and deploy — Netlify
-reads `netlify.toml`, so no manual build configuration is needed. Every push to
-`main` then deploys automatically.
+reads `netlify.toml`, so no manual build configuration is needed.
+
+Production deploys use up Netlify credits, so pushes to `main` only deploy when
+the commit message contains `[deploy]` (an `ignore` rule in `netlify.toml`).
+When squash-merging a PR, put `[deploy]` in its title. To deploy the current
+`main` without other changes:
+
+```bash
+git commit --allow-empty -m "chore: release [deploy]" && git push
+```
+
+Deploy previews for pull requests are free and always build.
 
 ## Caveats
 

@@ -6,6 +6,12 @@
 [build]
   command = "bun run build"
   publish = "dist"
+  # Production deploys cost Netlify credits, so pushes/merges to main only
+  # deploy when the commit message contains [deploy] (exit 0 = skip the build,
+  # exit 1 = build). Deploy previews for PRs are free and always build.
+  # To deploy main without other changes:
+  #   git commit --allow-empty -m "chore: release [deploy]" && git push
+  ignore = 'if [ "$BRANCH" = "main" ] && ! git log -1 --pretty=%B | grep -qF "[deploy]"; then exit 0; else exit 1; fi'
 
 [build.environment]
   # Match the Node version pinned in mise.toml. Netlify auto-detects bun from bun.lock.

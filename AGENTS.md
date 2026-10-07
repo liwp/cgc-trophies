@@ -129,3 +129,9 @@ bd close <id>           # Done
 - There is deliberately no Dolt remote. Ignore "no Dolt remote configured"
   warnings, and don't run `bd dolt remote add`, `bd dolt push`, or `bd sync`.
 - Commit and push only when asked.
+
+## Deployment
+
+Netlify deploys `main` only when the commit message contains `[deploy]`
+(production deploys cost credits; see README "Deployment"). Never add
+`[deploy]` to a commit message or PR title unless asked to deploy.
