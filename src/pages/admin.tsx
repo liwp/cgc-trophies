@@ -1,22 +1,16 @@
-import {
-  ArrowLeft,
-  BarChart3,
-  ChevronDown,
-  ChevronUp,
-  Map as MapIcon,
-} from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import CONFIG from "trophies-config";
 import CopyButton from "../components/CopyButton";
+import FlightLinks from "../components/FlightLinks";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import HeightLossWarning from "../components/HeightLossWarning";
 import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
-import Tooltip from "../components/Tooltip";
 import {
   evaluateTrophy,
   formatScore,
@@ -59,26 +53,7 @@ const FlightResultEntry = ({
       <td className="px-4 py-2 text-gray-500 text-sm">{tps}</td>
       <td className="px-4 py-2">
         <div className="inline-flex items-center gap-1">
-          <Tooltip text="BGA Ladder">
-            <a
-              href={`https://www.bgaladder.net/flightdetails/${id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-cambridge transition-colors"
-            >
-              <BarChart3 size={14} />
-            </a>
-          </Tooltip>
-          <Tooltip text="IGC Viewer">
-            <a
-              href={`https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-cambridge transition-colors"
-            >
-              <MapIcon size={14} />
-            </a>
-          </Tooltip>
+          <FlightLinks flightId={id} iconSize={14} />
           <HeightLossWarning
             flightId={id}
             reportedHeightLoss={task.heightLoss}
@@ -105,26 +80,7 @@ const LadderFlightRow = ({ flight }: { flight: Flight }) => (
     <td className="px-4 py-1.5" />
     <td className="px-4 py-1.5">
       <div className="inline-flex items-center gap-1">
-        <Tooltip text="BGA Ladder">
-          <a
-            href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-cambridge transition-colors"
-          >
-            <BarChart3 size={14} className="inline" />
-          </a>
-        </Tooltip>
-        <Tooltip text="IGC Viewer">
-          <a
-            href={`https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${flight.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-cambridge transition-colors"
-          >
-            <MapIcon size={14} className="inline" />
-          </a>
-        </Tooltip>
+        <FlightLinks flightId={flight.id} iconSize={14} inline />
         <HeightLossWarning
           flightId={flight.id}
           reportedHeightLoss={flight.task.heightLoss}
