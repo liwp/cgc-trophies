@@ -17,6 +17,7 @@ function makeFlight(
 ): Flight {
   return {
     date: new Date("2024-06-15"),
+    clubName: "Cambridge Gliding Centre",
     glider: { type: "ASW 20", handicap: 100, registration: "G-TEST" },
     ladders: ["open"],
     task: {
@@ -25,12 +26,15 @@ function makeFlight(
       crossCountryPoints: 100,
       isDeclared: true,
       scoringDistanceKm: 200,
+      taskDistanceKm: 200,
+      taskAchievement: "Declared/Completed",
       handicappedDistanceKm: 200,
       handicappedSpeedKph: 80,
       launchSite: "Gransden Lodge",
       start: "GRL",
       finish: "GRL",
       turnpoints: ["SHP"],
+      heightLoss: 0,
     },
     ...overrides,
   };
