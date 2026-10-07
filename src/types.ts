@@ -19,7 +19,6 @@ export interface Flight {
     start: string;
     finish: string;
     turnpoints: string[];
-    tps?: { id: string; lat: number; lon: number }[];
     heightLoss: number;
   };
 }
