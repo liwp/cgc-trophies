@@ -83,7 +83,7 @@ Defined in `src/App.tsx`; the season is a `?season=` query param.
 
 - `score` ranks flights best-first (by `score.value`, descending; higher is better for km, kph and pts), so a trophy needs no `sort` unless it wants a different order. The trophies still list `["sort", "score.value", "desc"]` explicitly
 - The `<=>` comparator checks array equality in both directions (reversible routes like BUG-MEN or MEN-BUG)
-- Season boundary: before March 1 = previous year's season (`useFlights.ts:currentSeason`)
+- Season boundary: before March 1 = previous year's season (`src/lib/season.ts:currentSeason`)
 - Fetches 3 years of data (season-1 to season+1) to handle cross-year trophies like Kelman Clock (Oct-Mar)
 
 ### Lodash
