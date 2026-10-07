@@ -12,10 +12,6 @@ const categories = [
     pred: () => true,
   },
   {
-    key: "weekend",
-    pred: (flight: any) => flight.weekendLadder,
-  },
-  {
     key: "300km",
     pred: ({ task: { taskDistanceKm } }: Flight) =>
       300 <= taskDistanceKm && taskDistanceKm < 400,
