@@ -38,7 +38,7 @@ config — always use `bun run test` to run the Vitest suite.
 
 ### Trophy Types
 
-- **FlightTrophy** (`type?: "flight"`): Uses a DSL of `[op, ...args]` expressions evaluated as a lodash chain. Operations: `filter`, `project`, `score`, `sort`. Each trophy's `expr` array defines its scoring pipeline.
+- **FlightTrophy** (`type?: "flight"`): Uses a DSL of `[op, ...args]` expressions evaluated as a lodash chain. Operations: `filter`, `score`, `sort`. Each trophy's `expr` array defines its scoring pipeline.
 - **LadderTrophy** (`type: "ladder"`): Groups flights by pilot or glider registration, takes top N by `crossCountryPoints`, sums scores. The Complicity Cup uses `groupBy: "registration"`, which requires at least 2 distinct pilots.
 
 ### Season-scoped trophy history

@@ -37,7 +37,7 @@ When unset, it falls back to `trophies.config.ts`.
 ### Trophy types
 
 - **Flight trophies** — scored from a small DSL of `[op, ...args]` expressions
-  (`filter` / `project` / `score` / `sort`) evaluated over the season's flights.
+  (`filter` / `score` / `sort`) evaluated over the season's flights.
 - **Ladder trophies** — group flights by pilot (or glider registration), take
   the top N by cross-country points, and sum the scores.
 
