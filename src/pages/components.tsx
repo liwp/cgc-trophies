@@ -1,12 +1,13 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import FlightLoadFailure from "../components/FlightLoadFailure";
+import LadderResultsList from "../components/LadderResultsList";
 import Loading from "../components/Loading";
+import ResultsList from "../components/ResultsList";
 import Stats from "../components/Stats";
 import Tooltip from "../components/Tooltip";
 import UnknownTrophy from "../components/UnknownTrophy";
 import type { Flight, LadderResult, ScoredFlight } from "../types";
-import { LadderResultsList, ResultsList } from "./trophy/trophyDetail";
 
 // ---------------------------------------------------------------------------
 // Dummy data
