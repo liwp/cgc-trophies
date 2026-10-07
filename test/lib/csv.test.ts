@@ -27,7 +27,7 @@ describe("CSV", () => {
       const spec = {
         src: "b_col",
         type: "boolean",
-        xform: (b) => b !== true,
+        xform: (b: boolean) => b !== true,
       };
 
       expect(csv.parseCsv(spec, data)).toEqual([false]);
@@ -37,7 +37,7 @@ describe("CSV", () => {
       const spec = {
         src: "d_col",
         type: "date",
-        xform: (d) => d.getFullYear(),
+        xform: (d: Date) => d.getFullYear(),
       };
 
       expect(csv.parseCsv(spec, data)).toEqual([2017]);
@@ -56,7 +56,7 @@ describe("CSV", () => {
       const spec = {
         src: "n_col",
         type: "number",
-        xform: (n) => 2 * n,
+        xform: (n: number) => 2 * n,
       };
 
       expect(csv.parseCsv(spec, data)).toEqual([24]);
@@ -75,7 +75,7 @@ describe("CSV", () => {
       const spec = {
         src: "s_col",
         type: "string",
-        xform: (s) => s.toUpperCase(),
+        xform: (s: string) => s.toUpperCase(),
       };
 
       expect(csv.parseCsv(spec, data)).toEqual(["CELL"]);
@@ -100,11 +100,11 @@ describe("CSV", () => {
           number: {
             src: "n_col",
             type: "number",
-            xform: (n) => -n,
+            xform: (n: number) => -n,
           },
         },
         type: "object",
-        xform: (o) => ({ xformed: true, ...o }),
+        xform: (o: object) => ({ xformed: true, ...o }),
       };
 
       expect(csv.parseCsv(spec, data)).toEqual([
@@ -126,7 +126,7 @@ describe("CSV", () => {
           number: {
             src: "n_col",
             type: "number",
-            xform: (n) => -n,
+            xform: (n: number) => -n,
           },
         },
         type: "object",
@@ -161,7 +161,7 @@ c1,c2,c1
           },
         ],
         type: "array",
-        xform: (a) => new Set(a),
+        xform: (a: string[]) => new Set(a),
       };
       const json = csv.parseCsv(spec, data);
       expect(json).toEqual([new Set(["c1", "c2"])]);
