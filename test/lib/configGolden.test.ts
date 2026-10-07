@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import CONFIG from "trophies-config";
 import { parseCsv } from "../../src/lib/csv";
 import { SPEC } from "../../src/lib/flightCsvSpec";
-import { evaluateTrophy } from "../../src/lib/results";
+import { evaluateTrophy, selectSeasonFlights } from "../../src/lib/results";
 import { resolveTrophies } from "../../src/lib/trophyHistory";
 import type { Flight, LadderResult, ScoredFlight } from "../../src/types";
 
@@ -27,16 +27,11 @@ function flightsForYear(year: number): Flight[] {
   }
 }
 
-// Mirrors useFlights: fetch season-1..season+1, keep the club's flights
-// (allFlights, used by ladders) and those launched from the club site (flights).
+// Mirrors useFlights: fetch season-1..season+1, then split into the club's
+// flights (ladders) and its home-site launches (flight trophies).
 function flightsForSeason(season: number) {
-  const allFlights = [season - 1, season, season + 1]
-    .flatMap(flightsForYear)
-    .filter((f) => f.clubName === CONFIG.club.name);
-  const flights = allFlights.filter(
-    (f) => f.task.launchSite === CONFIG.club.launchSite,
-  );
-  return { flights, allFlights };
+  const fetched = [season - 1, season, season + 1].flatMap(flightsForYear);
+  return selectSeasonFlights(fetched, CONFIG.club);
 }
 
 const day = (date: Date) => new Date(date).toISOString().slice(0, 10);
