@@ -1,0 +1,327 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`trophy config golden results > season 2022 1`] = `
+{
+  "10: Sanville Enigma": [
+    "Drury, Graham — 128.721 kph (104680, 2022-08-14, CJSS)",
+    "Welford, Robert — 122.688 kph (104664, 2022-08-14, G-RJW)",
+    "Jeffery, Phil — 101.508 kph (104482, 2022-08-13, G-CKYO)",
+  ],
+  "11: Slazenger Trophy": [
+    "Haigh, Stuart — 38.694 kph (105494, 2022-09-17, G-CFYK)",
+  ],
+  "1: The A.L.L. Alexander Trophy": [
+    "Dalton, Mark — 1407 pts (102449, 2022-06-28, CU)",
+    "Brooker, Charlie — 1364 pts (105055, 2022-08-26, G-CUGC)",
+    "Brooker, Charlie — 1329 pts (99709, 2022-04-10, G-CUGC)",
+  ],
+  "2: Boal Pot": [
+    "Lawrence-jones, Mark — 96.762 kph (104308, 2022-08-08, G-EVII)",
+    "Jeffery, Phil — 95.156 kph (102835, 2022-07-11, G-CKYO)",
+    "Welford, Robert — 93.83 kph (103918, 2022-08-06, G-RJW)",
+  ],
+  "3: The Boomerang": [
+    "Pesonen, Lauri — 74.832 kph (103071, 2022-07-15, G-CHPX)",
+    "Pesonen, Lauri — 60.69 kph (102913, 2022-07-13, G-CHPX)",
+  ],
+  "4: Double Century": [
+    "Brooker, Charlie — 52.463 kph (102108, 2022-06-21, G-CUGC)",
+  ],
+  "5: Gransden Trophy": [
+    "Lawrence-jones, Mark — 92.46 kph (104282, 2022-08-09, G-EVII)",
+    "Baker, Peter — 87.468 kph (101776, 2022-06-12, G-CKLP)",
+    "Theil, Robert — 86.15 kph (102942, 2022-07-14, G-CJJH)",
+  ],
+  "6: Jubilee Bowl": [
+    "Jeffery, Phil — 538.756 km (103757, 2022-08-05, G-CKYO)",
+    "Smith, Mike — 498.405 km (103072, 2022-07-14, M8)",
+    "Beatty, Andy — 496.237 km (101755, 2022-06-12, CG)",
+  ],
+  "7: The Kelman Clock": [
+    "Robinson, Mark — 178.934 km (105757, 2022-10-08, G-CHGV)",
+    "Baker, Peter — 177.287 km (105758, 2022-10-08, G-CKLP)",
+    "Theil, Robert — 170.84 km (105768, 2022-10-08, G-CJJH)",
+  ],
+  "8: Mug Metal Machin Trophy": [
+    "Theil, Robert — 691.971 km (103740, 2022-08-05, G-CJJH)",
+    "Smith, Mike — 587.66 km (103847, 2022-08-05, M8)",
+    "Jeffery, Phil — 545.72 km (104196, 2022-08-08, G-CKYO)",
+  ],
+  "9: Pons Pot": [
+    "Drury, Graham — 595.622 km (103819, 2022-08-05, CJSS)",
+    "Atkin, Phil — 587.256 km (103863, 2022-08-05, G-CHSK)",
+    "Beatty, Andy — 571.948 km (103773, 2022-08-05, CG)",
+  ],
+  "L1: Pot Pewter Pringle": [
+    "Baker, Peter — 22704 pts [Baker, Peter] (103758, 104203, 103418, 104501, 101776, 101939)",
+    "Theil, Robert — 21757 pts [Theil, Robert] (103740, 102942, 101907, 103371, 102184, 101753)",
+    "Jeffery, Phil — 21588 pts [Jeffery, Phil] (103757, 103431, 104196, 100796, 101965, 100255)",
+  ],
+  "L2: Glass Jug": [
+    "Smith, Mike — 16727 pts [Smith, Mike] (104728, 101832, 101331, 102400, 101524, 100732)",
+    "Jeffery, Phil — 16477 pts [Jeffery, Phil] (101834, 99708, 100676, 101540, 100422, 104482)",
+    "Welford, Robert — 16399 pts [Welford, Robert] (101785, 101297, 100647, 104664, 100445, 103918)",
+  ],
+  "L3: Presidents Trophy": [
+    "Brooker, Charlie — 7794 pts [Brooker, Charlie] (102809, 105055, 99709, 102108, 104915, 105158)",
+    "Alexander, James — 6548 pts [Alexander, James] (103725, 103897, 104439, 103128, 105074, 102689)",
+    "Clark, Aidan — 5061 pts [Clark, Aidan] (105138, 104888, 104890, 104814, 101174, 105136)",
+  ],
+  "L4: Ted Warner Trophy": [
+    "Brand, Tom — 8790 pts [Brand, Tom] (104582, 104162, 101954, 103384, 104260, 104960)",
+    "Brooker, Charlie — 7794 pts [Brooker, Charlie] (102809, 105055, 99709, 102108, 104915, 105158)",
+    "Xu, Wenshu — 7104 pts [Xu, Wenshu] (103801, 100671, 100425, 99590, 104867, 101108)",
+  ],
+  "L5: Complicity Cup": [
+    "G-PRBB — 13040 pts [Belcher, Peter; Brickwood, Richard] (103023, 103141, 102394, 102125, 102772, 102665)",
+    "G-CFYK — 4615 pts [Haigh, Stuart; Smith, Simon] (103031, 103157, 104889, 105494, 102724, 101086)",
+  ],
+  "L6: Bottle of Bolly Challenge": [
+    "Brooker, Charlie — 7794 pts [Brooker, Charlie] (102809, 105055, 99709, 102108, 104915, 105158)",
+  ],
+  "L7: Shark Challenge": [
+    "Ruskin, Paul — 16573 pts [Ruskin, Paul] (103737, 101986, 102273, 104467, 104141, 104406)",
+    "Belcher, Peter — 13407 pts [Belcher, Peter] (103023, 103141, 102394, 102125, 102772, 101188)",
+    "Lewis, Chris — 12719 pts [Lewis, Chris] (103759, 102202, 104471, 103163, 103408, 100607)",
+  ],
+}
+`;
+
+exports[`trophy config golden results > season 2023 1`] = `
+{
+  "10: Sanville Enigma": [
+    "Lawrence-jones, Mark — 83.24 kph (106544, 2023-04-08, G-EVII)",
+    "Baker, Peter — 74.228 kph (110070, 2023-08-07, G-CKLP)",
+    "Smith, Mike — 70.136 kph (106591, 2023-04-08, M8)",
+  ],
+  "11: Slazenger Trophy": [
+    "Krkovic, Matija — 50.293 kph (110443, 2023-08-17, G-CFER)",
+  ],
+  "1: The A.L.L. Alexander Trophy": [
+    "Alexander, James — 2619 pts (106786, 2023-04-25, CFUU)",
+    "Alexander, James — 2308 pts (107995, 2023-06-16, FUU)",
+    "Alexander, James — 1745 pts (109897, 2023-07-26, FUU)",
+  ],
+  "2: Boal Pot": [
+    "Alexander, James — 87.052 kph (106786, 2023-04-25, CFUU)",
+    "Bonhomme, Paul — 74.285 kph (106884, 2023-04-25, G-CGBG)",
+  ],
+  "3: The Boomerang": [
+    "Pesonen, Lauri — 88.217 kph (106814, 2023-04-25, G-CHPX)",
+    "Alexander, James — 74.677 kph (106508, 2023-04-08, DM)",
+  ],
+  "4: Double Century": [
+    "Maskell, Richard — 83.468 kph (110424, 2023-08-16, MB)",
+  ],
+  "5: Gransden Trophy": [],
+  "6: Jubilee Bowl": [
+    "Baker, Peter — 390.994 km (106883, 2023-04-25, G-CKLP)",
+    "Lawrence-jones, Mark — 378.496 km (106805, 2023-04-25, G-EVII)",
+    "Theil, Robert — 376.776 km (106783, 2023-04-25, G-CJJH)",
+  ],
+  "7: The Kelman Clock": [
+    "Welford, Robert — 272.609 km (112862, 2024-03-30, G-CRJW)",
+    "Baker, Peter — 203.06 km (112849, 2024-03-30, G-CKLP)",
+    "Theil, Robert — 186.435 km (112842, 2024-03-30, G-CJJH)",
+  ],
+  "8: Mug Metal Machin Trophy": [
+    "Lawrence-jones, Mark — 465.866 km (108377, 2023-06-26, G-EVII)",
+    "Lawrence-jones, Mark — 457.501 km (108206, 2023-06-21, G-EVII)",
+    "Baker, Peter — 428.077 km (108223, 2023-06-21, G-CKLP)",
+  ],
+  "9: Pons Pot": [
+    "Grosche, Malte — 474.709 km (107822, 2023-06-15, D-4818)",
+    "Baker, Peter — 321.548 km (107979, 2023-06-16, G-CKLP)",
+    "Lawrence-jones, Mark — 311.715 km (107162, 2023-05-16, G-EVII)",
+  ],
+  "L1: Pot Pewter Pringle": [
+    "Theil, Robert — 16932 pts [Theil, Robert] (107806, 108365, 106783, 108208, 108572, 107994)",
+    "Baker, Peter — 15838 pts [Baker, Peter] (106883, 108385, 108223, 109908, 110571, 106383)",
+    "Lawrence-jones, Mark — 15288 pts [Lawrence-jones, Mark] (106805, 108206, 108377, 108083, 111660, 108472)",
+  ],
+  "L2: Glass Jug": [
+    "Theil, Robert — 9977 pts [Theil, Robert] (106381, 110486, 112225, 112058, 111832, 111965)",
+    "Beatty, Andy — 8183 pts [Beatty, Andy] (110489, 106363, 112257, 111967, 107281)",
+    "Baker, Peter — 7451 pts [Baker, Peter] (110571, 106383, 112253, 111979)",
+  ],
+  "L3: Presidents Trophy": [
+    "Clark, Aidan — 5296 pts [Clark, Aidan] (108595, 112082, 108596, 110342, 108562, 108571)",
+    "Krkovic, Matija — 3300 pts [Krkovic, Matija] (110645, 110608, 110356, 110609, 112249, 111846)",
+    "Alexander, James — 1454 pts [Alexander, James] (106508)",
+  ],
+  "L4: Ted Warner Trophy": [
+    "Alexander, James — 10681 pts [Alexander, James] (106786, 107995, 109897, 106508, 108408, 110349)",
+    "Clark, Aidan — 7121 pts [Clark, Aidan] (111692, 111737, 108595, 110582, 112082, 108596)",
+    "Goss, Steve — 2531 pts [Goss, Steve] (109835, 109924, 110134)",
+  ],
+  "L5: Complicity Cup": [],
+  "L6: Bottle of Bolly Challenge": [],
+  "L7: Shark Challenge": [
+    "Ruskin, Paul — 11989 pts [Ruskin, Paul] (106823, 110362, 108191, 108235, 110510, 107810)",
+    "Goss, Steve — 2531 pts [Goss, Steve] (109835, 109924, 110134)",
+    "Lewis, Chris — 1157 pts [Lewis, Chris] (111659)",
+  ],
+}
+`;
+
+exports[`trophy config golden results > season 2024 1`] = `
+{
+  "10: Sanville Enigma": [
+    "Lawrence-jones, Mark — 86.548 kph (115836, 2024-07-14, G-EVII)",
+    "Theil, Robert — 83.887 kph (113488, 2024-04-26, G-CJJH)",
+    "Theil, Robert — 81.875 kph (114100, 2024-05-17, G-CJJH)",
+  ],
+  "11: Slazenger Trophy": [
+    "Dowell, Andrew — 50.779 kph (118611, 2024-08-29, G-CHTS)",
+  ],
+  "1: The A.L.L. Alexander Trophy": [
+    "Alexander, James — 3245 pts (119647, 2024-08-30, 4X)",
+    "Alexander, James — 3221 pts (116512, 2024-07-28, 4X)",
+    "Alexander, James — 2918 pts (112973, 2024-04-14, G-CFUU)",
+  ],
+  "2: Boal Pot": [
+    "Theil, Robert — 101.29 kph (115152, 2024-06-20, G-CJJH)",
+    "Maskell, Richard — 96.664 kph (115156, 2024-06-20, G-CKED)",
+    "Dalton, Mark — 94.785 kph (115148, 2024-06-20, G-CJXW)",
+  ],
+  "3: The Boomerang": [],
+  "4: Double Century": [
+    "Alexander, James — 87.437 kph (115229, 2024-06-21, 4X)",
+  ],
+  "5: Gransden Trophy": [
+    "Beatty, Markandy — 100.056 kph (119646, 2024-08-30, G-CJXW)",
+    "Holswilder, Alex — 93.479 kph (119700, 2024-08-30, G-CKYO)",
+    "Theil, Robert — 93.232 kph (119658, 2024-08-30, G-CJJH)",
+  ],
+  "6: Jubilee Bowl": [
+    "Holswilder, Alex — 500.564 km (115913, 2024-07-17, G-CKYO)",
+    "Beatty, Markandy — 500.333 km (119646, 2024-08-30, G-CJXW)",
+    "Baker, Peter — 478.619 km (116146, 2024-07-26, G-CKLP)",
+  ],
+  "7: The Kelman Clock": [
+    "Beatty, Andy — 237.823 km (121508, 2025-03-15, G-CJXW)",
+    "Beatty, Andy — 199.627 km (121555, 2025-03-20, 871)",
+    "Welford, Robert — 192.968 km (120131, 2024-10-04, G-CRJW)",
+  ],
+  "8: Mug Metal Machin Trophy": [
+    "Holswilder, Alex — 679.964 km (116237, 2024-07-26, G-CKYO)",
+    "Alexander, James — 527.536 km (116512, 2024-07-28, 4X)",
+    "Holswilder, Alex — 500.564 km (115913, 2024-07-17, G-CKYO)",
+  ],
+  "9: Pons Pot": [
+    "Grosche, Malte — 416.047 km (116313, 2024-07-27, D-1623)",
+    "Lawrence-jones, Mark — 378.829 km (115971, 2024-07-18, G-EVII)",
+    "Smith, Mike — 370.331 km (119940, 2024-09-13, M8)",
+  ],
+  "L1: Pot Pewter Pringle": [
+    "Holswilder, Alex — 18682 pts [Holswilder, Alex] (116237, 119700, 115913, 115838, 115182, 115106)",
+    "Baker, Peter — 18426 pts [Baker, Peter] (116146, 116425, 117077, 119931, 115241, 115904)",
+    "Theil, Robert — 18331 pts [Theil, Robert] (119658, 116371, 116126, 119872, 115152, 116541)",
+  ],
+  "L2: Glass Jug": [
+    "Alexander, James — 14459 pts [Alexander, James] (116512, 112973, 113697, 116268, 115366, 117497)",
+    "Theil, Robert — 12872 pts [Theil, Robert] (116371, 114921, 112948, 117499, 114478, 112842)",
+    "Head, Wendy — 12854 pts [Head, Wendy] (116444, 112979, 117205, 113609, 113327, 117516)",
+  ],
+  "L3: Presidents Trophy": [
+    "Clark, Aidan — 3428 pts [Clark, Aidan] (115429, 114762, 115864)",
+    "Beatty, Markandy — 2369 pts [Beatty, Markandy] (119870)",
+    "Brooker, Charlie — 1790 pts [Brooker, Charlie] (116124)",
+  ],
+  "L4: Ted Warner Trophy": [
+    "Alexander, James — 2918 pts [Alexander, James] (112973)",
+    "Haigh, Stuart — 2153 pts [Haigh, Stuart] (117204, 117001, 114269)",
+    "Xu, Wenshu — 636 pts [Xu, Wenshu] (113038)",
+  ],
+  "L5: Complicity Cup": [
+    "G-CKYO — 17062 pts [Holswilder, Alex; Bray, Duncan] (116237, 119700, 115913, 115838, 115182, 117459)",
+  ],
+  "L6: Bottle of Bolly Challenge": [],
+  "L7: Shark Challenge": [
+    "Ruskin, Paul — 15147 pts [Ruskin, Paul] (119672, 119884, 116558, 115164, 118561, 113862)",
+    "Belcher, Peter — 10359 pts [Belcher, Peter] (119783, 115268, 115880, 118582, 113947, 115390)",
+    "Lewis, Chris — 9238 pts [Lewis, Chris] (115199, 115889, 119850, 116297, 114208, 116296)",
+  ],
+}
+`;
+
+exports[`trophy config golden results > season 2025 1`] = `
+{
+  "10: Sanville Enigma": [
+    "Drury, Graham — 103.832 kph (122963, 2025-05-10, G-CJSS)",
+    "Alexander, James — 97.545 kph (122780, 2025-05-09, 4X)",
+    "Lawrence-jones, Mark — 80.67 kph (124890, 2025-07-03, G-PCGC)",
+  ],
+  "11: Slazenger Trophy": [
+    "Dowell, Andrew — 52.58 kph (123098, 2025-05-09, G-CHTS)",
+    "Taylor, Adrian — 33.599 kph (122461, 2025-05-01, G-CJXR)",
+  ],
+  "1: The A.L.L. Alexander Trophy": [
+    "Alexander, James — 4813 pts (124031, 2025-06-02, 4X)",
+    "Alexander, James — 4652 pts (124909, 2025-07-03, 4X)",
+    "Alexander, James — 3642 pts (122954, 2025-05-10, 4X)",
+  ],
+  "2: Boal Pot": [
+    "Theil, Robert — 99.673 kph (122784, 2025-05-09, G-CKFD)",
+    "Theil, Robert — 97.433 kph (126354, 2025-08-08, G-CKFD)",
+    "Beatty, Andy — 96.326 kph (126360, 2025-08-08, 871)",
+  ],
+  "3: The Boomerang": [
+    "Pesonen, Lauri — 75.521 kph (127342, 2025-09-05, G-CLGL)",
+  ],
+  "4: Double Century": [],
+  "5: Gransden Trophy": [
+    "Holswilder, Alex — 107.447 kph (124887, 2025-07-03, G-CKYO)",
+    "Bonhomme, Paul — 86.593 kph (124054, 2025-06-02, G-CGBG)",
+    "Pesonen, Lauri — 83.565 kph (124949, 2025-07-03, G-CLGL)",
+  ],
+  "6: Jubilee Bowl": [
+    "Welford, Robert — 546.467 km (124149, 2025-06-02, G-CRJW)",
+    "Holswilder, Alex — 538.56 km (124132, 2025-06-02, G-CKYO)",
+    "Lawrence-jones, Mark — 514.456 km (123019, 2025-05-10, G-EVII)",
+  ],
+  "7: The Kelman Clock": [],
+  "8: Mug Metal Machin Trophy": [
+    "Grosche, Malte — 769.474 km (125026, 2025-07-03, D-1623)",
+    "Atkin, Phil — 748.092 km (124109, 2025-06-02, G-PHNX)",
+    "Beatty, Markandy — 743.648 km (124956, 2025-07-03, 871)",
+  ],
+  "9: Pons Pot": [
+    "Alexander, James — 761.785 km (124909, 2025-07-03, 4X)",
+    "Maskell, Richard — 504.638 km (123843, 2025-05-23, 72)",
+    "Baker, Peter — 457.276 km (126298, 2025-08-06, G-CKLP)",
+  ],
+  "L1: Pot Pewter Pringle": [
+    "Grosche, Malte — 23216 pts [Grosche, Malte] (124127, 125026, 124806, 125237, 125590, 126704)",
+    "Theil, Robert — 23025 pts [Theil, Robert] (124931, 124016, 124444, 125768, 127358, 122962)",
+    "Beatty, Markandy — 21675 pts [Beatty, Markandy] (124956, 124003, 122981, 122812, 125573, 122016)",
+  ],
+  "L2: Glass Jug": [
+    "Beatty, Markandy — 12290 pts [Beatty, Markandy] (122981, 125573, 122172, 124733, 127116, 124335)",
+    "Alexander, James — 10549 pts [Alexander, James] (122954, 126048, 127490, 127117, 125922, 126814)",
+    "Head, Wendy — 9349 pts [Head, Wendy] (123060, 126549, 126550, 122669, 126055)",
+  ],
+  "L3: Presidents Trophy": [
+    "Clark, Aidan — 10306 pts [Clark, Aidan] (127409, 126605, 127363, 125215, 126668, 126691)",
+    "Landen, George  — 7795 pts [Landen, George ] (126486, 127517, 127022, 123666, 126502, 123002)",
+    "Lawrence-jones, Mark — 7659 pts [Lawrence-jones, Mark] (124890, 124799, 127357, 124194, 121862)",
+  ],
+  "L4: Ted Warner Trophy": [
+    "Dowell, Andrew — 3247 pts [Dowell, Andrew] (124955, 124603, 126415)",
+    "Haigh, Stuart — 2758 pts [Haigh, Stuart] (126570, 126720, 126719)",
+    "Goss, Steve — 2547 pts [Goss, Steve] (126681, 123832)",
+  ],
+  "L5: Complicity Cup": [
+    "G-CKYO — 17507 pts [Holswilder, Alex; Bray, Duncan] (124132, 124887, 122074, 123618, 122835, 126859)",
+    "G-PIKD — 9548 pts [Barrott, Chris; Brooker, Charlie] (127393, 122836, 126615, 126460, 125242, 125614)",
+  ],
+  "L6: Bottle of Bolly Challenge": [
+    "Clark, Aidan — 4912 pts [Clark, Aidan] (126605, 125215, 125218, 127345)",
+  ],
+  "L7: Shark Challenge": [
+    "Ruskin, Paul — 16385 pts [Ruskin, Paul] (124170, 125364, 123782, 124605, 123674, 121972)",
+    "Lewis, Chris — 9443 pts [Lewis, Chris] (124026, 125845, 122843, 122697, 124465)",
+    "Belcher, Peter — 8778 pts [Belcher, Peter] (124200, 125268, 124202, 124201, 126293, 125029)",
+  ],
+}
+`;
