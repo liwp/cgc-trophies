@@ -1,4 +1,5 @@
 import { Settings } from "lucide-react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import CONFIG from "trophies-config";
@@ -23,8 +24,12 @@ const TrophyList = ({
   allFlights: Flight[];
   season: number;
 }) => {
-  const trophies = resolveTrophies(season).map((trophy) =>
-    evaluateTrophy(trophy, season, { flights, allFlights }),
+  const trophies = useMemo(
+    () =>
+      resolveTrophies(season).map((trophy) =>
+        evaluateTrophy(trophy, season, { flights, allFlights }),
+      ),
+    [season, flights, allFlights],
   );
 
   return (

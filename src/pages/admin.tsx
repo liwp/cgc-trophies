@@ -1,5 +1,5 @@
 import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import CONFIG from "trophies-config";
@@ -166,7 +166,11 @@ const TrophySection = ({
   season: number;
 }) => {
   const [showAll, setShowAll] = useState(false);
-  const evaluated = evaluateTrophy(trophy, season, { flights, allFlights });
+  // Re-scoring on every "Show all" toggle or row expand is wasted work.
+  const evaluated = useMemo(
+    () => evaluateTrophy(trophy, season, { flights, allFlights }),
+    [trophy, season, flights, allFlights],
+  );
   const isLadder = evaluated.type === "ladder";
   const isSyndicate =
     evaluated.type === "ladder" && evaluated.trophy.groupBy === "registration";
