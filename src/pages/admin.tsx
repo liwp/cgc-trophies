@@ -247,10 +247,11 @@ const TrophySection = ({
 };
 
 const AdminPage = () => {
-  const { error, flights, allFlights, isLoading, season } = useFlights();
+  const state = useFlights();
 
-  if (error) return <FlightLoadFailure />;
-  if (isLoading) return <Loading />;
+  if (state.status === "error") return <FlightLoadFailure />;
+  if (state.status === "loading") return <Loading />;
+  const { season, flights, allFlights } = state;
 
   return (
     <PageLayout>
@@ -270,7 +271,7 @@ const AdminPage = () => {
           <Season season={season} />
         </div>
 
-        <Stats flights={flights!} season={season} />
+        <Stats flights={flights} season={season} />
 
         <nav className="flex flex-wrap gap-2">
           {CONFIG.trophies.map((t) => (
@@ -289,8 +290,8 @@ const AdminPage = () => {
             <TrophySection
               key={trophy.id}
               trophy={trophy}
-              flights={flights!}
-              allFlights={allFlights!}
+              flights={flights}
+              allFlights={allFlights}
               season={season}
             />
           ))}

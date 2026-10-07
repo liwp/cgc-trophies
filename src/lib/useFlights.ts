@@ -1,19 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import useSWR from "swr";
 import config from "trophies-config";
-import type { Flight } from "../types";
 import { fetchFlights } from "./fetchFlights";
-import { selectSeasonFlights } from "./results";
+import { type SeasonFlights, selectSeasonFlights } from "./results";
 import { currentSeason } from "./season";
 
-function useFlights(): {
-  error: any;
-  flights: Flight[] | undefined;
-  allFlights: Flight[] | undefined;
-  isLoading: boolean;
-  season: number;
-} {
+export type FlightsState =
+  | { status: "loading"; season: number }
+  | { status: "error"; season: number; error: unknown }
+  | ({ status: "ready"; season: number } & SeasonFlights);
+
+/**
+ * The selected season (from ?season=, defaulting to the current one) and its
+ * flights. The flight arrays keep their identity between renders, so callers
+ * can memoise work on them.
+ */
+function useFlights(): FlightsState {
   const [searchParams, setSearchParams] = useSearchParams();
   let season = parseInt(searchParams.get("season") ?? "", 10);
   if (Number.isNaN(season)) {
@@ -34,22 +37,18 @@ function useFlights(): {
   }, [searchParams, setSearchParams, season]);
 
   const [startYear, endYear] = [season - 1, season + 1];
-  const { data, error, isLoading } = useSWR(
-    ["flights", startYear, endYear],
-    () => fetchFlights(startYear, endYear),
+  const { data, error } = useSWR(["flights", startYear, endYear], () =>
+    fetchFlights(startYear, endYear),
   );
 
-  const seasonFlights = data && selectSeasonFlights(data, config.club);
-  const allFlights = seasonFlights?.allFlights;
-  const flights = seasonFlights?.flights;
+  const seasonFlights = useMemo(
+    () => data && selectSeasonFlights(data, config.club),
+    [data],
+  );
 
-  return {
-    error,
-    flights,
-    allFlights,
-    isLoading,
-    season,
-  };
+  if (error) return { status: "error", season, error };
+  if (!seasonFlights) return { status: "loading", season };
+  return { status: "ready", season, ...seasonFlights };
 }
 
 export default useFlights;
