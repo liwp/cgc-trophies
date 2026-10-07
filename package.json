@@ -8,7 +8,7 @@
     "build": "vite build",
     "start": "vite preview",
     "lint": "biome check .",
-    "typecheck": "tsc --noEmit -p .",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.test.json",
     "format": "biome check --write .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
