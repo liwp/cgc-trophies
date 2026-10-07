@@ -121,6 +121,11 @@ bd close <id>           # Done
 - Issues live in a local Dolt DB under `.beads/` (gitignored). `.beads/issues.jsonl`
   is auto-exported on every change and committed by the pre-commit hook; it is
   the backup and history.
+- The on-disk `issues.jsonl` can lag the DB, and the pre-commit hook re-exports
+  it only after staging, so the commit gets a stale copy and the file shows as
+  modified afterwards (`git commit -a` doesn't help: it stages before the hook
+  runs). When committing beads changes, export first:
+  `bd export -o .beads/issues.jsonl && git add .beads/issues.jsonl`.
 - There is deliberately no Dolt remote. Ignore "no Dolt remote configured"
   warnings, and don't run `bd dolt remote add`, `bd dolt push`, or `bd sync`.
 - Commit and push only when asked.
