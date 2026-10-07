@@ -635,6 +635,49 @@ describe("trophyEval DSL", () => {
     ]);
   });
 
+  it("ranks flights best-first when scoring, without an explicit sort", () => {
+    const task = makeFlight({ id: "", pilot: "" }).task;
+    const flights = [70, 95, 80].map((kph) =>
+      makeFlight({
+        id: String(kph),
+        pilot: `Pilot ${kph}`,
+        task: { ...task, handicappedSpeedKph: kph },
+      }),
+    );
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      speedTrophy([["score", "task.handicappedSpeedKph", "kph"]]),
+    );
+
+    expect(results.map((r) => r.score.value)).toEqual([95, 80, 70]);
+  });
+
+  it("lets a later sort override the best-first ranking", () => {
+    const task = makeFlight({ id: "", pilot: "" }).task;
+    const flights = [70, 95, 80].map((kph) =>
+      makeFlight({
+        id: String(kph),
+        pilot: `Pilot ${kph}`,
+        task: { ...task, handicappedSpeedKph: kph },
+      }),
+    );
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      speedTrophy([
+        ["score", "task.handicappedSpeedKph", "kph"],
+        ["sort", "score.value", "asc"],
+      ]),
+    );
+
+    expect(results.map((r) => r.score.value)).toEqual([70, 80, 95]);
+  });
+
   it("applies a cross-year season (start month after end month)", () => {
     const winter: SeasonConfig = {
       start: { month: 10, day: 1 },

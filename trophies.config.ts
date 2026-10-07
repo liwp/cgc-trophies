@@ -66,7 +66,8 @@ import type { TrophiesConfig } from "./src/types";
 //
 //       ["score", field, unit]
 //         Sets each flight's score to the value of field, labelled with unit
-//         (e.g. "km", "kph", "pts").
+//         ("km", "kph" or "pts"), and ranks flights best-first (highest score
+//         first).
 //
 //       ["sort", field, order]
 //         Sorts by field in the given order ("asc" or "desc").
