@@ -117,18 +117,19 @@ export function trophyEval(
         break;
       }
       case "score": {
+        // Higher is better for every unit (km, kph, pts), so scoring also
+        // ranks flights best-first. A later "sort" can still reorder them.
         const [, field, unit] = expr;
-        chain_ = chain_.map((f: any) =>
-          Object.assign({}, f, { score: { value: get(f, field), unit } }),
-        );
+        chain_ = chain_
+          .map((f: any) =>
+            Object.assign({}, f, { score: { value: get(f, field), unit } }),
+          )
+          .orderBy("score.value", "desc");
+        break;
       }
-      // Intentional fall-through (see AGENTS.md).
       case "sort": {
-        // When falling through from "score", the third element is the unit,
-        // not an order, so the scored field is sorted ascending (as lodash
-        // does for any order but "desc"). Trophies then apply their own sort.
         const [, field, order] = expr;
-        chain_ = chain_.orderBy(field, order === "desc" ? "desc" : "asc");
+        chain_ = chain_.orderBy(field, order);
         break;
       }
       default: {
