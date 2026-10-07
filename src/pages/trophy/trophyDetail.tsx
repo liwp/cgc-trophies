@@ -1,16 +1,15 @@
 import { keyBy, uniqBy } from "lodash";
 import {
   ArrowLeft,
-  BarChart3,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  Map as MapIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { Link as NextLink, useParams } from "react-router-dom";
 import CopyButton from "../../components/CopyButton";
+import FlightLinks from "../../components/FlightLinks";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
 import HeightLossWarning from "../../components/HeightLossWarning";
 import Loading from "../../components/Loading";
@@ -72,26 +71,7 @@ const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
       </td>
       <td className="px-4 py-3">
         <div className="inline-flex items-center gap-1">
-          <Tooltip text="BGA Ladder">
-            <a
-              href={`https://www.bgaladder.net/flightdetails/${id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-cambridge transition-colors"
-            >
-              <BarChart3 size={16} />
-            </a>
-          </Tooltip>
-          <Tooltip text="IGC Viewer">
-            <a
-              href={`https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-cambridge transition-colors"
-            >
-              <MapIcon size={16} />
-            </a>
-          </Tooltip>
+          <FlightLinks flightId={id} />
           {rank === 1 && <CopyButton data={flightCopyData(result)} />}
           {rank === 1 && (
             <HeightLossWarning
@@ -189,26 +169,7 @@ const LadderFlightRow = ({
       </td>
       <td className="px-4 py-2 text-gray-500">
         <div className="inline-flex items-center gap-1">
-          <Tooltip text="BGA Ladder">
-            <a
-              href={`https://www.bgaladder.net/flightdetails/${flight.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-cambridge transition-colors"
-            >
-              <BarChart3 size={16} className="inline" />
-            </a>
-          </Tooltip>
-          <Tooltip text="IGC Viewer">
-            <a
-              href={`https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/${flight.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-cambridge transition-colors"
-            >
-              <MapIcon size={16} className="inline" />
-            </a>
-          </Tooltip>
+          <FlightLinks flightId={flight.id} inline />
           {showHeightLoss && (
             <HeightLossWarning
               flightId={flight.id}
