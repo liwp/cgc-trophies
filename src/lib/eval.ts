@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-const { chain, get, isEqual, isFunction } = _;
+const { chain, get, isEqual } = _;
 
 import type {
   Flight,
@@ -113,16 +113,6 @@ export function trophyEval(
             return pred(get(flight, field), value);
           }
         });
-        break;
-      }
-      case "project": {
-        const [field, fieldsOfProjection] = args;
-        const projection = isFunction(fieldsOfProjection)
-          ? fieldsOfProjection
-          : (f: any) => fieldsOfProjection.map((key: string) => get(f, key));
-        chain_ = chain_.map((f: any) =>
-          Object.assign({}, f, { [field]: projection(f) }),
-        );
         break;
       }
       case "score": {
