@@ -78,3 +78,22 @@ test("a failed flight download shows an error message", async ({ page }) => {
 
   await expect(page.getByText("Failed to load flight data.")).toBeVisible();
 });
+
+test("icon-only links are named by their tooltips", async ({ page }) => {
+  await page.goto("/trophy/8?season=2023");
+
+  const ladderLink = page.getByRole("link", { name: "BGA Ladder" }).first();
+  await expect(ladderLink).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "IGC Viewer" }).first(),
+  ).toBeVisible();
+
+  // The tooltip is shown on keyboard focus, not just on hover.
+  const tooltip = page.getByRole("tooltip", { name: "BGA Ladder" }).first();
+  await expect(tooltip).toHaveCSS("opacity", "0");
+  await ladderLink.focus();
+  await expect(tooltip).toHaveCSS("opacity", "1");
+
+  await page.goto("/?season=2024");
+  await expect(page.getByRole("link", { name: "Admin view" })).toBeVisible();
+});

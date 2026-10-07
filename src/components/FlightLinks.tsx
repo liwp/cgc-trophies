@@ -18,7 +18,7 @@ const FlightLinks = ({
   const iconClass = inline ? "inline" : undefined;
   return (
     <>
-      <Tooltip text="BGA Ladder">
+      <Tooltip text="BGA Ladder" asLabel>
         <a
           href={flightDetailsUrl(flightId)}
           target="_blank"
@@ -28,7 +28,7 @@ const FlightLinks = ({
           <BarChart3 size={iconSize} className={iconClass} />
         </a>
       </Tooltip>
-      <Tooltip text="IGC Viewer">
+      <Tooltip text="IGC Viewer" asLabel>
         <a
           href={igcViewerUrl(flightId)}
           target="_blank"
