@@ -93,7 +93,7 @@ export function trophyEval(
       include: includedIds[flight.id],
     }));
 
-  trophy.expr.forEach(([op, ...args]: [string, ...any[]]) => {
+  trophy.expr.forEach(([op, ...args]) => {
     switch (op) {
       case "filter": {
         const [field, comparator = "=", value = true] = args;
