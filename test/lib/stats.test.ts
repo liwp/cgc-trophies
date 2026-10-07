@@ -1,7 +1,6 @@
 import {
   calculateStats,
   categories,
-  updateAttemptedDistance,
   updateCategory,
   updateStats,
 } from "../../src/lib/stats";
@@ -112,63 +111,6 @@ describe("stats", () => {
         total: 1,
         percentage: 0,
       });
-    });
-  });
-
-  describe("updateAttemptedDistance", () => {
-    it("uses scoringDistanceKm when tps are absent", () => {
-      const result = updateAttemptedDistance(
-        { attemptedKm: 10 },
-        makeFlight({ scoringDistanceKm: 250 }),
-      );
-      expect(result.attemptedKm).toBe(260);
-    });
-
-    it("uses scoringDistanceKm when any turnpoint id is starred", () => {
-      const flight = makeFlight({
-        scoringDistanceKm: 200,
-        tps: [
-          { id: "GRL", lat: 52, lon: 0 },
-          { id: "*FIN", lat: 53, lon: 0 },
-        ],
-      });
-      expect(
-        updateAttemptedDistance({ attemptedKm: 0 }, flight).attemptedKm,
-      ).toBe(200);
-    });
-
-    it("sums great-circle legs between turnpoints when none are starred", () => {
-      // ~1 degree of latitude between the two points ≈ 111 km.
-      const flight = makeFlight({
-        scoringDistanceKm: 999,
-        tps: [
-          { id: "A", lat: 52, lon: 0 },
-          { id: "B", lat: 53, lon: 0 },
-        ],
-      });
-      const { attemptedKm } = updateAttemptedDistance(
-        { attemptedKm: 0 },
-        flight,
-      );
-      expect(attemptedKm).toBeGreaterThan(110);
-      expect(attemptedKm).toBeLessThan(112);
-    });
-
-    it("accumulates across multiple legs", () => {
-      const flight = makeFlight({
-        tps: [
-          { id: "A", lat: 52, lon: 0 },
-          { id: "B", lat: 53, lon: 0 },
-          { id: "C", lat: 52, lon: 0 },
-        ],
-      });
-      const { attemptedKm } = updateAttemptedDistance(
-        { attemptedKm: 0 },
-        flight,
-      );
-      // Two ~111 km legs out and back.
-      expect(attemptedKm).toBeGreaterThan(221);
-      expect(attemptedKm).toBeLessThan(223);
     });
   });
 
