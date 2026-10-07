@@ -6,6 +6,7 @@ import type { Flight, LadderResult } from "../types";
 import CopyButton from "./CopyButton";
 import FlightLinks from "./FlightLinks";
 import HeightLossWarning from "./HeightLossWarning";
+import Th from "./Th";
 
 const LadderFlightRow = ({
   flight,
@@ -133,27 +134,13 @@ const LadderResultsList = ({
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Rank
-            </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              {isSyndicate ? "Glider" : "Pilot"}
-            </th>
-            {isSyndicate && (
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                Pilots
-              </th>
-            )}
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Score
-            </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Distance
-            </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Flights
-            </th>
-            <th className="px-4 py-3"></th>
+            <Th>Rank</Th>
+            <Th>{isSyndicate ? "Glider" : "Pilot"}</Th>
+            {isSyndicate && <Th>Pilots</Th>}
+            <Th>Score</Th>
+            <Th>Distance</Th>
+            <Th>Flights</Th>
+            <Th />
           </tr>
         </thead>
         <tbody>

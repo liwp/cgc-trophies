@@ -11,6 +11,7 @@ import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
+import Th from "../components/Th";
 import {
   evaluateTrophy,
   formatScore,
@@ -208,28 +209,18 @@ const TrophySection = ({
               <table className="w-full table-auto border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="px-4 py-2 text-left font-semibold text-gray-700">
-                      #
-                    </th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                    <Th compact>#</Th>
+                    <Th compact>
                       {isLadder
                         ? isSyndicate
                           ? "Glider / Pilots"
                           : "Pilot"
                         : "Pilot"}
-                    </th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-700">
-                      Score
-                    </th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-700">
-                      {isLadder ? "Flights" : "Date"}
-                    </th>
-                    {!isLadder && (
-                      <th className="px-4 py-2 text-left font-semibold text-gray-700">
-                        Task
-                      </th>
-                    )}
-                    <th className="px-4 py-2"></th>
+                    </Th>
+                    <Th compact>Score</Th>
+                    <Th compact>{isLadder ? "Flights" : "Date"}</Th>
+                    {!isLadder && <Th compact>Task</Th>}
+                    <Th compact />
                   </tr>
                 </thead>
                 <tbody>

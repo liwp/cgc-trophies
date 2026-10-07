@@ -7,6 +7,7 @@ import type { ScoredFlight } from "../types";
 import CopyButton from "./CopyButton";
 import FlightLinks from "./FlightLinks";
 import HeightLossWarning from "./HeightLossWarning";
+import Th from "./Th";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 
@@ -94,21 +95,11 @@ const ResultsList = ({ results }: { results: ScoredFlight[] }) => {
         <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                Pilot
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                Date
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                Score
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                Task
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                Links
-              </th>
+              <Th>Pilot</Th>
+              <Th>Date</Th>
+              <Th>Score</Th>
+              <Th>Task</Th>
+              <Th>Links</Th>
             </tr>
           </thead>
           <tbody>
