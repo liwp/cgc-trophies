@@ -144,6 +144,13 @@ bd close <id>           # Done
   (`bd export -o .beads/issues.jsonl`) and check the file matches what's
   committed.
 
+## Dependency updates (Renovate)
+
+Renovate (`renovate.json`) opens weekly dependency PRs and keeps them rebased on
+`main`. Lock file maintenance and minor/patch/pin/digest updates are
+automerged by Renovate once every check passes; major updates wait for review
+(read the release notes). Don't merge Renovate's non-major PRs by hand.
+
 ## Deployment
 
 Netlify deploys `main` only when the commit message contains `[deploy]`
