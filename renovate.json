@@ -2,8 +2,12 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", "schedule:weekly"],
   "labels": ["dependencies"],
+  "rebaseWhen": "behind-base-branch",
+  "platformAutomerge": false,
+  "automergeStrategy": "rebase",
   "lockFileMaintenance": {
-    "enabled": true
+    "enabled": true,
+    "automerge": true
   },
   "packageRules": [
     {
@@ -16,6 +20,11 @@
       "description": "Group GitHub Actions updates into a single PR",
       "matchManagers": ["github-actions"],
       "groupName": "github-actions"
+    },
+    {
+      "description": "Automerge non-major updates once CI passes; majors wait for review",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
     },
     {
       "description": "Keep @types/node on the major matching the pinned Node LTS (mise.toml: node 24); bump this cap when the Node version is raised",
