@@ -1,6 +1,7 @@
 import {
   evaluateTrophy,
   formatScore,
+  selectSeasonFlights,
   type TrophyResults,
   winnerFlights,
   winnerName,
@@ -235,5 +236,30 @@ describe("winner helpers", () => {
       expect(winnerScore(evaluated)).toBeUndefined();
       expect(winnerFlights(evaluated)).toEqual([]);
     }
+  });
+});
+
+describe("selectSeasonFlights", () => {
+  const club = {
+    name: "Cambridge Gliding Centre",
+    launchSite: "Gransden Lodge",
+  };
+  const task = makeFlight({ id: "" }).task;
+
+  it("keeps the club's flights, and its home-site launches separately", () => {
+    const home = makeFlight({ id: "home" });
+    const away = makeFlight({
+      id: "away",
+      task: { ...task, launchSite: "Aston Down" },
+    });
+    const otherClub = makeFlight({ id: "other", clubName: "Other GC" });
+
+    const { flights, allFlights } = selectSeasonFlights(
+      [home, away, otherClub],
+      club,
+    );
+
+    expect(allFlights.map((f) => f.id)).toEqual(["home", "away"]);
+    expect(flights.map((f) => f.id)).toEqual(["home"]);
   });
 });

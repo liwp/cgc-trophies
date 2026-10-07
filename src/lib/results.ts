@@ -1,5 +1,6 @@
 import CONFIG from "trophies-config";
 import type {
+  ClubConfig,
   Flight,
   FlightTrophy,
   LadderResult,
@@ -20,6 +21,18 @@ export interface SeasonFlights {
   flights: Flight[];
   /** All of the club's flights, wherever launched (used by ladders). */
   allFlights: Flight[];
+}
+
+/** Split fetched flights into the club's flights and its home-site launches. */
+export function selectSeasonFlights(
+  fetched: Flight[],
+  club: Pick<ClubConfig, "name" | "launchSite">,
+): SeasonFlights {
+  const allFlights = fetched.filter((f) => f.clubName === club.name);
+  const flights = allFlights.filter(
+    (f) => f.task.launchSite === club.launchSite,
+  );
+  return { flights, allFlights };
 }
 
 /**

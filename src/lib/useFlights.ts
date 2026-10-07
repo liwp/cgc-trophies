@@ -4,6 +4,7 @@ import useSWR from "swr";
 import config from "trophies-config";
 import type { Flight } from "../types";
 import { fetchFlights } from "./fetchFlights";
+import { selectSeasonFlights } from "./results";
 import { currentSeason } from "./season";
 
 function useFlights(): {
@@ -38,10 +39,9 @@ function useFlights(): {
     () => fetchFlights(startYear, endYear),
   );
 
-  const allFlights = data?.filter((f) => f.clubName === config.club.name);
-  const flights = allFlights?.filter(
-    (f) => f.task.launchSite === config.club.launchSite,
-  );
+  const seasonFlights = data && selectSeasonFlights(data, config.club);
+  const allFlights = seasonFlights?.allFlights;
+  const flights = seasonFlights?.flights;
 
   return {
     error,
