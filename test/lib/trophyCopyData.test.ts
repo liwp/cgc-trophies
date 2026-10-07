@@ -4,6 +4,7 @@ import type { LadderResult, ScoredFlight } from "../../src/types";
 const makeFlight = (overrides?: Partial<ScoredFlight>): ScoredFlight => ({
   id: "116237",
   date: new Date("2024-07-26"),
+  clubName: "Cambridge Gliding Centre",
   pilot: "Holswilder, Alex",
   glider: { type: "Ventus 3", handicap: 100, registration: "G-CKYO" },
   ladders: ["open"],
@@ -21,6 +22,7 @@ const makeFlight = (overrides?: Partial<ScoredFlight>): ScoredFlight => ({
     start: "GRL",
     finish: "GRL",
     turnpoints: ["SHM", "CAX", "BRF"],
+    heightLoss: 0,
   },
   score: { value: 680, unit: "km" },
   ...overrides,

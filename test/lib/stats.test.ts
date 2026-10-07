@@ -94,12 +94,12 @@ describe("stats", () => {
 
     it("defaults missing task flags to false", () => {
       const flight = makeFlight();
-      // @ts-expect-error deliberately drop the flags to hit the defaults
+      // Deliberately drop the flags to hit the defaults.
       flight.task = {
         ...flight.task,
         isCompleted: undefined,
         isDeclared: undefined,
-      };
+      } as unknown as Flight["task"];
       expect(updateCategory(undefined, flight)).toEqual({
         completed: 0,
         total: 1,
