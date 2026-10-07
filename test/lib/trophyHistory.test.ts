@@ -122,22 +122,22 @@ describe("resolveTrophy", () => {
         {
           untilSeason: 2025,
           description: "middle",
-          expr: [["filter", "task.isCompleted", "==", "middle"]],
+          expr: [["filter", "task.launchSite", "=", "middle"]],
         },
         {
           untilSeason: 2020,
           description: "oldest",
-          expr: [["filter", "task.isCompleted", "==", "oldest"]],
+          expr: [["filter", "task.launchSite", "=", "oldest"]],
         },
       ],
     };
     expect(resolveTrophy(trophy, 2019).description).toBe("oldest");
     expect(resolveTrophy(trophy, 2019).expr).toEqual([
-      ["filter", "task.isCompleted", "==", "oldest"],
+      ["filter", "task.launchSite", "=", "oldest"],
     ]);
     expect(resolveTrophy(trophy, 2023).description).toBe("middle");
     expect(resolveTrophy(trophy, 2023).expr).toEqual([
-      ["filter", "task.isCompleted", "==", "middle"],
+      ["filter", "task.launchSite", "=", "middle"],
     ]);
     expect(resolveTrophy(trophy, 2026).description).toBe("current");
   });
