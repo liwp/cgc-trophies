@@ -25,6 +25,9 @@ jobs:
       - name: Lint + format check (Biome)
         run: bun run lint
 
+      - name: Type-check (tsc)
+        run: bun run typecheck
+
       - name: Test (Vitest)
         run: bun run test
 
