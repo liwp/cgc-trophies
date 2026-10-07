@@ -67,3 +67,14 @@ test("the homepage loads with no console errors", async ({ page }) => {
   const appErrors = errors.filter((e) => !e.includes("favicon"));
   expect(appErrors).toEqual([]);
 });
+
+test("a failed flight download shows an error message", async ({ page }) => {
+  // Registered after beforeEach's mock, so it takes precedence.
+  await page.route("**/getlogfilescsv/**", (route) =>
+    route.fulfill({ status: 503, body: "Service Unavailable" }),
+  );
+
+  await page.goto("/?season=2024");
+
+  await expect(page.getByText("Failed to load flight data.")).toBeVisible();
+});

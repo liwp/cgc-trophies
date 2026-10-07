@@ -14,18 +14,16 @@ import useFlights from "../../lib/useFlights";
 
 const TrophyPage = () => {
   const { trophyId = "" } = useParams();
-  const { error, flights, allFlights, isLoading, season } = useFlights();
+  const state = useFlights();
 
-  if (error) return <FlightLoadFailure />;
-  if (isLoading) return <Loading />;
+  if (state.status === "error") return <FlightLoadFailure />;
+  if (state.status === "loading") return <Loading />;
+  const { season, flights, allFlights } = state;
 
   const config = keyBy(resolveTrophies(season), "id")[trophyId];
   if (!config) return <UnknownTrophy trophyId={trophyId} />;
 
-  const evaluated = evaluateTrophy(config, season, {
-    flights: flights!,
-    allFlights: allFlights!,
-  });
+  const evaluated = evaluateTrophy(config, season, { flights, allFlights });
 
   return (
     <PageLayout>

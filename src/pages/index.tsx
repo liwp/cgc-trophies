@@ -77,10 +77,11 @@ const TrophyList = ({
 };
 
 const TrophiesPage = () => {
-  const { error, flights, allFlights, isLoading, season } = useFlights();
+  const state = useFlights();
 
-  if (error) return <FlightLoadFailure />;
-  if (isLoading) return <Loading />;
+  if (state.status === "error") return <FlightLoadFailure />;
+  if (state.status === "loading") return <Loading />;
+  const { season, flights, allFlights } = state;
 
   return (
     <PageLayout>
@@ -101,12 +102,8 @@ const TrophiesPage = () => {
             </Tooltip>
           </div>
         </div>
-        <Stats flights={flights!} season={season} />
-        <TrophyList
-          flights={flights!}
-          allFlights={allFlights!}
-          season={season}
-        />
+        <Stats flights={flights} season={season} />
+        <TrophyList flights={flights} allFlights={allFlights} season={season} />
       </div>
     </PageLayout>
   );
