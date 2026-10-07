@@ -7,6 +7,7 @@ import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
+import Th from "../components/Th";
 import Tooltip from "../components/Tooltip";
 import { evaluateTrophy, winnerName, winnerScore } from "../lib/results";
 import { resolveTrophies } from "../lib/trophyHistory";
@@ -31,15 +32,9 @@ const TrophyList = ({
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Trophy
-            </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Winner
-            </th>
-            <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
-              Score
-            </th>
+            <Th>Trophy</Th>
+            <Th>Winner</Th>
+            <Th align="right">Score</Th>
           </tr>
         </thead>
         <tbody>
