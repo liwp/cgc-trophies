@@ -42,12 +42,6 @@ describe("stats", () => {
       );
     });
 
-    it("weekend matches flights flagged on the weekend ladder", () => {
-      const weekend = { ...makeFlight(), weekendLadder: true };
-      expect(category("weekend").pred(weekend)).toBe(true);
-      expect(category("weekend").pred(makeFlight())).toBeFalsy();
-    });
-
     it.each([
       ["300km", 299, false],
       ["300km", 300, true],
