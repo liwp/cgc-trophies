@@ -1,11 +1,10 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
-
-const firstYear = 2007;
+import { clampSeason, FIRST_SEASON, latestSeason } from "../lib/season";
 
 const Season = ({ season }: { season: number }) => {
   const [, setSearchParams] = useSearchParams();
-  const currentYear = new Date().getFullYear();
+  const latest = latestSeason();
 
   const goToSeason = (year: number) =>
     setSearchParams(
@@ -23,8 +22,8 @@ const Season = ({ season }: { season: number }) => {
         type="button"
         aria-label="Previous season"
         className="p-1.5 rounded-lg hover:bg-cambridge-light hover:text-cambridge-dark disabled:opacity-30 transition-colors"
-        disabled={season === firstYear}
-        onClick={() => goToSeason(season - 1)}
+        disabled={season <= FIRST_SEASON}
+        onClick={() => goToSeason(clampSeason(season - 1))}
       >
         <ChevronLeft size={18} />
       </button>
@@ -35,8 +34,8 @@ const Season = ({ season }: { season: number }) => {
         type="button"
         aria-label="Next season"
         className="p-1.5 rounded-lg hover:bg-cambridge-light hover:text-cambridge-dark disabled:opacity-30 transition-colors"
-        disabled={season === currentYear}
-        onClick={() => goToSeason(season + 1)}
+        disabled={season >= latest}
+        onClick={() => goToSeason(clampSeason(season + 1))}
       >
         <ChevronRight size={18} />
       </button>

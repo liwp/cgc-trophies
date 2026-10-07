@@ -115,3 +115,26 @@ test("ladder rows can be expanded from the keyboard", async ({ page }) => {
   // The winner's six counting flights are listed under their row.
   await expect(rows).toHaveCount(collapsedRows + 6);
 });
+
+test("the season picker stays within the available seasons", async ({
+  page,
+}) => {
+  const currentYear = new Date().getFullYear();
+
+  // A hand-edited season beyond the range: can't go further, and stepping
+  // back lands on the latest real season rather than 2098.
+  await page.goto("/?season=2099");
+  await expect(
+    page.getByRole("button", { name: "Next season" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Previous season" }).click();
+  await expect(page).toHaveURL(new RegExp(`season=${currentYear}`));
+
+  // Likewise below the first season.
+  await page.goto("/?season=1990");
+  await expect(
+    page.getByRole("button", { name: "Previous season" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Next season" }).click();
+  await expect(page).toHaveURL(/season=2007/);
+});
