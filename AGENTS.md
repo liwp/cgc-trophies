@@ -101,7 +101,7 @@ Lodash may be imported either as a default import (`import _ from "lodash"`, the
 - Vitest 5, configured in the `test` block of `vite.config.ts` (`environment: "node"`, `globals: true`, setup in `test/setup.ts`)
 - Tests in `test/` directory (excluded from `tsconfig.json` compilation)
 - Tests import from `../../src/` paths (not aliases)
-- Coverage via `@vitest/coverage-v8` (`bun run test:coverage`); `src/main.tsx`, `src/App.tsx`, and `*.d.ts` are excluded. No thresholds are currently enforced (see `trophies-3qv`)
+- Coverage via `@vitest/coverage-v8` (`bun run test:coverage`); `src/main.tsx`, `src/App.tsx`, presentational React (`src/pages/**`, `src/components/**`, `src/styles/**`, covered by the Playwright suite instead), and `*.d.ts` are excluded. An 80% threshold (statements, branches, functions, lines) is enforced in `vite.config.ts`; ratchet it upward as coverage improves, never lower it
 
 ## Beads (personal todo list)
 
