@@ -1,13 +1,10 @@
 import type { LadderResult, ScoredFlight } from "../types";
+import { flightDetailsUrl } from "./links";
 import TURNPOINTS from "./turnpoints";
 
 export function formatPilotName(name: string): string {
   const parts = name.split(", ");
   return parts.length === 2 ? `${parts[1]} ${parts[0]}` : name;
-}
-
-function flightUrl(id: string): string {
-  return `https://www.bgaladder.net/flightdetails/${id}`;
 }
 
 export function flightCopyData(result: ScoredFlight): string[][] {
@@ -27,7 +24,7 @@ export function flightCopyData(result: ScoredFlight): string[][] {
     ["Aircraft Reg.", glider.registration],
     ["H/C Distance (kms)", task.handicappedDistanceKm.toFixed(2)],
     ["H/C Speed (kph)", task.handicappedSpeedKph.toFixed(2)],
-    ["Ladder", flightUrl(id)],
+    ["Ladder", flightDetailsUrl(id)],
   ];
   task.turnpoints.forEach((tp, i) => {
     const row = rows[i + 1];

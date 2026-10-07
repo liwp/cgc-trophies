@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import type { HeightLossResult } from "../types";
 import { computeHeightLoss, parseIgc } from "./igc";
+import { igcFileUrl } from "./links";
 
 async function fetchAndCompute(url: string): Promise<HeightLossResult | null> {
   const res = await fetch(url);
@@ -15,7 +16,7 @@ export function useHeightLoss(flightId: string | undefined): {
   isLoading: boolean;
 } {
   const { data, isLoading } = useSWR(
-    flightId ? `https://api.bgaladder.net/api/FlightIGC/${flightId}` : null,
+    flightId ? igcFileUrl(flightId) : null,
     fetchAndCompute,
     { revalidateOnFocus: false },
   );
