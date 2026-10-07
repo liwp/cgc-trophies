@@ -17,6 +17,9 @@
 # local DB, runtime state, and credential key stay ignored via .beads/.gitignore
 # interactions.jsonl is a per-machine audit log — churns constantly, not shared
 .beads/interactions.jsonl
+# Runtime files bd leaves outside .beads/.gitignore's patterns
+.beads.gate.lock
+.beads/dolt-server-config.yaml
 
 # Dolt database files (added by bd init)
 .dolt/
