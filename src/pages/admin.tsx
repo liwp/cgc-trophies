@@ -18,7 +18,13 @@ import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Tooltip from "../components/Tooltip";
-import { ladderEval, trophyEval } from "../lib/eval";
+import {
+  evaluateTrophy,
+  formatScore,
+  winnerFlights,
+  winnerName,
+  winnerScore,
+} from "../lib/results";
 import {
   copyDataToClipboard,
   flightCopyData,
@@ -27,13 +33,7 @@ import {
 } from "../lib/trophyCopyData";
 import { resolveTrophies } from "../lib/trophyHistory";
 import useFlights from "../lib/useFlights";
-import type {
-  Flight,
-  FlightTrophy,
-  LadderResult,
-  LadderTrophy,
-  ScoredFlight,
-} from "../types";
+import type { Flight, LadderResult, ScoredFlight, Trophy } from "../types";
 
 const CopyButton = ({ data }: { data: string[][] }) => {
   const [copied, setCopied] = React.useState(false);
@@ -67,10 +67,7 @@ const FlightResultEntry = ({
 }) => {
   const { date, id, pilot, score, task } = result;
   const tps = [task.start, ...task.turnpoints, task.finish].join(" - ");
-  const scoreDisplay =
-    score.unit === "pts"
-      ? `${score.value.toFixed(0)} ${score.unit}`
-      : `${score.value.toFixed(1)} ${score.unit}`;
+  const scoreDisplay = formatScore(score);
 
   return (
     <tr
@@ -125,7 +122,7 @@ const LadderFlightRow = ({ flight }: { flight: Flight }) => (
       {formatPilotName(flight.pilot)}
     </td>
     <td className="px-4 py-1.5 text-gray-500 text-sm">
-      {flight.task.crossCountryPoints.toFixed(0)} pts
+      {formatScore({ value: flight.task.crossCountryPoints, unit: "pts" })}
     </td>
     <td className="px-4 py-1.5 text-gray-500 text-sm">
       {flight.date.toLocaleDateString()}
@@ -195,7 +192,7 @@ const LadderResultEntry = ({
           </div>
         </td>
         <td className="px-4 py-2 text-gray-700">
-          {result.totalScore.toFixed(0)} pts
+          {formatScore({ value: result.totalScore, unit: "pts" })}
         </td>
         <td className="px-4 py-2 text-gray-500 text-sm">
           {result.flights.length} flights
@@ -231,62 +228,29 @@ const TrophySection = ({
   allFlights,
   season,
 }: {
-  trophy: (typeof CONFIG.trophies)[number];
+  trophy: Trophy;
   flights: Flight[];
   allFlights: Flight[];
   season: number;
 }) => {
   const [showAll, setShowAll] = useState(false);
-  const isLadder = trophy.type === "ladder";
+  const evaluated = evaluateTrophy(trophy, season, { flights, allFlights });
+  const isLadder = evaluated.type === "ladder";
   const isSyndicate =
-    isLadder && (trophy as LadderTrophy).groupBy === "registration";
+    evaluated.type === "ladder" && evaluated.trophy.groupBy === "registration";
+  const { results } = evaluated;
 
-  const results = isLadder
-    ? ladderEval(
-        CONFIG.season,
-        season,
-        allFlights,
-        trophy as LadderTrophy,
-        CONFIG.pilotMilestones,
-      )
-    : trophyEval(
-        CONFIG.season,
-        season,
-        flights,
-        trophy as FlightTrophy,
-        CONFIG.pilotMilestones,
-      );
-
-  const winner = results[0];
-  const winnerFlights: Flight[] = winner
-    ? isLadder
-      ? (winner as LadderResult).flights
-      : [winner as ScoredFlight]
-    : [];
-  let winnerLabel = "No qualifying flights";
-  if (winner) {
-    if (isLadder) {
-      const lr = winner as LadderResult;
-      winnerLabel = isSyndicate
-        ? `${lr.key} (${lr.pilots.map(formatPilotName).join(", ")}) — ${lr.totalScore.toFixed(0)} pts`
-        : `${formatPilotName(lr.key)} — ${lr.totalScore.toFixed(0)} pts`;
-    } else {
-      const sf = winner as ScoredFlight;
-      const { value, unit } = sf.score;
-      const scoreStr =
-        unit === "pts"
-          ? `${value.toFixed(0)} ${unit}`
-          : `${value.toFixed(1)} ${unit}`;
-      winnerLabel = `${formatPilotName(sf.pilot)} — ${scoreStr}`;
-    }
-  }
+  const name = winnerName(evaluated);
+  const winnerLabel = name
+    ? `${name} — ${winnerScore(evaluated)}`
+    : "No qualifying flights";
 
   return (
     <div id={`trophy-${trophy.id}`} className="scroll-mt-4">
       <div className="flex items-baseline justify-between gap-4 mb-2">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold text-gray-900">{trophy.name}</h3>
-          {winnerFlights.map((f) => (
+          {winnerFlights(evaluated).map((f) => (
             <HeightLossWarning
               key={f.id}
               flightId={f.id}
@@ -338,8 +302,8 @@ const TrophySection = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {isLadder
-                    ? (results as LadderResult[]).map((r, i) => (
+                  {evaluated.type === "ladder"
+                    ? evaluated.results.map((r, i) => (
                         <LadderResultEntry
                           key={r.key}
                           result={r}
@@ -347,7 +311,7 @@ const TrophySection = ({
                           isSyndicate={isSyndicate}
                         />
                       ))
-                    : (results as ScoredFlight[]).map((r, i) => (
+                    : evaluated.results.map((r, i) => (
                         <FlightResultEntry key={r.id} result={r} rank={i + 1} />
                       ))}
                 </tbody>
