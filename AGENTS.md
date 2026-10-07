@@ -130,6 +130,19 @@ bd close <id>           # Done
   warnings, and don't run `bd dolt remote add`, `bd dolt push`, or `bd sync`.
 - Commit and push only when asked.
 
+## Git
+
+- Make a separate commit for each change that can stand on its own (e.g. a
+  refactor, a behaviour fix it enables, a config or test-infrastructure
+  change), not one commit per bead or PR. A PR may contain several commits.
+- Merge PRs with "Rebase and merge" (or a merge commit) so those commits
+  survive on `main`; squash merging collapses them into one.
+- Switching branches or rebasing triggers the beads hooks, which rewrite
+  `.beads/issues.jsonl` mid-operation and can block a pull or stall a rebase.
+  Run such commands with `git -c core.hooksPath=/dev/null ...`, then re-export
+  (`bd export -o .beads/issues.jsonl`) and check the file matches what's
+  committed.
+
 ## Deployment
 
 Netlify deploys `main` only when the commit message contains `[deploy]`
