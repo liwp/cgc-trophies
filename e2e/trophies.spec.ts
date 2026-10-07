@@ -97,3 +97,21 @@ test("icon-only links are named by their tooltips", async ({ page }) => {
   await page.goto("/?season=2024");
   await expect(page.getByRole("link", { name: "Admin view" })).toBeVisible();
 });
+
+test("ladder rows can be expanded from the keyboard", async ({ page }) => {
+  await page.goto("/trophy/L1?season=2024");
+  const rows = page.locator("tbody tr");
+  const collapsedRows = await rows.count();
+
+  const toggle = page.getByRole("button", {
+    name: "Flights for Alex Holswilder",
+  });
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+  await toggle.focus();
+  await page.keyboard.press("Enter");
+
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  // The winner's six counting flights are listed under their row.
+  await expect(rows).toHaveCount(collapsedRows + 6);
+});

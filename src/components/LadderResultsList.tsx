@@ -1,9 +1,9 @@
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { formatScore } from "../lib/results";
 import { formatPilotName, ladderCopyData } from "../lib/trophyCopyData";
 import type { Flight, LadderResult } from "../types";
 import CopyButton from "./CopyButton";
+import ExpandButton from "./ExpandButton";
 import FlightLinks from "./FlightLinks";
 import HeightLossWarning from "./HeightLossWarning";
 import Th from "./Th";
@@ -85,11 +85,11 @@ const LadderResultRow = ({
         <td className="px-4 py-3 text-gray-500">{result.flights.length}</td>
         <td className="px-4 py-3">
           <div className="inline-flex items-center gap-1">
-            {expanded ? (
-              <ChevronUp size={16} className="text-gray-400" />
-            ) : (
-              <ChevronDown size={16} className="text-gray-400" />
-            )}
+            <ExpandButton
+              expanded={expanded}
+              onToggle={() => setExpanded(!expanded)}
+              label={`Flights for ${isSyndicate ? result.key : formatPilotName(result.key)}`}
+            />
             {rank === 1 && (
               <CopyButton
                 data={ladderCopyData(
