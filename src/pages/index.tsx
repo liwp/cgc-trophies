@@ -8,42 +8,10 @@ import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Tooltip from "../components/Tooltip";
-import { ladderEval, trophyEval } from "../lib/eval";
-import { formatPilotName } from "../lib/trophyCopyData";
+import { evaluateTrophy, winnerName, winnerScore } from "../lib/results";
 import { resolveTrophies } from "../lib/trophyHistory";
 import useFlights from "../lib/useFlights";
-import type {
-  Flight,
-  FlightTrophy,
-  LadderResult,
-  LadderTrophy,
-  ScoredFlight,
-} from "../types";
-
-function formatScore(trophy: any): string {
-  if (trophy.type === "ladder") {
-    const lr = trophy.results[0] as LadderResult | undefined;
-    return lr ? `${lr.totalScore.toFixed(0)} pts` : "";
-  }
-  const sf = trophy.results[0] as ScoredFlight | undefined;
-  if (!sf) return "";
-  const { value, unit } = sf.score;
-  return unit === "pts"
-    ? `${value.toFixed(0)} ${unit}`
-    : `${value.toFixed(1)} ${unit}`;
-}
-
-function formatWinner(trophy: any): string {
-  if (trophy.type === "ladder") {
-    const lr = trophy.results[0] as LadderResult | undefined;
-    if (!lr) return "No qualifying flights";
-    return trophy.groupBy === "registration"
-      ? `${lr.key} (${lr.pilots.map((p: string) => p.split(", ")[1] || p).join(", ")})`
-      : formatPilotName(lr.key);
-  }
-  const sf = trophy.results[0] as ScoredFlight | undefined;
-  return sf ? formatPilotName(sf.pilot) : "No qualifying flights";
-}
+import type { Flight } from "../types";
 
 const TrophyList = ({
   flights,
@@ -54,30 +22,9 @@ const TrophyList = ({
   allFlights: Flight[];
   season: number;
 }) => {
-  const trophies = resolveTrophies(season).map((trophy) => {
-    const results =
-      trophy.type === "ladder"
-        ? ladderEval(
-            CONFIG.season,
-            season,
-            allFlights,
-            trophy as LadderTrophy,
-            CONFIG.pilotMilestones,
-          )
-        : trophyEval(
-            CONFIG.season,
-            season,
-            flights,
-            trophy as FlightTrophy,
-            CONFIG.pilotMilestones,
-          );
-    return {
-      ...trophy,
-      results,
-      groupBy: (trophy as LadderTrophy).groupBy,
-      season,
-    };
-  });
+  const trophies = resolveTrophies(season).map((trophy) =>
+    evaluateTrophy(trophy, season, { flights, allFlights }),
+  );
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
@@ -96,8 +43,9 @@ const TrophyList = ({
           </tr>
         </thead>
         <tbody>
-          {trophies.map((trophy) => {
-            const hasResults = trophy.results.length > 0;
+          {trophies.map((evaluated) => {
+            const { trophy } = evaluated;
+            const winner = winnerName(evaluated);
             return (
               <tr
                 key={trophy.id}
@@ -115,16 +63,14 @@ const TrophyList = ({
                   </div>
                 </td>
                 <td className="px-4 py-3 text-gray-700">
-                  {hasResults ? (
-                    formatWinner(trophy)
-                  ) : (
+                  {winner ?? (
                     <span className="text-gray-400 italic">
                       No qualifying flights
                     </span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-right text-gray-500 whitespace-nowrap">
-                  {hasResults ? formatScore(trophy) : ""}
+                  {winnerScore(evaluated) ?? ""}
                 </td>
               </tr>
             );

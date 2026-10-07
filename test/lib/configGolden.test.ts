@@ -6,8 +6,8 @@
 import { readFileSync } from "node:fs";
 import CONFIG from "trophies-config";
 import { parseCsv } from "../../src/lib/csv";
-import { ladderEval, trophyEval } from "../../src/lib/eval";
 import { SPEC } from "../../src/lib/flightCsvSpec";
+import { evaluateTrophy } from "../../src/lib/results";
 import { resolveTrophies } from "../../src/lib/trophyHistory";
 import type { Flight, LadderResult, ScoredFlight } from "../../src/types";
 
@@ -58,31 +58,16 @@ function summariseLadder(r: LadderResult): string {
   return `${r.key} — ${r.totalScore} pts [${r.pilots.join("; ")}] (${ids})`;
 }
 
-// Mirrors the per-trophy dispatch in the pages (index, admin, trophy detail).
+// Scores trophies the way the pages do, via evaluateTrophy.
 function podiums(season: number): Record<string, string[]> {
-  const { flights, allFlights } = flightsForSeason(season);
+  const seasonFlights = flightsForSeason(season);
   return Object.fromEntries(
     resolveTrophies(season).map((trophy) => {
+      const evaluated = evaluateTrophy(trophy, season, seasonFlights);
       const top =
-        trophy.type === "ladder"
-          ? ladderEval(
-              CONFIG.season,
-              season,
-              allFlights,
-              trophy,
-              CONFIG.pilotMilestones,
-            )
-              .slice(0, PODIUM)
-              .map(summariseLadder)
-          : trophyEval(
-              CONFIG.season,
-              season,
-              flights,
-              trophy,
-              CONFIG.pilotMilestones,
-            )
-              .slice(0, PODIUM)
-              .map(summariseFlight);
+        evaluated.type === "ladder"
+          ? evaluated.results.slice(0, PODIUM).map(summariseLadder)
+          : evaluated.results.slice(0, PODIUM).map(summariseFlight);
       return [`${trophy.id}: ${trophy.name}`, top];
     }),
   );

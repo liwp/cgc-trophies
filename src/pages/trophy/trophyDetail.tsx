@@ -13,7 +13,6 @@ import {
 import React, { useState } from "react";
 import { Link as NextLink, useParams } from "react-router-dom";
 
-import CONFIG from "trophies-config";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
 import HeightLossWarning from "../../components/HeightLossWarning";
 import Loading from "../../components/Loading";
@@ -21,7 +20,7 @@ import PageLayout from "../../components/PageLayout";
 import Season from "../../components/Season";
 import Tooltip from "../../components/Tooltip";
 import UnknownTrophy from "../../components/UnknownTrophy";
-import { ladderEval, trophyEval } from "../../lib/eval";
+import { evaluateTrophy, formatScore } from "../../lib/results";
 import {
   copyDataToClipboard,
   flightCopyData,
@@ -32,13 +31,7 @@ import { resolveTrophies } from "../../lib/trophyHistory";
 import { getTrophyNav } from "../../lib/trophyNav";
 import TURNPOINTS from "../../lib/turnpoints";
 import useFlights from "../../lib/useFlights";
-import type {
-  Flight,
-  FlightTrophy,
-  LadderResult,
-  LadderTrophy,
-  ScoredFlight,
-} from "../../types";
+import type { Flight, LadderResult, ScoredFlight } from "../../types";
 
 const CopyButton = ({ data }: { data: string[][] }) => {
   const [copied, setCopied] = React.useState(false);
@@ -63,26 +56,9 @@ const CopyButton = ({ data }: { data: string[][] }) => {
   );
 };
 
-const Score = ({ value, unit }: { value: number; unit: string }) => {
-  let display: string;
-  switch (unit) {
-    case "km":
-    case "kph":
-      display = value.toFixed(1);
-      break;
-    case "pts":
-      display = value.toFixed(0);
-      break;
-    default:
-      display = String(value);
-  }
-
-  return (
-    <span>
-      {display} {unit}
-    </span>
-  );
-};
+const Score = ({ value, unit }: { value: number; unit: string }) => (
+  <span>{formatScore({ value, unit })}</span>
+);
 
 const Task = ({
   task,
@@ -232,7 +208,7 @@ const LadderFlightRow = ({
         </td>
       )}
       <td className="px-4 py-2 text-gray-500">
-        {flight.task.crossCountryPoints.toFixed(0)} pts
+        {formatScore({ value: flight.task.crossCountryPoints, unit: "pts" })}
       </td>
       <td className="px-4 py-2 text-gray-500">
         {flight.task.scoringDistanceKm.toFixed(0)} km
@@ -299,7 +275,7 @@ const LadderResultRow = ({
           </td>
         )}
         <td className="px-4 py-3 text-gray-700">
-          {result.totalScore.toFixed(0)} pts
+          {formatScore({ value: result.totalScore, unit: "pts" })}
         </td>
         <td className="px-4 py-3 text-gray-500">
           {result.totalDistance.toFixed(0)} km
@@ -487,7 +463,10 @@ const TrophyPage = () => {
   const config = keyBy(resolveTrophies(season), "id")[trophyId];
   if (!config) return <UnknownTrophy trophyId={trophyId} />;
 
-  const isLadder = config.type === "ladder";
+  const evaluated = evaluateTrophy(config, season, {
+    flights: flights!,
+    allFlights: allFlights!,
+  });
 
   return (
     <PageLayout>
@@ -502,27 +481,13 @@ const TrophyPage = () => {
         <p className="text-sm text-gray-500">{config.description}</p>
 
         <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-          {isLadder ? (
+          {evaluated.type === "ladder" ? (
             <LadderResultsList
-              results={ladderEval(
-                CONFIG.season,
-                season,
-                allFlights!,
-                config as LadderTrophy,
-                CONFIG.pilotMilestones,
-              )}
-              isSyndicate={(config as LadderTrophy).groupBy === "registration"}
+              results={evaluated.results}
+              isSyndicate={evaluated.trophy.groupBy === "registration"}
             />
           ) : (
-            <ResultsList
-              results={trophyEval(
-                CONFIG.season,
-                season,
-                flights!,
-                config as FlightTrophy,
-                CONFIG.pilotMilestones,
-              )}
-            />
+            <ResultsList results={evaluated.results} />
           )}
         </div>
       </div>
