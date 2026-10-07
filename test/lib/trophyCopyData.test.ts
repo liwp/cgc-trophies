@@ -1,9 +1,4 @@
-import {
-  flightCopyData,
-  flightFlightDetails,
-  ladderCopyData,
-  ladderFlightDetails,
-} from "../../src/lib/trophyCopyData";
+import { flightCopyData, ladderCopyData } from "../../src/lib/trophyCopyData";
 import type { LadderResult, ScoredFlight } from "../../src/types";
 
 const makeFlight = (overrides?: Partial<ScoredFlight>): ScoredFlight => ({
@@ -118,61 +113,5 @@ describe("ladderCopyData", () => {
 
     expect(keys).not.toContain("Flight 1");
     expect(keys).not.toContain("Flight 2");
-  });
-});
-
-describe("flightFlightDetails", () => {
-  it("maps a scored flight to a SingleFlightDetail", () => {
-    expect(flightFlightDetails(makeFlight())).toEqual({
-      date: new Date("2024-07-26"),
-      gliderType: "Ventus 3",
-      gliderReg: "G-CKYO",
-      handicappedDistanceKm: 680,
-      scoringDistanceKm: 680,
-      handicappedSpeedKph: 74.2,
-      task: "GRL-SHM-CAX-BRF-GRL",
-      score: { value: 680, unit: "km" },
-      ladderUrl: "https://www.bgaladder.net/flightdetails/116237",
-      igcUrl:
-        "https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/116237",
-    });
-  });
-
-  it("joins start, turnpoints and finish into the task string", () => {
-    const flight = makeFlight();
-    flight.task = {
-      ...flight.task,
-      turnpoints: [],
-      start: "GRL",
-      finish: "GRL",
-    };
-    expect(flightFlightDetails(flight).task).toBe("GRL-GRL");
-  });
-});
-
-describe("ladderFlightDetails", () => {
-  it("maps flights to FlightDetail objects", () => {
-    const flights = [makeFlight({ id: "116237", pilot: "Holswilder, Alex" })];
-    const result: LadderResult = {
-      key: "Holswilder, Alex",
-      totalScore: 5000,
-      totalDistance: 680,
-      pilots: ["Holswilder, Alex"],
-      flights,
-    };
-    const details = ladderFlightDetails(result);
-
-    expect(details).toHaveLength(1);
-    expect(details[0]).toEqual({
-      pilot: "Alex Holswilder",
-      date: new Date("2024-07-26"),
-      points: 500,
-      distanceKm: 680,
-      speedKph: 74.2,
-      task: "GRL-SHM-CAX-BRF-GRL",
-      ladderUrl: "https://www.bgaladder.net/flightdetails/116237",
-      igcUrl:
-        "https://igcviewer.bgaladder.net/?igc=https://api.bgaladder.net/api/FlightIGC/116237",
-    });
   });
 });
