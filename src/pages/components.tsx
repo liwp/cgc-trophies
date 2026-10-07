@@ -1,9 +1,9 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import LadderResultsList from "../components/LadderResultsList";
 import Loading from "../components/Loading";
 import ResultsList from "../components/ResultsList";
+import { SeasonPicker } from "../components/Season";
 import Stats from "../components/Stats";
 import Tooltip from "../components/Tooltip";
 import UnknownTrophy from "../components/UnknownTrophy";
@@ -309,35 +309,13 @@ const TooltipShowcase = () => {
 
 const SeasonShowcase = () => {
   const [season, setSeason] = useState(2024);
-  const currentYear = new Date().getFullYear();
-
   return (
     <div className="space-y-3">
       <p className="text-xs text-gray-500">
-        This is a local-state replica — the real Season component updates the
-        URL ?season param.
+        SeasonPicker with local state; on the pages, Season binds it to the URL
+        ?season param.
       </p>
-      <div className="flex flex-row items-center gap-4">
-        <button
-          type="button"
-          aria-label="Previous season"
-          className="rounded p-2 hover:bg-gray-100 disabled:opacity-40"
-          disabled={season === 2007}
-          onClick={() => setSeason((s) => s - 1)}
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <span>{season}</span>
-        <button
-          type="button"
-          aria-label="Next season"
-          className="rounded p-2 hover:bg-gray-100 disabled:opacity-40"
-          disabled={season === currentYear}
-          onClick={() => setSeason((s) => s + 1)}
-        >
-          <ChevronRight size={20} />
-        </button>
-      </div>
+      <SeasonPicker season={season} onChange={setSeason} />
     </div>
   );
 };
