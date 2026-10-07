@@ -20,27 +20,29 @@ const comparators: Record<string, Comparator> = {
   "<=>": (xs, ys) => isEqual(xs, [...ys].reverse()) || isEqual(xs, ys),
 };
 
-function configToDate(
-  season: number,
-  { day, month }: { day: number; month: number },
-): Date {
-  return new Date(`${season}-${month}-${day}`);
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Flight dates are UTC midnight (see csv.ts), so season days are compared as
+// UTC days too, making the result independent of the runtime's timezone.
+function utcDay(year: number, { day, month }: { day: number; month: number }) {
+  return Date.UTC(year, month - 1, day) / DAY_MS;
 }
 
+// Both the start and end days are part of the season. A season whose start is
+// later in the year than its end (e.g. Oct-Mar) ends in the following year.
 function inSeasonPredicate(
   season: number,
   config: SeasonConfig,
 ): (flight: { date: Date }) => boolean {
-  const start = configToDate(season, config.start);
-  const end = configToDate(season, config.end);
-
+  const start = utcDay(season, config.start);
+  let end = utcDay(season, config.end);
   if (start > end) {
-    end.setFullYear(end.getFullYear() + 1);
+    end = utcDay(season + 1, config.end);
   }
 
   return ({ date }) => {
-    const flight = new Date(date);
-    return start < flight && flight < end;
+    const day = Math.floor(new Date(date).getTime() / DAY_MS);
+    return start <= day && day <= end;
   };
 }
 

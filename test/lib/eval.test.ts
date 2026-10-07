@@ -722,3 +722,94 @@ describe("trophyEval DSL", () => {
     ).toThrow("Unknown op: rank");
   });
 });
+
+describe("season boundaries", () => {
+  // Flight dates come from the CSV as UTC midnight. Season start and end days
+  // are inclusive, whatever timezone the code runs in.
+  const TIMEZONES = [
+    "UTC",
+    "Europe/London",
+    "America/Los_Angeles",
+    "Asia/Tokyo",
+  ];
+  const winter: SeasonConfig = {
+    start: { month: 10, day: 1 },
+    end: { month: 3, day: 31 },
+  };
+  const trophy = (season?: SeasonConfig): FlightTrophy => ({
+    id: "T",
+    name: "Test",
+    description: "Test",
+    expr: [["filter", "task.isCompleted"]],
+    season,
+  });
+  const flightsOn = (...dates: string[]) =>
+    dates.map((date) =>
+      makeFlight({ id: date, pilot: date, date: new Date(date) }),
+    );
+
+  let originalTz: string | undefined;
+  beforeEach(() => {
+    originalTz = process.env.TZ;
+  });
+  afterEach(() => {
+    process.env.TZ = originalTz;
+  });
+
+  describe.each(TIMEZONES)("in %s", (tz) => {
+    beforeEach(() => {
+      process.env.TZ = tz;
+    });
+
+    it("includes the first and last day of a calendar season", () => {
+      const flights = flightsOn(
+        "2023-12-31",
+        "2024-01-01",
+        "2024-12-31",
+        "2025-01-01",
+      );
+
+      const results = trophyEval(defaultSeason, 2024, flights, trophy());
+
+      expect(results.map((r) => r.id)).toEqual(["2024-01-01", "2024-12-31"]);
+    });
+
+    it("includes the first and last day of a cross-year season", () => {
+      const flights = flightsOn(
+        "2024-09-30",
+        "2024-10-01",
+        "2025-03-31",
+        "2025-04-01",
+      );
+
+      const results = trophyEval(defaultSeason, 2024, flights, trophy(winter));
+
+      expect(results.map((r) => r.id)).toEqual(["2024-10-01", "2025-03-31"]);
+    });
+
+    it("applies the same boundaries to ladders", () => {
+      const ladder: LadderTrophy = {
+        id: "L",
+        type: "ladder",
+        name: "Ladder",
+        description: "Test",
+        ladderKey: "open",
+        groupBy: "pilot",
+        topN: 6,
+      };
+      const flights = flightsOn(
+        "2023-12-31",
+        "2024-01-01",
+        "2024-12-31",
+        "2025-01-01",
+      );
+
+      const results = ladderEval(defaultSeason, 2024, flights, ladder);
+
+      expect(results.map((r) => r.key).sort()).toEqual([
+        "2024-01-01",
+        "2024-12-31",
+      ]);
+    });
+  });
+});
