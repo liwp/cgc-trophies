@@ -27,6 +27,11 @@
       "automerge": true
     },
     {
+      "description": "Update the pinned bun version in package.json (packageManager) and mise.toml together",
+      "matchDepNames": ["bun"],
+      "groupName": "bun"
+    },
+    {
       "description": "Keep @types/node on the major matching the pinned Node LTS (mise.toml: node 24); bump this cap when the Node version is raised",
       "matchPackageNames": ["@types/node"],
       "allowedVersions": "<25"
