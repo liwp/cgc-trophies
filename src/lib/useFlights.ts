@@ -4,12 +4,7 @@ import useSWR from "swr";
 import config from "trophies-config";
 import type { Flight } from "../types";
 import { fetchFlights } from "./fetchFlights";
-
-function currentSeason(): number {
-  const now = new Date();
-  const startOfSeason = new Date(now.getFullYear(), 2, 1);
-  return startOfSeason < now ? now.getFullYear() : now.getFullYear() - 1;
-}
+import { currentSeason } from "./season";
 
 function useFlights(): {
   error: any;
