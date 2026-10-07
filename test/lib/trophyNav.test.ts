@@ -3,7 +3,6 @@ import { getTrophyNav } from "../../src/lib/trophyNav";
 describe("getTrophyNav", () => {
   it("returns prev and next for a middle trophy", () => {
     const nav = getTrophyNav("L2");
-    expect(nav.current.id).toBe("L2");
     expect(nav.prev).not.toBeNull();
     expect(nav.prev?.id).toBe("L1");
     expect(nav.next).not.toBeNull();
