@@ -97,7 +97,7 @@ const TrophiesPage = () => {
           </h1>
           <div className="flex items-center gap-4">
             <Season season={season} />
-            <Tooltip text="Admin view">
+            <Tooltip text="Admin view" asLabel>
               <Link
                 to={`/admin?season=${season}`}
                 className="p-2 rounded-lg text-gray-400 hover:text-cambridge hover:bg-cambridge-light transition-colors"
