@@ -1,9 +1,10 @@
-import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import CONFIG from "trophies-config";
 import CopyButton from "../components/CopyButton";
+import ExpandButton from "../components/ExpandButton";
 import FlightLinks from "../components/FlightLinks";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import HeightLossWarning from "../components/HeightLossWarning";
@@ -138,11 +139,12 @@ const LadderResultEntry = ({
                 isSyndicate ? "registration" : "pilot",
               )}
             />
-            {expanded ? (
-              <ChevronUp size={14} className="text-gray-400" />
-            ) : (
-              <ChevronDown size={14} className="text-gray-400" />
-            )}
+            <ExpandButton
+              expanded={expanded}
+              onToggle={() => setExpanded(!expanded)}
+              label={`Flights for ${isSyndicate ? result.key : formatPilotName(result.key)}`}
+              iconSize={14}
+            />
           </div>
         </td>
       </tr>
