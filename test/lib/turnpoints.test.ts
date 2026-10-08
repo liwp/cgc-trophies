@@ -1,8 +1,13 @@
 import TURNPOINTS from "../../src/lib/turnpoints";
 
 describe("TURNPOINTS", () => {
-  it("keeps every turnpoint", () => {
-    expect(Object.keys(TURNPOINTS).length).toBe(1397);
+  it("includes turnpoints added in a later BGA release", () => {
+    expect(TURNPOINTS.HAC).toEqual({ name: "Hawstead Church", added: 2026 });
+  });
+
+  it("keeps turnpoints that past seasons' tasks used after they are retired", () => {
+    // BSE was in the 2025 Mug Metal Machin winner's task.
+    expect(TURNPOINTS.BSE).toEqual({ name: "Bury St Edmunds", removed: 2026 });
   });
 
   it("exposes names as objects", () => {
