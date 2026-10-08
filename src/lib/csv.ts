@@ -86,7 +86,8 @@ function parseSpec(spec: any, obj: Record<string, string>): any {
       val = (src as any[]).map((s) => parseSpec(s, obj));
       break;
     case "string":
-      val = obj[src];
+      // BGA data has had stray whitespace, e.g. "Landen, George ".
+      val = obj[src]?.trim();
       break;
     default:
       throw new Error(`Unknown type in spec: ${JSON.stringify(spec)}`);

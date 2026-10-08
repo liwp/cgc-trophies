@@ -90,6 +90,14 @@ describe("CSV", () => {
       expect(csv.parseCsv(spec, data)).toEqual(["cell"]);
     });
 
+    it("should trim surrounding whitespace from strings", () => {
+      // BGA data has had names with trailing spaces, e.g. "Landen, George ".
+      const spec = { src: "s_col", type: "string" };
+      const padded = `s_col\n"  George "\n`;
+
+      expect(csv.parseCsv(spec, padded)).toEqual(["George"]);
+    });
+
     it("should parse object with xform", () => {
       const spec = {
         src: {
