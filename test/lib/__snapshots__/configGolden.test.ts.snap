@@ -110,9 +110,7 @@ exports[`trophy config golden results > season 2023 1`] = `
     "Pesonen, Lauri — 88.217 kph (106814, 2023-04-25, G-CHPX)",
     "Alexander, James — 74.677 kph (106508, 2023-04-08, DM)",
   ],
-  "4: Double Century": [
-    "Maskell, Richard — 83.468 kph (110424, 2023-08-16, MB)",
-  ],
+  "4: Double Century": [],
   "5: Gransden Trophy": [],
   "6: Jubilee Bowl": [
     "Baker, Peter — 390.994 km (106883, 2023-04-25, G-CKLP)",
@@ -150,9 +148,9 @@ exports[`trophy config golden results > season 2023 1`] = `
     "Alexander, James — 1454 pts [Alexander, James] (106508)",
   ],
   "L4: Ted Warner Trophy": [
-    "Alexander, James — 10681 pts [Alexander, James] (106786, 107995, 109897, 106508, 108408, 110349)",
     "Clark, Aidan — 7121 pts [Clark, Aidan] (111692, 111737, 108595, 110582, 112082, 108596)",
     "Goss, Steve — 2531 pts [Goss, Steve] (109835, 109924, 110134)",
+    "Pledger, Tony — 2416 pts [Pledger, Tony] (110182, 109965, 108573, 110242)",
   ],
   "L5: Complicity Cup": [],
   "L6: Bottle of Bolly Challenge": [],
@@ -185,9 +183,7 @@ exports[`trophy config golden results > season 2024 1`] = `
     "Dalton, Mark — 94.785 kph (115148, 2024-06-20, G-CJXW)",
   ],
   "3: The Boomerang": [],
-  "4: Double Century": [
-    "Alexander, James — 87.437 kph (115229, 2024-06-21, 4X)",
-  ],
+  "4: Double Century": [],
   "5: Gransden Trophy": [
     "Beatty, Markandy — 100.056 kph (119646, 2024-08-30, G-CJXW)",
     "Holswilder, Alex — 93.479 kph (119700, 2024-08-30, G-CKYO)",
@@ -229,9 +225,7 @@ exports[`trophy config golden results > season 2024 1`] = `
     "Brooker, Charlie — 1790 pts [Brooker, Charlie] (116124)",
   ],
   "L4: Ted Warner Trophy": [
-    "Alexander, James — 2918 pts [Alexander, James] (112973)",
     "Haigh, Stuart — 2153 pts [Haigh, Stuart] (117204, 117001, 114269)",
-    "Xu, Wenshu — 636 pts [Xu, Wenshu] (113038)",
   ],
   "L5: Complicity Cup": [
     "G-CKYO — 17062 pts [Holswilder, Alex; Bray, Duncan] (116237, 119700, 115913, 115838, 115182, 117459)",
