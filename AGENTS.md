@@ -76,6 +76,7 @@ Defined in `src/App.tsx`; the season is a `?season=` query param.
 - `src/lib/fetchFlights.ts` — fetches + parses BGA CSV directly from the client
 - `src/lib/trophyCopyData.ts` — Clipboard copy formatting for trophy results
 - `src/lib/stats.ts` — Season statistics (completion rates, distance calculations)
+- `scripts/pilot-milestones.ts` — Derives `pilotMilestones` (first season with a declared, completed 300 km / 500 km task) from the club's BGA Ladder history and reports differences from `trophies.config.ts`; rerun each season. Changing milestones can change past results, so review the golden snapshot diff
 
 ## Code Conventions
 
