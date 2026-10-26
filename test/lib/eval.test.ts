@@ -891,6 +891,52 @@ describe("season boundaries", () => {
       process.env.TZ = tz;
     });
 
+    it.each([
+      // [season, last day counted, clock-change Sunday]
+      [2023, "2024-03-30", "2024-03-31"], // March ends on a Sunday
+      [2024, "2025-03-29", "2025-03-30"],
+      [2026, "2027-03-27", "2027-03-28"],
+      [2027, "2028-03-25", "2028-03-26"],
+    ])(
+      "ends the %i winter season the day before the clocks go forward",
+      (season, lastDay, clockChange) => {
+        const untilClockChange: SeasonConfig = {
+          start: { month: 10, day: 1 },
+          end: { month: 3, day: "lastSunday", offsetDays: -1 },
+        };
+        const flights = flightsOn(
+          `${season}-09-30`,
+          `${season}-10-01`,
+          lastDay,
+          clockChange,
+        );
+
+        const results = trophyEval(
+          defaultSeason,
+          season,
+          flights,
+          trophy(untilClockChange),
+        );
+
+        expect(results.map((r) => r.id).sort()).toEqual([
+          `${season}-10-01`,
+          lastDay,
+        ]);
+      },
+    );
+
+    it("supports a season starting on a last Sunday", () => {
+      const season: SeasonConfig = {
+        start: { month: 10, day: "lastSunday" },
+        end: { month: 12, day: 31 },
+      };
+      const flights = flightsOn("2026-10-24", "2026-10-25");
+
+      const results = trophyEval(defaultSeason, 2026, flights, trophy(season));
+
+      expect(results.map((r) => r.id)).toEqual(["2026-10-25"]);
+    });
+
     it("includes the first and last day of a calendar season", () => {
       const flights = flightsOn(
         "2023-12-31",

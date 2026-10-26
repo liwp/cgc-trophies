@@ -23,9 +23,20 @@ export interface Flight {
   };
 }
 
+/**
+ * A day of the year. `day` is a day of the month, or "lastSunday" for the
+ * month's last Sunday (UK clock changes are on the last Sundays of March and
+ * October). `offsetDays` shifts the result, e.g. -1 for the day before.
+ */
+export interface SeasonDate {
+  month: number;
+  day: number | "lastSunday";
+  offsetDays?: number;
+}
+
 export interface SeasonConfig {
-  start: { month: number; day: number };
-  end: { month: number; day: number };
+  start: SeasonDate;
+  end: SeasonDate;
 }
 
 export interface ClubConfig {
@@ -87,8 +98,9 @@ export type SortExpr = [
 
 export type TrophyExpr = FilterExpr | ScoreExpr | SortExpr;
 
+/** Fields a version leaves out are taken from the headline trophy. */
 export interface TrophyVersion
-  extends Required<Pick<FlightTrophy, "description" | "expr">> {
+  extends Partial<Pick<FlightTrophy, "description" | "expr" | "season">> {
   /** Inclusive: this version applied through this season (e.g. `untilSeason: 2025`
    *  means it was in force through the 2025 season and superseded from 2026). */
   untilSeason: number;

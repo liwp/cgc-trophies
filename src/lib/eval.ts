@@ -11,6 +11,7 @@ import type {
   PilotMilestones,
   ScoredFlight,
   SeasonConfig,
+  SeasonDate,
 } from "../types";
 
 type Comparator = (x: any, y: any) => boolean;
@@ -25,8 +26,16 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 // Flight dates are UTC midnight (see csv.ts), so season days are compared as
 // UTC days too, making the result independent of the runtime's timezone.
-function utcDay(year: number, { day, month }: { day: number; month: number }) {
-  return Date.UTC(year, month - 1, day) / DAY_MS;
+function utcDay(year: number, { month, day, offsetDays = 0 }: SeasonDate) {
+  let dayOfMonth: number;
+  if (day === "lastSunday") {
+    // Day 0 of the next month is this month's last day; step back to Sunday.
+    const lastDay = new Date(Date.UTC(year, month, 0));
+    dayOfMonth = lastDay.getUTCDate() - lastDay.getUTCDay();
+  } else {
+    dayOfMonth = day;
+  }
+  return Date.UTC(year, month - 1, dayOfMonth) / DAY_MS + offsetDays;
 }
 
 // Both the start and end days are part of the season. A season whose start is

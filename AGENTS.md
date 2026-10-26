@@ -45,7 +45,7 @@ config — always use `bun run test` to run the Vitest suite.
 
 ### Season-scoped trophy history
 
-A trophy's headline `description`/`expr` describe the CURRENT task definition. When a trophy's task changes (e.g. its turnpoints), the OLD `description`/`expr` are preserved as an entry in `history: TrophyVersion[]`, each tagged with an inclusive `untilSeason` (the last season that version applied to). `resolveTrophy`/`resolveTrophies` (`src/lib/trophyHistory.ts`) pick the right version for a given season — the smallest `untilSeason` that is `>= season`, falling back to the headline fields if none match. Anything reading a trophy's `description` or `expr` for a specific season (scoring, UI display) MUST call `resolveTrophy`/`resolveTrophies` first rather than reading the trophy object directly. For example, a turnpoint change from 2026 onward looks like:
+A trophy's headline `description`/`expr` describe the CURRENT task definition. When a trophy's task changes (e.g. its turnpoints), the OLD `description`/`expr`/`season` are preserved as an entry in `history: TrophyVersion[]` (fields an entry leaves out come from the headline trophy), each tagged with an inclusive `untilSeason` (the last season that version applied to). `resolveTrophy`/`resolveTrophies` (`src/lib/trophyHistory.ts`) pick the right version for a given season — the smallest `untilSeason` that is `>= season`, falling back to the headline fields if none match. Anything reading a trophy's `description` or `expr` for a specific season (scoring, UI display) MUST call `resolveTrophy`/`resolveTrophies` first rather than reading the trophy object directly. For example, a turnpoint change from 2026 onward looks like:
 
 ```ts
 {

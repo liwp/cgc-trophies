@@ -62,6 +62,27 @@ function makeFlight(turnpoints: string[], date: Date): Flight {
 }
 
 describe("resolveTrophy", () => {
+  it("takes fields a version leaves out from the headline trophy", () => {
+    const fixedEnd: SeasonConfig = {
+      start: { month: 10, day: 1 },
+      end: { month: 3, day: 31 },
+    };
+    const trophy: FlightTrophy = {
+      ...doubleCentury,
+      season: {
+        start: { month: 10, day: 1 },
+        end: { month: 3, day: "lastSunday", offsetDays: -1 },
+      },
+      history: [{ untilSeason: 2025, season: fixedEnd }],
+    };
+
+    const old = resolveTrophy(trophy, 2025);
+    expect(old.season).toEqual(fixedEnd);
+    expect(old.description).toBe(doubleCentury.description);
+    expect(old.expr).toBe(doubleCentury.expr);
+    expect(resolveTrophy(trophy, 2026).season).toBe(trophy.season);
+  });
+
   it("uses the headline version for the current season", () => {
     const resolved = resolveTrophy(doubleCentury, 2026);
     expect(resolved.description).toContain("205.2km");
