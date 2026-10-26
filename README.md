@@ -150,6 +150,27 @@ It adds the entry to `trophies.config.ts` and reformats it with Biome. It errors
 if the pilot already exists in that milestone. Pilot names use `"Last, First"`
 format, matching the BGA Ladder flight data.
 
+## Yearly turnpoint update
+
+`src/lib/turnpoints.ts` maps BGA turnpoint codes to names for the results and
+copy-to-clipboard views. It is generated from the BGA's turnpoint file, which
+the BGA updates about once a year, so after each new release:
+
+1. Get the new `.cup` file (named like `BGA TPs 2026-06-10.cup`).
+2. Regenerate the list, stamping codes added or retired with the season:
+
+   ```bash
+   python3 scripts/update-turnpoints.py "BGA TPs 2026-06-10.cup" --season 2026
+   ```
+
+   The script needs Python 3.10 or newer (on macOS, e.g.
+   `uv run --python 3.12 scripts/update-turnpoints.py ...`). Retired codes are
+   kept, stamped `removed`, because past seasons' flights still use them.
+3. Check the codes it reports as retired against `trophies.config.ts`. If a
+   trophy's task uses one, give the trophy a new task and keep the old one in
+   its `history` (see AGENTS.md, "Season-scoped trophy history").
+4. Commit `turnpoints.ts` as generated; don't edit it by hand.
+
 ## License
 
 [MIT](LICENSE)
