@@ -26,6 +26,11 @@ export interface SeasonFlights {
   flights: Flight[];
   /** All of the club's flights, wherever launched (used by ladders). */
   allFlights: Flight[];
+  /**
+   * Every flight in the club's BGA download, including members' flights
+   * filed under another club.
+   */
+  anyClubFlights: Flight[];
 }
 
 /** Split fetched flights into the club's flights and its home-site launches. */
@@ -37,7 +42,7 @@ export function selectSeasonFlights(
   const flights = allFlights.filter(
     (f) => f.task.launchSite === club.launchSite,
   );
-  return { flights, allFlights };
+  return { flights, allFlights, anyClubFlights: fetched };
 }
 
 /**
@@ -47,7 +52,7 @@ export function selectSeasonFlights(
 export function evaluateTrophy(
   trophy: Trophy,
   season: number,
-  { flights, allFlights }: SeasonFlights,
+  { flights, allFlights }: Pick<SeasonFlights, "flights" | "allFlights">,
 ): TrophyResults {
   const resolved = resolveTrophy(trophy, season);
   const { excludedFlights = {}, pilotMilestones } = CONFIG;

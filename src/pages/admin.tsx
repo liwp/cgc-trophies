@@ -11,10 +11,12 @@ import FlightLoadFailure from "../components/FlightLoadFailure";
 import HeightLossCheck from "../components/HeightLossCheck";
 import HeightLossWarning from "../components/HeightLossWarning";
 import Loading from "../components/Loading";
+import MissingLadderFlights from "../components/MissingLadderFlights";
 import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Th from "../components/Th";
+import { missingLadderFlights } from "../lib/missingLadderFlights";
 import {
   evaluateTrophy,
   formatScore,
@@ -175,11 +177,13 @@ const TrophySection = ({
   trophy,
   flights,
   allFlights,
+  anyClubFlights,
   season,
 }: {
   trophy: Trophy;
   flights: Flight[];
   allFlights: Flight[];
+  anyClubFlights: Flight[];
   season: number;
 }) => {
   const [showAll, setShowAll] = useState(false);
@@ -187,6 +191,24 @@ const TrophySection = ({
   const evaluated = useMemo(
     () => evaluateTrophy(trophy, season, { flights, allFlights }),
     [trophy, season, flights, allFlights],
+  );
+  // Pilots on an eligibility-restricted club ladder (e.g. novices on
+  // Fastrackers) sometimes forget to enter their flights on it.
+  const missing = useMemo(
+    () =>
+      trophy.type === "ladder" &&
+      trophy.excludePilotsWithMilestone &&
+      trophy.ladderKey !== "open"
+        ? missingLadderFlights(
+            CONFIG.season,
+            season,
+            { allFlights, anyClubFlights },
+            trophy,
+            CONFIG.pilotMilestones,
+            CONFIG.excludedFlights,
+          )
+        : [],
+    [trophy, season, allFlights, anyClubFlights],
   );
   const isLadder = evaluated.type === "ladder";
   const isSyndicate =
@@ -269,6 +291,16 @@ const TrophySection = ({
           <ExcludedFlights flights={evaluated.excluded} compact />
         </div>
       )}
+
+      {missing.length > 0 && (
+        <div className="mt-3">
+          <MissingLadderFlights
+            missing={missing}
+            ladderName={trophy.name}
+            clubName={CONFIG.club.name}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -278,7 +310,7 @@ const AdminPage = () => {
 
   if (state.status === "error") return <FlightLoadFailure />;
   if (state.status === "loading") return <Loading />;
-  const { season, flights, allFlights } = state;
+  const { season, flights, allFlights, anyClubFlights } = state;
 
   return (
     <PageLayout>
@@ -319,6 +351,7 @@ const AdminPage = () => {
               trophy={trophy}
               flights={flights}
               allFlights={allFlights}
+              anyClubFlights={anyClubFlights}
               season={season}
             />
           ))}
