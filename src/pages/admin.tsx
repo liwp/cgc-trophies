@@ -8,6 +8,7 @@ import ExcludedFlights from "../components/ExcludedFlights";
 import ExpandButton from "../components/ExpandButton";
 import FlightLinks from "../components/FlightLinks";
 import FlightLoadFailure from "../components/FlightLoadFailure";
+import HeightLossCheck from "../components/HeightLossCheck";
 import HeightLossWarning from "../components/HeightLossWarning";
 import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";
@@ -57,9 +58,10 @@ const FlightResultEntry = ({
       <td className="px-4 py-2">
         <div className="inline-flex items-center gap-1">
           <FlightLinks flightId={id} iconSize={14} />
-          <HeightLossWarning
+          <HeightLossCheck
             flightId={id}
             reportedHeightLoss={task.heightLoss}
+            auto={rank === 1}
           />
           <CopyButton data={flightCopyData(result)} />
         </div>
@@ -68,7 +70,13 @@ const FlightResultEntry = ({
   );
 };
 
-const LadderFlightRow = ({ flight }: { flight: Flight }) => (
+const LadderFlightRow = ({
+  flight,
+  isWinner,
+}: {
+  flight: Flight;
+  isWinner: boolean;
+}) => (
   <tr className="bg-gray-50">
     <td className="px-4 py-1.5" />
     <td className="px-4 py-1.5 text-gray-500 text-sm pl-10">
@@ -84,9 +92,10 @@ const LadderFlightRow = ({ flight }: { flight: Flight }) => (
     <td className="px-4 py-1.5">
       <div className="inline-flex items-center gap-1">
         <FlightLinks flightId={flight.id} iconSize={14} inline />
-        <HeightLossWarning
+        <HeightLossCheck
           flightId={flight.id}
           reportedHeightLoss={flight.task.heightLoss}
+          auto={isWinner}
         />
       </div>
     </td>
@@ -116,13 +125,14 @@ const LadderResultEntry = ({
             {isSyndicate
               ? `${result.key} (${result.pilots.map(formatPilotName).join(", ")})`
               : formatPilotName(result.key)}
-            {result.flights.map((f) => (
-              <HeightLossWarning
-                key={f.id}
-                flightId={f.id}
-                reportedHeightLoss={f.task.heightLoss}
-              />
-            ))}
+            {rank === 1 &&
+              result.flights.map((f) => (
+                <HeightLossWarning
+                  key={f.id}
+                  flightId={f.id}
+                  reportedHeightLoss={f.task.heightLoss}
+                />
+              ))}
           </div>
         </td>
         <td className="px-4 py-2 text-gray-700">
@@ -151,7 +161,11 @@ const LadderResultEntry = ({
       </tr>
       {expanded &&
         result.flights.map((flight) => (
-          <LadderFlightRow key={flight.id} flight={flight} />
+          <LadderFlightRow
+            key={flight.id}
+            flight={flight}
+            isWinner={rank === 1}
+          />
         ))}
     </>
   );
