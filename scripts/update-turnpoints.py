@@ -59,10 +59,25 @@ def parse_existing(path: Path) -> dict[str, dict]:
         return {}
 
     existing: dict[str, dict] = {}
-    for line in path.read_text().splitlines():
+    in_body = False
+    for number, line in enumerate(path.read_text().splitlines(), start=1):
+        if line.startswith("> = {"):
+            in_body = True
+            continue
+        if line.startswith("};"):
+            in_body = False
+            continue
+        if not in_body or not line.strip():
+            continue
         m = ENTRY_RE.match(line)
         if not m:
-            continue
+            # Dropping the line would silently lose its added/removed stamps.
+            print(
+                f"error: {path}:{number}: can't parse turnpoint entry "
+                f"(expected one per line): {line.strip()}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
         code, name, added, removed = m.groups()
         entry: dict[str, str | int] = {"name": unescape(name)}
         if added is not None:

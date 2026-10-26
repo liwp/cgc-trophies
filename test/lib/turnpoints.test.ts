@@ -1,3 +1,4 @@
+import { currentSeason, FIRST_SEASON } from "../../src/lib/season";
 import TURNPOINTS from "../../src/lib/turnpoints";
 
 describe("TURNPOINTS", () => {
@@ -26,5 +27,33 @@ describe("TURNPOINTS", () => {
   it("leaves added and removed unset for current turnpoints", () => {
     expect(TURNPOINTS.GRL.added).toBeUndefined();
     expect(TURNPOINTS.GRL.removed).toBeUndefined();
+  });
+
+  describe("every entry", () => {
+    const entries = Object.entries(TURNPOINTS);
+    // Retired codes are backfilled from BGA Ladder flights since FIRST_SEASON.
+    const earliest = FIRST_SEASON;
+    const latest = currentSeason() + 1;
+
+    it("has a BGA-style code and a trimmed, non-empty name", () => {
+      for (const [code, { name }] of entries) {
+        expect(code, code).toMatch(/^[A-Z0-9]{2,4}$/);
+        expect(name, code).not.toBe("");
+        expect(name, code).toBe(name.trim());
+      }
+    });
+
+    it("has added and removed seasons in range, added before removed", () => {
+      for (const [code, { added, removed }] of entries) {
+        for (const season of [added, removed]) {
+          if (season === undefined) continue;
+          expect(season, code).toBeGreaterThanOrEqual(earliest);
+          expect(season, code).toBeLessThanOrEqual(latest);
+        }
+        if (added !== undefined && removed !== undefined) {
+          expect(added, code).toBeLessThan(removed);
+        }
+      }
+    });
   });
 });
