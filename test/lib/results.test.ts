@@ -14,33 +14,7 @@ import type {
   LadderTrophy,
   ScoredFlight,
 } from "../../src/types";
-
-function makeFlight(overrides: Partial<Flight> & { id: string }): Flight {
-  return {
-    date: new Date("2024-06-15"),
-    clubName: "Cambridge Gliding Centre",
-    pilot: "Smith, Jane",
-    glider: { type: "ASW 20", handicap: 100, registration: "G-TEST" },
-    ladders: ["open"],
-    task: {
-      claimType: "C",
-      isCompleted: true,
-      crossCountryPoints: 100,
-      isDeclared: true,
-      scoringDistanceKm: 200,
-      taskDistanceKm: 200,
-      taskAchievement: "100% Completed",
-      handicappedDistanceKm: 200,
-      handicappedSpeedKph: 80,
-      launchSite: "Gransden Lodge",
-      start: "GRL",
-      finish: "GRL",
-      turnpoints: ["SHP"],
-      heightLoss: 0,
-    },
-    ...overrides,
-  };
-}
+import { makeFlight } from "../helpers/flight";
 
 const flightTrophy: FlightTrophy = {
   id: "F",
@@ -101,7 +75,7 @@ describe("evaluateTrophy", () => {
       makeFlight({
         id: "2",
         pilot: "Fast, Fay",
-        task: { ...makeFlight({ id: "" }).task, handicappedSpeedKph: 95 },
+        task: { handicappedSpeedKph: 95 },
       }),
     ];
     const elsewhere = makeFlight({ id: "3", pilot: "Away, Al" });
@@ -180,17 +154,16 @@ describe("evaluateTrophy", () => {
         },
       ],
     };
-    const task = makeFlight({ id: "" }).task;
     const flights = [
       makeFlight({
         id: "old",
         date: new Date("2023-06-15"),
-        task: { ...task, turnpoints: ["BIC", "HUS"] },
+        task: { turnpoints: ["BIC", "HUS"] },
       }),
       makeFlight({
         id: "new",
         date: new Date("2024-06-15"),
-        task: { ...task, turnpoints: ["BNW", "HUS"] },
+        task: { turnpoints: ["BNW", "HUS"] },
       }),
     ];
 
@@ -283,13 +256,12 @@ describe("selectSeasonFlights", () => {
     name: "Cambridge Gliding Centre",
     launchSite: "Gransden Lodge",
   };
-  const task = makeFlight({ id: "" }).task;
 
   it("keeps the club's flights, and its home-site launches separately", () => {
     const home = makeFlight({ id: "home" });
     const away = makeFlight({
       id: "away",
-      task: { ...task, launchSite: "Aston Down" },
+      task: { launchSite: "Aston Down" },
     });
     const otherClub = makeFlight({ id: "other", clubName: "Other GC" });
 

@@ -7,39 +7,12 @@ import type {
   SeasonConfig,
   TrophyExpr,
 } from "../../src/types";
+import { makeFlight } from "../helpers/flight";
 
 const defaultSeason: SeasonConfig = {
   start: { month: 1, day: 1 },
   end: { month: 12, day: 31 },
 };
-
-function makeFlight(
-  overrides: Partial<Flight> & { id: string; pilot: string },
-): Flight {
-  return {
-    date: new Date("2024-06-15"),
-    clubName: "Cambridge Gliding Centre",
-    glider: { type: "ASW 20", handicap: 100, registration: "G-TEST" },
-    ladders: ["open"],
-    task: {
-      claimType: "C",
-      isCompleted: true,
-      crossCountryPoints: 100,
-      isDeclared: true,
-      scoringDistanceKm: 200,
-      taskDistanceKm: 200,
-      taskAchievement: "Declared/Completed",
-      handicappedDistanceKm: 200,
-      handicappedSpeedKph: 80,
-      launchSite: "Gransden Lodge",
-      start: "GRL",
-      finish: "GRL",
-      turnpoints: ["SHP"],
-      heightLoss: 0,
-    },
-    ...overrides,
-  };
-}
 
 describe("ladderEval", () => {
   const openTrophy: LadderTrophy = {
@@ -58,7 +31,6 @@ describe("ladderEval", () => {
         id: "1",
         pilot: "Alice",
         task: {
-          ...makeFlight({ id: "", pilot: "" }).task,
           crossCountryPoints: 100,
         },
       }),
@@ -66,7 +38,6 @@ describe("ladderEval", () => {
         id: "2",
         pilot: "Alice",
         task: {
-          ...makeFlight({ id: "", pilot: "" }).task,
           crossCountryPoints: 80,
         },
       }),
@@ -74,7 +45,6 @@ describe("ladderEval", () => {
         id: "3",
         pilot: "Bob",
         task: {
-          ...makeFlight({ id: "", pilot: "" }).task,
           crossCountryPoints: 90,
         },
       }),
@@ -96,7 +66,6 @@ describe("ladderEval", () => {
         id: String(i + 1),
         pilot: "Alice",
         task: {
-          ...makeFlight({ id: "", pilot: "" }).task,
           crossCountryPoints: (8 - i) * 10,
         },
       }),
@@ -152,7 +121,6 @@ describe("ladderEval", () => {
         id: "1",
         pilot: "Alice",
         task: {
-          ...makeFlight({ id: "", pilot: "" }).task,
           crossCountryPoints: 50,
         },
       }),
@@ -160,7 +128,6 @@ describe("ladderEval", () => {
         id: "2",
         pilot: "Bob",
         task: {
-          ...makeFlight({ id: "", pilot: "" }).task,
           crossCountryPoints: 100,
         },
       }),
@@ -168,7 +135,6 @@ describe("ladderEval", () => {
         id: "3",
         pilot: "Charlie",
         task: {
-          ...makeFlight({ id: "", pilot: "" }).task,
           crossCountryPoints: 75,
         },
       }),
@@ -180,17 +146,16 @@ describe("ladderEval", () => {
   });
 
   it("drops excluded flights so the next-best flight counts", () => {
-    const task = makeFlight({ id: "", pilot: "" }).task;
     const flights: Flight[] = [
       makeFlight({
         id: "1",
         pilot: "Alice",
-        task: { ...task, crossCountryPoints: 100 },
+        task: { crossCountryPoints: 100 },
       }),
       makeFlight({
         id: "2",
         pilot: "Alice",
-        task: { ...task, crossCountryPoints: 80 },
+        task: { crossCountryPoints: 80 },
       }),
     ];
 
@@ -251,7 +216,6 @@ describe("ladderEval", () => {
             glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" },
             ladders: ["local2"],
             task: {
-              ...makeFlight({ id: "", pilot: "" }).task,
               crossCountryPoints: 100 - i * 10,
             },
           }),
@@ -263,7 +227,6 @@ describe("ladderEval", () => {
           glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" },
           ladders: ["local2"],
           task: {
-            ...makeFlight({ id: "", pilot: "" }).task,
             crossCountryPoints: 5,
           },
         }),
@@ -295,7 +258,6 @@ describe("ladderEval", () => {
           glider: { type: "ASW 20", handicap: 100, registration: "G-ABCD" },
           ladders: ["local2"],
           task: {
-            ...makeFlight({ id: "", pilot: "" }).task,
             crossCountryPoints: 80,
           },
         }),
@@ -313,7 +275,6 @@ describe("ladderEval", () => {
         id: "1",
         pilot: "Alice",
         task: {
-          ...makeFlight({ id: "", pilot: "" }).task,
           crossCountryPoints: 100,
         },
       }),
@@ -602,22 +563,21 @@ describe("trophyEval DSL", () => {
   });
 
   it("matches '<=>' turnpoint sequences in either direction", () => {
-    const task = makeFlight({ id: "", pilot: "" }).task;
     const flights = [
       makeFlight({
         id: "1",
         pilot: "Forward",
-        task: { ...task, turnpoints: ["BNW", "HUS"] },
+        task: { turnpoints: ["BNW", "HUS"] },
       }),
       makeFlight({
         id: "2",
         pilot: "Reverse",
-        task: { ...task, turnpoints: ["HUS", "BNW"] },
+        task: { turnpoints: ["HUS", "BNW"] },
       }),
       makeFlight({
         id: "3",
         pilot: "Other",
-        task: { ...task, turnpoints: ["BNW", "SHP"] },
+        task: { turnpoints: ["BNW", "SHP"] },
       }),
     ];
 
@@ -632,17 +592,16 @@ describe("trophyEval DSL", () => {
   });
 
   it("scores a field and sorts by score descending", () => {
-    const task = makeFlight({ id: "", pilot: "" }).task;
     const flights = [
       makeFlight({
         id: "1",
         pilot: "Slow",
-        task: { ...task, handicappedSpeedKph: 70 },
+        task: { handicappedSpeedKph: 70 },
       }),
       makeFlight({
         id: "2",
         pilot: "Fast",
-        task: { ...task, handicappedSpeedKph: 95 },
+        task: { handicappedSpeedKph: 95 },
       }),
     ];
 
@@ -663,12 +622,11 @@ describe("trophyEval DSL", () => {
   });
 
   it("ranks flights best-first when scoring, without an explicit sort", () => {
-    const task = makeFlight({ id: "", pilot: "" }).task;
     const flights = [70, 95, 80].map((kph) =>
       makeFlight({
         id: String(kph),
         pilot: `Pilot ${kph}`,
-        task: { ...task, handicappedSpeedKph: kph },
+        task: { handicappedSpeedKph: kph },
       }),
     );
 
@@ -683,12 +641,11 @@ describe("trophyEval DSL", () => {
   });
 
   it("lets a later sort override the best-first ranking", () => {
-    const task = makeFlight({ id: "", pilot: "" }).task;
     const flights = [70, 95, 80].map((kph) =>
       makeFlight({
         id: String(kph),
         pilot: `Pilot ${kph}`,
-        task: { ...task, handicappedSpeedKph: kph },
+        task: { handicappedSpeedKph: kph },
       }),
     );
 
@@ -802,18 +759,17 @@ describe("trophyEval DSL", () => {
   });
 
   it("lets flights listed in include bypass filters", () => {
-    const task = makeFlight({ id: "", pilot: "" }).task;
     const flights = [
       makeFlight({ id: "1", pilot: "Qualifies" }),
       makeFlight({
         id: "2",
         pilot: "Included",
-        task: { ...task, isCompleted: false },
+        task: { isCompleted: false },
       }),
       makeFlight({
         id: "3",
         pilot: "Fails",
-        task: { ...task, isCompleted: false },
+        task: { isCompleted: false },
       }),
     ];
 

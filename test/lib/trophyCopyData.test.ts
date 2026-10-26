@@ -1,29 +1,22 @@
 import { flightCopyData, ladderCopyData } from "../../src/lib/trophyCopyData";
 import type { LadderResult, ScoredFlight } from "../../src/types";
+import { makeFlight as baseFlight } from "../helpers/flight";
 
 const makeFlight = (overrides?: Partial<ScoredFlight>): ScoredFlight => ({
-  id: "116237",
-  date: new Date("2024-07-26"),
-  clubName: "Cambridge Gliding Centre",
-  pilot: "Holswilder, Alex",
-  glider: { type: "Ventus 3", handicap: 100, registration: "G-CKYO" },
-  ladders: ["open"],
-  task: {
-    claimType: "C",
-    isCompleted: true,
-    isDeclared: true,
-    crossCountryPoints: 500,
-    scoringDistanceKm: 680,
-    taskDistanceKm: 680,
-    taskAchievement: "Declared/Completed",
-    handicappedDistanceKm: 680,
-    handicappedSpeedKph: 74.2,
-    launchSite: "Gransden Lodge",
-    start: "GRL",
-    finish: "GRL",
-    turnpoints: ["SHM", "CAX", "BRF"],
-    heightLoss: 0,
-  },
+  ...baseFlight({
+    id: "116237",
+    date: new Date("2024-07-26"),
+    pilot: "Holswilder, Alex",
+    glider: { type: "Ventus 3", registration: "G-CKYO" },
+    task: {
+      crossCountryPoints: 500,
+      scoringDistanceKm: 680,
+      taskDistanceKm: 680,
+      handicappedDistanceKm: 680,
+      handicappedSpeedKph: 74.2,
+      turnpoints: ["SHM", "CAX", "BRF"],
+    },
+  }),
   score: { value: 680, unit: "km" },
   ...overrides,
 });

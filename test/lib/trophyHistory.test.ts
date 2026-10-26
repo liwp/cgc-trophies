@@ -6,6 +6,7 @@ import type {
   LadderTrophy,
   SeasonConfig,
 } from "../../src/types";
+import { makeFlight as baseFlight } from "../helpers/flight";
 
 const defaultSeason: SeasonConfig = {
   start: { month: 1, day: 1 },
@@ -34,32 +35,8 @@ const doubleCentury: FlightTrophy = {
   ],
 };
 
-function makeFlight(turnpoints: string[], date: Date): Flight {
-  return {
-    id: "f1",
-    date,
-    clubName: "Cambridge",
-    pilot: "A Pilot",
-    glider: { type: "ASW 20", handicap: 100, registration: "G-TEST" },
-    ladders: ["open"],
-    task: {
-      claimType: "C",
-      isCompleted: true,
-      crossCountryPoints: 100,
-      isDeclared: true,
-      scoringDistanceKm: 205,
-      taskDistanceKm: 205,
-      taskAchievement: "100% Completed",
-      handicappedDistanceKm: 205,
-      handicappedSpeedKph: 80,
-      launchSite: "Gransden Lodge",
-      start: "GRL",
-      finish: "GRL",
-      turnpoints,
-      heightLoss: 0,
-    },
-  };
-}
+const makeFlight = (turnpoints: string[], date: Date): Flight =>
+  baseFlight({ date, task: { turnpoints } });
 
 describe("resolveTrophy", () => {
   it("takes fields a version leaves out from the headline trophy", () => {

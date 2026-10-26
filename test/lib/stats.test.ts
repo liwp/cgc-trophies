@@ -5,32 +5,22 @@ import {
   updateStats,
 } from "../../src/lib/stats";
 import type { Flight } from "../../src/types";
+import { makeFlight as baseFlight } from "../helpers/flight";
 
-const makeFlight = (task: Partial<Flight["task"]> = {}): Flight => ({
-  id: "1",
-  date: new Date("2025-07-01"),
-  clubName: "Cambridge Gliding Centre",
-  pilot: "Doe, Jane",
-  glider: { type: "Discus", handicap: 100, registration: "G-TEST" },
-  ladders: ["open"],
-  task: {
-    claimType: "C",
-    isCompleted: true,
-    crossCountryPoints: 100,
-    isDeclared: true,
-    scoringDistanceKm: 350,
-    taskDistanceKm: 350,
-    taskAchievement: "Declared/Completed",
-    handicappedDistanceKm: 350,
-    handicappedSpeedKph: 70,
-    launchSite: "Gransden Lodge",
-    start: "GRL",
-    finish: "GRL",
-    turnpoints: [],
-    heightLoss: 0,
-    ...task,
-  },
-});
+const makeFlight = (task: Partial<Flight["task"]> = {}): Flight =>
+  baseFlight({
+    date: new Date("2025-07-01"),
+    pilot: "Doe, Jane",
+    glider: { type: "Discus" },
+    task: {
+      scoringDistanceKm: 350,
+      taskDistanceKm: 350,
+      handicappedDistanceKm: 350,
+      handicappedSpeedKph: 70,
+      turnpoints: [],
+      ...task,
+    },
+  });
 
 const category = (key: string) => categories.find((c) => c.key === key)!;
 
