@@ -22,7 +22,9 @@ import type { TrophiesConfig } from "./src/types";
 // season:
 //   The default competition season date range. Most trophies use the calendar
 //   year (Jan 1 – Dec 31). Individual trophies can override this with their own
-//   season (e.g. the Kelman Clock runs Oct 1 – Mar 31 for winter flights).
+//   season (e.g. the Kelman Clock runs from Oct 1 to the day before the clocks
+//   go forward). A date is {month, day}, where day is a day of the month or
+//   "lastSunday", optionally shifted by offsetDays (e.g. -1 for the day before).
 //
 // pilotMilestones:
 //   Maps milestone names (e.g. "300km", "500km") to pilot → year records.
@@ -505,16 +507,21 @@ const config: TrophiesConfig = {
         ["score", "task.handicappedDistanceKm", "km"],
         ["sort", "score.value", "desc"],
       ],
+      // From 2026 the winter season ends the day before the clocks go forward
+      // (the last Sunday of March); flights on that Sunday don't count.
       season: {
-        start: {
-          month: 10,
-          day: 1,
-        },
-        end: {
-          month: 3,
-          day: 31,
-        },
+        start: { month: 10, day: 1 },
+        end: { month: 3, day: "lastSunday", offsetDays: -1 },
       },
+      history: [
+        {
+          untilSeason: 2025,
+          season: {
+            start: { month: 10, day: 1 },
+            end: { month: 3, day: 31 },
+          },
+        },
+      ],
       exclude: {
         105786: "whoops (2022)",
       },
