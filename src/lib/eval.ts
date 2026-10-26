@@ -3,6 +3,7 @@ import _ from "lodash";
 const { chain, get, isEqual } = _;
 
 import type {
+  ExcludedFlights,
   Flight,
   FlightTrophy,
   LadderResult,
@@ -68,10 +69,14 @@ export function trophyEval(
   flights: Flight[],
   trophy: FlightTrophy,
   pilotMilestones?: PilotMilestones,
+  excludedFlights?: ExcludedFlights,
 ): ScoredFlight[] {
   const inSeason = inSeasonPredicate(season, trophy.season || defaultSeason);
 
-  const excludedIds: Record<string, string> = {
+  // Excluded flights still run through the pipeline, tagged with the reason,
+  // so callers can show which flights would otherwise have counted.
+  const excludedIds: ExcludedFlights = {
+    ...excludedFlights,
     ...trophy.exclude,
   };
   const includedIds: Record<string, string> = trophy.include || {};
@@ -83,13 +88,10 @@ export function trophyEval(
 
   let chain_ = chain(flights)
     .filter(inSeason)
+    .filter((flight) => !excludedPilots.has(flight.pilot))
     .map((flight) => ({
       ...flight,
-      exclude:
-        excludedIds[flight.id] ||
-        (excludedPilots.has(flight.pilot)
-          ? `${trophy.excludePilotsWithMilestone} milestone`
-          : undefined),
+      exclude: excludedIds[flight.id],
       include: includedIds[flight.id],
     }));
 
@@ -104,16 +106,9 @@ export function trophyEval(
             `Unknown filter predicate: ${comparator} in ${expr.join(" ")}`,
           );
         }
-        chain_ = chain_.filter((flight: any) => {
-          if (flight.exclude) {
-            console.log(`flight excluded - ${flight.id}: ${flight.exclude}`);
-            return false;
-          } else if (flight.include) {
-            return true;
-          } else {
-            return pred(get(flight, field), value);
-          }
-        });
+        chain_ = chain_.filter(
+          (flight: any) => flight.include || pred(get(flight, field), value),
+        );
         break;
       }
       case "score": {
@@ -174,13 +169,14 @@ function selectTopFlightsMultiPilot(
   return selected;
 }
 
-export function ladderEval(
+/** In-season flights that qualify for a ladder, ignoring excluded flights. */
+export function ladderQualifyingFlights(
   defaultSeason: SeasonConfig,
   season: number,
   flights: Flight[],
   trophy: LadderTrophy,
   pilotMilestones?: PilotMilestones,
-): LadderResult[] {
+): Flight[] {
   const inSeason = inSeasonPredicate(season, defaultSeason);
   const excludedPilots = milestoneExcludedPilots(
     pilotMilestones,
@@ -188,8 +184,7 @@ export function ladderEval(
     season,
   );
 
-  // 1. Filter to in-season flights qualifying for this ladder
-  const qualifying = flights
+  return flights
     .filter(inSeason)
     .filter((f) => f.ladders.includes(trophy.ladderKey))
     .filter((f) => !excludedPilots.has(f.pilot))
@@ -199,6 +194,24 @@ export function ladderEval(
         new RegExp(pattern, "i").test(f.glider.type),
       );
     });
+}
+
+export function ladderEval(
+  defaultSeason: SeasonConfig,
+  season: number,
+  flights: Flight[],
+  trophy: LadderTrophy,
+  pilotMilestones?: PilotMilestones,
+  excludedFlights?: ExcludedFlights,
+): LadderResult[] {
+  // 1. Filter to in-season flights qualifying for this ladder
+  const qualifying = ladderQualifyingFlights(
+    defaultSeason,
+    season,
+    flights,
+    trophy,
+    pilotMilestones,
+  ).filter((f) => !excludedFlights?.[f.id]);
 
   // 2. Group by pilot or glider registration
   const groups = new Map<string, Flight[]>();

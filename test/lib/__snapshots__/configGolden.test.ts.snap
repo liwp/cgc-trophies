@@ -41,6 +41,7 @@ exports[`trophy config golden results > season 2022 1`] = `
     "Robinson, Mark — 178.934 km (105757, 2022-10-08, G-CHGV)",
     "Baker, Peter — 177.287 km (105758, 2022-10-08, G-CKLP)",
     "Theil, Robert — 170.84 km (105768, 2022-10-08, G-CJJH)",
+    "excluded: Beatty, Andy — 185.073 km (105786, 2022-10-08, 871) [reason: whoops (2022)]",
   ],
   "8: Mug Metal Machin Trophy": [
     "Theil, Robert — 691.971 km (103740, 2022-08-05, G-CJJH)",

@@ -38,7 +38,7 @@ const day = (date: Date) => new Date(date).toISOString().slice(0, 10);
 
 function summariseFlight(f: ScoredFlight): string {
   const flags = [
-    f.exclude && `excluded: ${f.exclude}`,
+    f.exclude && `reason: ${f.exclude}`,
     f.include && `included: ${f.include}`,
   ].filter(Boolean);
   return [
@@ -63,7 +63,10 @@ function podiums(season: number): Record<string, string[]> {
         evaluated.type === "ladder"
           ? evaluated.results.slice(0, PODIUM).map(summariseLadder)
           : evaluated.results.slice(0, PODIUM).map(summariseFlight);
-      return [`${trophy.id}: ${trophy.name}`, top];
+      const excluded = evaluated.excluded.map(
+        (f) => `excluded: ${summariseFlight(f)}`,
+      );
+      return [`${trophy.id}: ${trophy.name}`, [...top, ...excluded]];
     }),
   );
 }

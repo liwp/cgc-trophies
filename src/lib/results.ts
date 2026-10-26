@@ -1,6 +1,7 @@
 import CONFIG from "trophies-config";
 import type {
   ClubConfig,
+  ExcludedFlight,
   Flight,
   FlightTrophy,
   LadderResult,
@@ -8,13 +9,17 @@ import type {
   ScoredFlight,
   Trophy,
 } from "../types";
-import { ladderEval, trophyEval } from "./eval";
+import { ladderEval, ladderQualifyingFlights, trophyEval } from "./eval";
 import { formatPilotName } from "./trophyCopyData";
 import { resolveTrophy } from "./trophyHistory";
 
-export type TrophyResults =
+export type TrophyResults = (
   | { type: "ladder"; trophy: LadderTrophy; results: LadderResult[] }
-  | { type: "flight"; trophy: FlightTrophy; results: ScoredFlight[] };
+  | { type: "flight"; trophy: FlightTrophy; results: ScoredFlight[] }
+) & {
+  /** Flights that would have counted for the trophy but are excluded. */
+  excluded: ExcludedFlight[];
+};
 
 export interface SeasonFlights {
   /** The club's flights launched from the club site (used by flight trophies). */
@@ -45,7 +50,21 @@ export function evaluateTrophy(
   { flights, allFlights }: SeasonFlights,
 ): TrophyResults {
   const resolved = resolveTrophy(trophy, season);
+  const { excludedFlights = {}, pilotMilestones } = CONFIG;
   if (resolved.type === "ladder") {
+    const excluded = ladderQualifyingFlights(
+      CONFIG.season,
+      season,
+      allFlights,
+      resolved,
+      pilotMilestones,
+    )
+      .filter((f) => excludedFlights[f.id])
+      .map((f) => ({
+        ...f,
+        score: { value: f.task.crossCountryPoints, unit: "pts" },
+        exclude: excludedFlights[f.id],
+      }));
     return {
       type: "ladder",
       trophy: resolved,
@@ -54,20 +73,25 @@ export function evaluateTrophy(
         season,
         allFlights,
         resolved,
-        CONFIG.pilotMilestones,
+        pilotMilestones,
+        excludedFlights,
       ),
+      excluded,
     };
   }
+  const scored = trophyEval(
+    CONFIG.season,
+    season,
+    flights,
+    resolved,
+    pilotMilestones,
+    excludedFlights,
+  );
   return {
     type: "flight",
     trophy: resolved,
-    results: trophyEval(
-      CONFIG.season,
-      season,
-      flights,
-      resolved,
-      CONFIG.pilotMilestones,
-    ),
+    results: scored.filter((f) => !f.exclude),
+    excluded: scored.filter((f): f is ExcludedFlight => !!f.exclude),
   };
 }
 

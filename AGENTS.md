@@ -41,6 +41,7 @@ config — always use `bun run test` to run the Vitest suite.
 
 - **FlightTrophy** (`type?: "flight"`): Uses a DSL of `[op, ...args]` expressions evaluated as a lodash chain. Operations: `filter`, `score`, `sort`. Each trophy's `expr` array defines its scoring pipeline. Expressions are typed (`TrophyExpr` in `src/types.ts`, with field paths derived from `Flight`), so a misspelt field, wrong comparator/value type, unit or sort order in `trophies.config.ts` is a compile error; `test/lib/trophyExpr.test.ts` pins down what is rejected.
 - **LadderTrophy** (`type: "ladder"`): Groups flights by pilot or glider registration, takes top N by `crossCountryPoints`, sums scores. The Complicity Cup uses `groupBy: "registration"`, which requires at least 2 distinct pilots.
+- **Excluded flights**: `excludedFlights` in `trophies.config.ts` (club-wide) and a flight trophy's `exclude` map flights to a reason. Excluded flights are scored but kept out of the results, so the next-best flight counts; `evaluateTrophy` returns them as `excluded` for the trophy and admin pages to list.
 
 ### Season-scoped trophy history
 

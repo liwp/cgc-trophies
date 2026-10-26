@@ -123,12 +123,20 @@ export interface LadderTrophy {
 
 export type PilotMilestones = Record<string, Record<string, number>>;
 
+/** {flightId: "reason"} map of flights excluded from scoring. */
+export type ExcludedFlights = Record<string, string>;
+
 export type Trophy = FlightTrophy | LadderTrophy;
 
 export interface ScoredFlight extends Flight {
   score: { value: number; unit: string };
   exclude?: string;
   include?: string;
+}
+
+/** A flight that would have counted for a trophy but is excluded, and why. */
+export interface ExcludedFlight extends ScoredFlight {
+  exclude: string;
 }
 
 export interface LadderResult {
@@ -168,5 +176,6 @@ export interface TrophiesConfig {
   club: ClubConfig;
   season: SeasonConfig;
   pilotMilestones?: PilotMilestones;
+  excludedFlights?: ExcludedFlights;
   trophies: Trophy[];
 }

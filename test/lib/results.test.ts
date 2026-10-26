@@ -130,6 +130,24 @@ describe("evaluateTrophy", () => {
     ).toEqual(["Away, Al", "Home, Hal"]);
   });
 
+  it("separates a flight trophy's excluded flights from its results", () => {
+    const flights = [
+      makeFlight({ id: "1", pilot: "Kept, Kim" }),
+      makeFlight({ id: "2", pilot: "Excluded, Ed" }),
+    ];
+
+    const evaluated = evaluateTrophy(
+      { ...flightTrophy, exclude: { 2: "bad trace" } },
+      2024,
+      { flights, allFlights: flights },
+    );
+
+    expect(flightResultsOf(evaluated).map((r) => r.id)).toEqual(["1"]);
+    expect(evaluated.excluded.map((f) => [f.id, f.exclude])).toEqual([
+      ["2", "bad trace"],
+    ]);
+  });
+
   it("applies the trophy version in force for the season", () => {
     const trophy: FlightTrophy = {
       ...flightTrophy,
@@ -188,6 +206,7 @@ describe("winner helpers", () => {
     type: "flight",
     trophy: flightTrophy,
     results,
+    excluded: [],
   });
   const ladderResults = (
     results: LadderResult[],
@@ -196,6 +215,7 @@ describe("winner helpers", () => {
     type: "ladder",
     trophy: { ...ladderTrophy, groupBy },
     results,
+    excluded: [],
   });
 
   it("describes a flight trophy winner", () => {

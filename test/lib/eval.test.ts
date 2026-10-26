@@ -179,6 +179,33 @@ describe("ladderEval", () => {
     expect(results.map((r) => r.key)).toEqual(["Bob", "Charlie", "Alice"]);
   });
 
+  it("drops excluded flights so the next-best flight counts", () => {
+    const task = makeFlight({ id: "", pilot: "" }).task;
+    const flights: Flight[] = [
+      makeFlight({
+        id: "1",
+        pilot: "Alice",
+        task: { ...task, crossCountryPoints: 100 },
+      }),
+      makeFlight({
+        id: "2",
+        pilot: "Alice",
+        task: { ...task, crossCountryPoints: 80 },
+      }),
+    ];
+
+    const results = ladderEval(
+      defaultSeason,
+      2024,
+      flights,
+      { ...openTrophy, topN: 1 },
+      undefined,
+      { 1: "duplicate claim" },
+    );
+
+    expect(results.map((r) => [r.key, r.totalScore])).toEqual([["Alice", 80]]);
+  });
+
   describe("syndicate (groupBy registration)", () => {
     const syndicateTrophy: LadderTrophy = {
       id: "L5",
@@ -707,7 +734,7 @@ describe("trophyEval DSL", () => {
     expect(results.map((r) => r.pilot).sort()).toEqual(["Feb", "Nov"]);
   });
 
-  it("removes flights listed in exclude", () => {
+  it("tags flights listed in exclude with the reason", () => {
     const flights = [
       makeFlight({ id: "1", pilot: "Kept" }),
       makeFlight({ id: "2", pilot: "Excluded" }),
@@ -718,7 +745,60 @@ describe("trophyEval DSL", () => {
       exclude: { 2: "bad trace" },
     });
 
-    expect(results.map((r) => r.pilot)).toEqual(["Kept"]);
+    expect(results.map((r) => [r.pilot, r.exclude])).toEqual([
+      ["Kept", undefined],
+      ["Excluded", "bad trace"],
+    ]);
+  });
+
+  it("tags excluded flights even without a filter", () => {
+    const flights = [makeFlight({ id: "1", pilot: "Excluded" })];
+
+    const results = trophyEval(defaultSeason, 2024, flights, {
+      ...speedTrophy([]),
+      exclude: { 1: "bad trace" },
+    });
+
+    expect(results.map((r) => r.exclude)).toEqual(["bad trace"]);
+  });
+
+  it("tags flights in the club-wide excludedFlights", () => {
+    const flights = [
+      makeFlight({ id: "1", pilot: "Kept" }),
+      makeFlight({ id: "2", pilot: "Excluded" }),
+    ];
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      speedTrophy([["filter", "task.isCompleted"]]),
+      undefined,
+      { 2: "duplicate claim" },
+    );
+
+    expect(results.map((r) => [r.pilot, r.exclude])).toEqual([
+      ["Kept", undefined],
+      ["Excluded", "duplicate claim"],
+    ]);
+  });
+
+  it("does not let include override an exclusion", () => {
+    const flights = [makeFlight({ id: "1", pilot: "Excluded" })];
+
+    const results = trophyEval(
+      defaultSeason,
+      2024,
+      flights,
+      {
+        ...speedTrophy([["filter", "task.isCompleted"]]),
+        include: { 1: "approved" },
+      },
+      undefined,
+      { 1: "duplicate claim" },
+    );
+
+    expect(results.map((r) => r.exclude)).toEqual(["duplicate claim"]);
   });
 
   it("lets flights listed in include bypass filters", () => {
