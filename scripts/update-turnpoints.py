@@ -237,7 +237,7 @@ def main() -> None:
         entries, backfilled = backfill_entries(existing, args.backfill, args.season)
         header = read_header(args.out)
         names = ", ".join(sorted({p.name for p in args.backfill}))
-        header = [h for h in header if not h.startswith("// Retired codes backfilled")]
+        header = [h for h in header if not h.startswith("// Retired codes backfilled from:")]
         header.append(f"// Retired codes backfilled from: {names}.")
         args.out.write_text(render(entries, header))
         print(f"Backfilled {len(backfilled)} codes: {', '.join(backfilled) or 'none'}")
