@@ -20,7 +20,7 @@ function flightsForYear(year: number): Flight[] {
       new URL(`../../e2e/fixtures/${year}.csv`, import.meta.url),
       "utf8",
     );
-    return parseCsv(SPEC, csv) as Flight[];
+    return parseCsv(SPEC, csv);
   } catch {
     // No fixture for this year (e.g. season + 1 of the latest season).
     return [];

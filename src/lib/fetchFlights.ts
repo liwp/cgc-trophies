@@ -29,5 +29,5 @@ export async function fetchFlights(
     ),
   );
 
-  return csvs.flatMap((csv) => parseCsv(SPEC, csv)) as Flight[];
+  return csvs.flatMap((csv) => parseCsv(SPEC, csv));
 }

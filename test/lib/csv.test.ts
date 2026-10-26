@@ -1,9 +1,14 @@
+import { readFileSync } from "node:fs";
 import {
+  type FieldSpec,
   parseBoolean,
   parseCsv,
   parseDate,
   parseNumber,
+  type SpecOutput,
 } from "../../src/lib/csv";
+import { SPEC } from "../../src/lib/flightCsvSpec";
+import type { Flight } from "../../src/types";
 
 const csv = { parseCsv, parseBoolean, parseDate, parseNumber };
 
@@ -18,7 +23,7 @@ describe("CSV", () => {
       const spec = {
         src: "b_col",
         type: "boolean",
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual([true]);
     });
@@ -28,7 +33,7 @@ describe("CSV", () => {
         src: "b_col",
         type: "boolean",
         xform: (b: boolean) => b !== true,
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual([false]);
     });
@@ -38,7 +43,7 @@ describe("CSV", () => {
         src: "d_col",
         type: "date",
         xform: (d: Date) => d.getFullYear(),
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual([2017]);
     });
@@ -47,7 +52,7 @@ describe("CSV", () => {
       const spec = {
         src: "d_col",
         type: "date",
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual([new Date("2017-07-01")]);
     });
@@ -57,7 +62,7 @@ describe("CSV", () => {
         src: "n_col",
         type: "number",
         xform: (n: number) => 2 * n,
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual([24]);
     });
@@ -66,7 +71,7 @@ describe("CSV", () => {
       const spec = {
         src: "n_col",
         type: "number",
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual([12]);
     });
@@ -76,7 +81,7 @@ describe("CSV", () => {
         src: "s_col",
         type: "string",
         xform: (s: string) => s.toUpperCase(),
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual(["CELL"]);
     });
@@ -85,14 +90,14 @@ describe("CSV", () => {
       const spec = {
         src: "s_col",
         type: "string",
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual(["cell"]);
     });
 
     it("should trim surrounding whitespace from strings", () => {
       // BGA data has had names with trailing spaces, e.g. "Landen, George ".
-      const spec = { src: "s_col", type: "string" };
+      const spec = { src: "s_col", type: "string" } satisfies FieldSpec;
       const padded = `s_col\n"  George "\n`;
 
       expect(csv.parseCsv(spec, padded)).toEqual(["George"]);
@@ -113,7 +118,7 @@ describe("CSV", () => {
         },
         type: "object",
         xform: (o: object) => ({ xformed: true, ...o }),
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual([
         {
@@ -138,7 +143,7 @@ describe("CSV", () => {
           },
         },
         type: "object",
-      };
+      } satisfies FieldSpec;
 
       expect(csv.parseCsv(spec, data)).toEqual([
         {
@@ -170,7 +175,7 @@ c1,c2,c1
         ],
         type: "array",
         xform: (a: string[]) => new Set(a),
-      };
+      } satisfies FieldSpec;
       const json = csv.parseCsv(spec, data);
       expect(json).toEqual([new Set(["c1", "c2"])]);
     });
@@ -188,7 +193,7 @@ c1,c2,c1
           },
         ],
         type: "array",
-      };
+      } satisfies FieldSpec;
       const json = csv.parseCsv(spec, data);
       expect(json).toEqual([["cell", true]]);
     });
@@ -196,7 +201,7 @@ c1,c2,c1
     it("should throw when src not specified", () => {
       const spec = {
         type: "boolean",
-      };
+      } as unknown as FieldSpec;
 
       expect(() => csv.parseCsv(spec, data)).toThrow(
         `'src' not specified in spec: {"type":"boolean"}`,
@@ -206,11 +211,60 @@ c1,c2,c1
     it("should throw when type not specified", () => {
       const spec = {
         src: "b_col",
-      };
+      } as unknown as FieldSpec;
 
       expect(() => csv.parseCsv(spec, data)).toThrow(
         'Unknown type in spec: {"src":"b_col"}',
       );
+    });
+  });
+
+  describe("column checks", () => {
+    const spec = {
+      src: {
+        a: { src: "a_col", type: "string" },
+        b: { src: "b_col", type: "number" },
+        c: { src: "c_col", type: "boolean" },
+      },
+      type: "object",
+    } satisfies FieldSpec;
+
+    it("names a missing column", () => {
+      expect(() => csv.parseCsv(spec, "a_col,b_col\nx,1\n")).toThrow(
+        'Missing CSV column "c_col"',
+      );
+    });
+
+    it("names every missing column", () => {
+      expect(() => csv.parseCsv(spec, "a_col\nx\n")).toThrow(
+        'Missing CSV columns "b_col", "c_col"',
+      );
+    });
+
+    it("checks the header even when there are no rows", () => {
+      expect(() => csv.parseCsv(spec, "a_col\n")).toThrow(
+        'Missing CSV columns "b_col", "c_col"',
+      );
+    });
+
+    it("returns no rows for an empty response", () => {
+      expect(csv.parseCsv(spec, "")).toEqual([]);
+    });
+
+    it("reports a renamed BGA column in the flight spec", () => {
+      const fixture = readFileSync(
+        new URL("../../e2e/fixtures/2025.csv", import.meta.url),
+        "utf8",
+      );
+      const renamed = fixture.replace('"Completed?"', '"Completed"');
+
+      expect(() => csv.parseCsv(SPEC, renamed)).toThrow(
+        'Missing CSV column "Completed?"',
+      );
+    });
+
+    it("parses the flight spec to a Flight", () => {
+      expectTypeOf<SpecOutput<typeof SPEC>>().toEqualTypeOf<Flight>();
     });
   });
 

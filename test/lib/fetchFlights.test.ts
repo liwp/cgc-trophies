@@ -6,6 +6,8 @@ const fixtureCsv = readFileSync(
   new URL("../../e2e/fixtures/2025.csv", import.meta.url),
   "utf8",
 );
+// What the BGA API returns for a year with no flights.
+const headerOnlyCsv = `${fixtureCsv.split("\n")[0]}\n`;
 
 const okResponse = (body: string) =>
   ({ ok: true, text: () => Promise.resolve(body) }) as Response;
@@ -16,7 +18,7 @@ describe("fetchFlights", () => {
   });
 
   it("fetches each year in the inclusive range from the BGA API", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(okResponse("header\n"));
+    const fetchMock = vi.fn().mockResolvedValue(okResponse(headerOnlyCsv));
     vi.stubGlobal("fetch", fetchMock);
 
     await fetchFlights(2023, 2025);
@@ -31,7 +33,7 @@ describe("fetchFlights", () => {
   });
 
   it("handles a single-year range", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(okResponse("header\n"));
+    const fetchMock = vi.fn().mockResolvedValue(okResponse(headerOnlyCsv));
     vi.stubGlobal("fetch", fetchMock);
 
     const flights = await fetchFlights(2025, 2025);

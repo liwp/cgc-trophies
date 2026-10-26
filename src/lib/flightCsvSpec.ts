@@ -1,4 +1,6 @@
 import { capitalize } from "lodash";
+import type { Flight } from "../types";
+import type { FieldSpec } from "./csv";
 
 const GLIDER_SPEC = {
   src: {
@@ -16,7 +18,7 @@ const GLIDER_SPEC = {
     },
   },
   type: "object",
-};
+} satisfies FieldSpec;
 
 const LADDERS_SPEC = {
   src: {
@@ -63,7 +65,7 @@ const LADDERS_SPEC = {
       .filter(([_, v]) => v)
       .map(([k]) => k);
   },
-};
+} satisfies FieldSpec;
 
 const TASK_SPEC = {
   src: {
@@ -146,7 +148,7 @@ const TASK_SPEC = {
   // (stats.ts), not trophy scoring, so the rounding error is immaterial and not
   // worth a per-flight FLIGHT/{id} request to refine. Completed/missing-pct
   // flights fall back to scoringDistanceKm (≈ task distance when completed).
-  xform: (task: Record<string, any>) => {
+  xform: (task: Omit<Flight["task"], "taskDistanceKm">): Flight["task"] => {
     const pctMatch = task.taskAchievement?.match(/(\d+\.?\d*)%\s*Completed/);
     const pct = pctMatch ? parseFloat(pctMatch[1]) : null;
     const taskDistanceKm =
@@ -155,7 +157,7 @@ const TASK_SPEC = {
         : task.scoringDistanceKm;
     return { ...task, taskDistanceKm };
   },
-};
+} satisfies FieldSpec;
 
 const SPEC = {
   src: {
@@ -191,6 +193,6 @@ const SPEC = {
     task: TASK_SPEC,
   },
   type: "object",
-};
+} satisfies FieldSpec;
 
 export { GLIDER_SPEC, LADDERS_SPEC, SPEC, TASK_SPEC };

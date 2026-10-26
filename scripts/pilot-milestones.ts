@@ -26,7 +26,7 @@ const lastSeason = Number(process.argv[2] ?? new Date().getFullYear());
 async function flightsFor(year: number): Promise<Flight[]> {
   const res = await fetch(`${URL}/${year}/${CONFIG.club.code}`);
   if (!res.ok) throw new Error(`Failed to fetch ${year}: ${res.status}`);
-  return parseCsv(SPEC, await res.text()) as Flight[];
+  return parseCsv(SPEC, await res.text());
 }
 
 async function main() {
