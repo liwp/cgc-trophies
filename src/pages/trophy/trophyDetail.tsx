@@ -1,5 +1,6 @@
 import { keyBy } from "lodash";
 import { useParams } from "react-router-dom";
+import ExcludedFlights from "../../components/ExcludedFlights";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
 import LadderResultsList from "../../components/LadderResultsList";
 import Loading from "../../components/Loading";
@@ -47,6 +48,8 @@ const TrophyPage = () => {
             <ResultsList results={evaluated.results} />
           )}
         </div>
+
+        <ExcludedFlights flights={evaluated.excluded} />
       </div>
     </PageLayout>
   );

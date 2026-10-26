@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import CONFIG from "trophies-config";
 import CopyButton from "../components/CopyButton";
+import ExcludedFlights from "../components/ExcludedFlights";
 import ExpandButton from "../components/ExpandButton";
 import FlightLinks from "../components/FlightLinks";
 import FlightLoadFailure from "../components/FlightLoadFailure";
@@ -247,6 +248,12 @@ const TrophySection = ({
             </div>
           )}
         </>
+      )}
+
+      {evaluated.excluded.length > 0 && (
+        <div className="mt-3">
+          <ExcludedFlights flights={evaluated.excluded} compact />
+        </div>
       )}
     </div>
   );

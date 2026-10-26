@@ -148,6 +148,25 @@ describe("evaluateTrophy", () => {
     ]);
   });
 
+  it("lists the club-wide excluded flights that a ladder would count", () => {
+    // 131406 is in trophies.config.ts excludedFlights.
+    const date = new Date("2026-07-08");
+    const kept = makeFlight({ id: "1", date, pilot: "Clark, Aidan" });
+    const excluded = makeFlight({ id: "131406", date, pilot: "Clark, Aidan" });
+
+    const evaluated = evaluateTrophy(ladderTrophy, 2026, {
+      flights: [],
+      allFlights: [kept, excluded],
+    });
+
+    expect(
+      ladderResultsOf(evaluated).flatMap((r) => r.flights.map((f) => f.id)),
+    ).toEqual(["1"]);
+    expect(evaluated.excluded.map((f) => [f.id, f.score])).toEqual([
+      ["131406", { value: 100, unit: "pts" }],
+    ]);
+  });
+
   it("applies the trophy version in force for the season", () => {
     const trophy: FlightTrophy = {
       ...flightTrophy,

@@ -31,6 +31,12 @@ import type { TrophiesConfig } from "./src/types";
 //   Trophies reference milestones via excludePilotsWithMilestone: a pilot
 //   is excluded if their milestone year < the current season (or year === 0).
 //
+// excludedFlights:
+//   {flightId: "reason"} map of flights the committee has rejected that still
+//   count on the BGA Ladder. They are excluded from every trophy, so the
+//   next-best flight counts instead, and are listed with the reason on the
+//   trophy and admin pages. Include the season in the reason.
+//
 // trophies:
 //   An array of trophy definitions. There are two types:
 //
@@ -239,6 +245,10 @@ const config: TrophiesConfig = {
       "Welford, Robert": 2007,
       "Xu, Wenshu": 2025,
     },
+  },
+  excludedFlights: {
+    131406:
+      "Second declared task claimed from the same IGC file as 131403 (2026)",
   },
   trophies: [
     // --- Ladder trophies ---
