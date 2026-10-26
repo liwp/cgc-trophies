@@ -524,6 +524,10 @@ const config: TrophiesConfig = {
       ],
       exclude: {
         105786: "whoops (2022)",
+        121723:
+          "Awarded to Andy Beatty while a bug hid last-day flights; award stands (2024)",
+        121729:
+          "Awarded to Andy Beatty while a bug hid last-day flights; award stands (2024)",
       },
     },
     {
