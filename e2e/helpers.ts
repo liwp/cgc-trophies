@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Page } from "@playwright/test";
 
-const FIXTURES = join(__dirname, "fixtures");
+const FIXTURES = join(import.meta.dirname, "fixtures");
 
 // Header row only — used for years without a fixture (parses to zero flights).
 const HEADER_ONLY = readFileSync(join(FIXTURES, "2024.csv"), "utf8").split(

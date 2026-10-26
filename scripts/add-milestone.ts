@@ -9,16 +9,15 @@
  * Errors if the pilot already exists in that milestone.
  */
 
-/* eslint-disable @typescript-eslint/no-require-imports */
-const fs = require("node:fs");
-const path = require("node:path");
-const { execSync } = require("node:child_process");
+import { execSync } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
 
 const [pilotName, milestone, yearArg] = process.argv.slice(2);
 
 if (!pilotName || !milestone) {
   console.error(
-    'Usage: npx ts-node scripts/add-milestone.ts "Last, First" <milestone> [year]',
+    'Usage: bun scripts/add-milestone.ts "Last, First" <milestone> [year]',
   );
   process.exit(1);
 }
@@ -29,12 +28,17 @@ if (Number.isNaN(year)) {
   process.exit(1);
 }
 
-const configPath = path.resolve(__dirname, "..", "trophies.config.ts");
+const configPath = path.resolve(
+  import.meta.dirname,
+  "..",
+  "trophies.config.ts",
+);
 let content = fs.readFileSync(configPath, "utf-8");
 
 // Find the milestone block, e.g. "300km": {
+const escapedMilestone = milestone.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const milestonePattern = new RegExp(
-  `("${milestone}":\\s*\\{)([^}]*)(\\})`,
+  `("${escapedMilestone}":\\s*\\{)([^}]*)(\\})`,
   "s",
 );
 const match = content.match(milestonePattern);

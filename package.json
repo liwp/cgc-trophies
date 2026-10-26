@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Rank glider flights for trophies.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
