@@ -8,7 +8,6 @@ import {
   winnerScore,
 } from "../../src/lib/results";
 import type {
-  Flight,
   FlightTrophy,
   LadderResult,
   LadderTrophy,
