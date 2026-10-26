@@ -156,7 +156,8 @@ format, matching the BGA Ladder flight data.
 copy-to-clipboard views. It is generated from the BGA's turnpoint file, which
 the BGA updates about once a year, so after each new release:
 
-1. Get the new `.cup` file (named like `BGA TPs 2026-06-10.cup`).
+1. Download the new `.cup` file (named like `BGA TPs 2026-06-10.cup`) from
+   [navboys.com](https://www.navboys.com/downloads.html).
 2. Regenerate the list, stamping codes added or retired with the season:
 
    ```bash
