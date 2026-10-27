@@ -236,4 +236,6 @@ export interface CandidateRecord {
   category: RecordCategory;
   flight: Flight;
   value: number;
+  /** The record this candidate beats: the current record or an earlier candidate. */
+  beats: number | null;
 }

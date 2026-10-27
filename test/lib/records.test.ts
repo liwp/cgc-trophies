@@ -2,6 +2,7 @@ import {
   findCandidates,
   formatRecordValue,
   isEligible,
+  isFaiTriangle,
   recordValue,
 } from "../../src/lib/records";
 import type { RecordCategory, RecordRule } from "../../src/types";
@@ -109,8 +110,53 @@ describe("recordValue", () => {
     expect(recordValue(rule, makeFlight())).toBe(200);
   });
 
+  it("rejects a speed flight over the height-loss limit", () => {
+    expect(
+      recordValue(orRule, makeFlight({ task: { ...or, heightLoss: 1571 } })),
+    ).toBeNull();
+    expect(
+      recordValue(orRule, makeFlight({ task: { ...or, heightLoss: 1000 } })),
+    ).toBe(122.9);
+  });
+
+  it("rejects a triangle without FAI geometry", () => {
+    const rule: RecordRule = {
+      kind: "speed",
+      shape: "triangle",
+      minDistanceKm: 200,
+    };
+    const legs = (shortest: number, longest: number) =>
+      makeFlight({ task: { triangleLegsPct: { shortest, longest } } });
+    expect(recordValue(rule, legs(14, 50))).toBeNull();
+    expect(recordValue(rule, legs(30, 36))).toBe(80);
+  });
+
   it("never values height", () => {
     expect(recordValue({ kind: "height" }, makeFlight())).toBeNull();
+  });
+});
+
+describe("isFaiTriangle", () => {
+  const task = (km: number, shortest: number, longest: number) =>
+    makeFlight({
+      task: { scoringDistanceKm: km, triangleLegsPct: { shortest, longest } },
+    }).task;
+
+  it("needs every leg at least 28% under 750 km", () => {
+    expect(isFaiTriangle(task(749, 28, 44))).toBe(true);
+    expect(isFaiTriangle(task(749, 27.9, 40))).toBe(false);
+  });
+
+  it("needs every leg 25-45% from 750 km", () => {
+    expect(isFaiTriangle(task(750, 25, 45))).toBe(true);
+    expect(isFaiTriangle(task(750, 24.9, 40))).toBe(false);
+    expect(isFaiTriangle(task(750, 26, 45.1))).toBe(false);
+  });
+
+  it("rejects a triangle without leg data", () => {
+    expect(
+      isFaiTriangle(makeFlight({ task: { triangleLegsPct: null } }).task),
+    ).toBe(false);
   });
 });
 
@@ -179,6 +225,64 @@ describe("findCandidates", () => {
       "t300",
       "t200",
     ]);
+  });
+
+  const on = (date: string, speed: number, id = date) =>
+    makeFlight({
+      id,
+      date: new Date(date),
+      task: { ...orTask, scoringSpeedKph: speed },
+    });
+
+  it("needs to beat the record by more than 1 km/h", () => {
+    const cats = [category("c", or100, 120)];
+    expect(findCandidates(cats, [on("2020-06-01", 121)])).toEqual([]);
+    expect(findCandidates(cats, [on("2020-06-01", 121.1)])).toHaveLength(1);
+  });
+
+  it("walks flights in date order and records each new record", () => {
+    const result = findCandidates(
+      [category("c", or100, 100)],
+      [
+        on("2022-08-14", 133.9),
+        on("2010-08-31", 110.9),
+        on("2014-07-29", 111.5),
+        on("2013-08-31", 118.3),
+      ],
+    );
+    expect(result.map((c) => [c.flight.id, c.beats])).toEqual([
+      ["2010-08-31", 100],
+      ["2013-08-31", 110.9],
+      ["2022-08-14", 118.3],
+    ]);
+  });
+
+  it("lets a later flight within the margin of a new record lapse", () => {
+    const result = findCandidates(
+      [category("c", or100, 89.5)],
+      [on("2018-06-21", 99), on("2022-08-05", 99.7)],
+    );
+    expect(result.map((c) => c.flight.id)).toEqual(["2018-06-21"]);
+  });
+
+  it("counts only the best flight of a day, without the margin", () => {
+    const result = findCandidates(
+      [category("c", or100, 100)],
+      [on("2020-06-01", 110, "a"), on("2020-06-01", 110.5, "b")],
+    );
+    expect(result.map((c) => c.flight.id)).toEqual(["b"]);
+  });
+
+  it("ignores flights on or before the record's date", () => {
+    const cats = [
+      {
+        ...category("c", or100, 100),
+        record: { ...category("c", or100, 100).record!, date: "2020-06-01" },
+      },
+    ];
+    expect(
+      findCandidates(cats, [on("2019-01-01", 150), on("2020-06-01", 150)]),
+    ).toEqual([]);
   });
 
   it("never yields height candidates", () => {

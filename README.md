@@ -181,9 +181,13 @@ distance records and heights). To find ladder flights that would beat them:
 bun run scripts/club-records.ts 2026
 ```
 
-It fetches every season from 2007 to the one given and lists, per category, the
-best eligible flight (the club's own, launched at its site, declared and
-completed) that beats the current record, using actual speeds. Height records
+It fetches every season from 2007 to the one given and walks the eligible
+flights (the club's own, launched at its site, declared and completed) in date
+order, using actual speeds and the FAI SC3 rules: a new record must beat the
+standing one by more than 1 km or 1 km/h, only the best flight of a day counts,
+triangles need FAI geometry, and speed flights must stay within the 1000 m
+height-loss limit. It lists every flight that would have broken a record, so a
+category can show several in turn; the last one is the current record. Height records
 are never derived from ladder data. The script only prints; a person approves
 each candidate and edits `records.config.ts` by hand.
 
