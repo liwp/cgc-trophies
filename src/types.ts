@@ -17,6 +17,8 @@ export interface Flight {
     handicappedSpeedKph: number;
     scoringSpeedKph: number;
     taskShape: "triangle" | "out-and-return" | "other";
+    /** A triangle's shortest and longest legs as % of the course, else null. */
+    triangleLegsPct: { shortest: number; longest: number } | null;
     launchSite: string;
     start: string;
     finish: string;

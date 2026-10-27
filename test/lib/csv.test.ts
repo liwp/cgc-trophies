@@ -293,6 +293,14 @@ c1,c2,c1
         );
       });
 
+      it("parses triangle leg percentages", () => {
+        expect(parseWith("80", "14%/50% Triangle").triangleLegsPct).toEqual({
+          shortest: 14,
+          longest: 50,
+        });
+        expect(parseWith("80", "Out and Return").triangleLegsPct).toBeNull();
+      });
+
       it("maps other and blank shapes to other", () => {
         expect(parseWith("80", "Convex Polygon").taskShape).toBe("other");
         expect(parseWith("80", "").taskShape).toBe("other");

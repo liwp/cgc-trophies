@@ -40,6 +40,7 @@ export function makeFlight({
       handicappedSpeedKph: 80,
       scoringSpeedKph: 80,
       taskShape: "triangle",
+      triangleLegsPct: { shortest: 33, longest: 34 },
       launchSite: "Gransden Lodge",
       start: "GRL",
       finish: "GRL",

@@ -107,6 +107,16 @@ const TASK_SPEC = {
         return "other";
       },
     },
+    triangleLegsPct: {
+      src: "Task Shape",
+      type: "string",
+      xform: (shape: string) => {
+        const m = shape.trim().match(/^([\d.]+)%\/([\d.]+)% Triangle$/);
+        return m
+          ? { shortest: parseFloat(m[1]), longest: parseFloat(m[2]) }
+          : null;
+      },
+    },
     handicappedSpeedKph: {
       src: "Handicapped Speed (kph)",
       type: "number",
