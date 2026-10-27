@@ -15,6 +15,8 @@ export interface Flight {
     taskAchievement: string;
     handicappedDistanceKm: number;
     handicappedSpeedKph: number;
+    scoringSpeedKph: number;
+    taskShape: "triangle" | "out-and-return" | "other";
     launchSite: string;
     start: string;
     finish: string;
@@ -22,6 +24,8 @@ export interface Flight {
     heightLoss: number;
   };
 }
+
+export type TaskShape = Flight["task"]["taskShape"];
 
 /**
  * A day of the year. `day` is a day of the month, or "lastSunday" for the
