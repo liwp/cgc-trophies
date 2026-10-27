@@ -1,4 +1,9 @@
-import { findCandidates, isEligible, recordValue } from "../../src/lib/records";
+import {
+  findCandidates,
+  formatRecordValue,
+  isEligible,
+  recordValue,
+} from "../../src/lib/records";
 import type { RecordCategory, RecordRule } from "../../src/types";
 import { makeFlight } from "../helpers/flight";
 
@@ -180,5 +185,43 @@ describe("findCandidates", () => {
     expect(
       findCandidates([category("h", { kind: "height" }, null)], [makeFlight()]),
     ).toEqual([]);
+  });
+});
+
+describe("formatRecordValue", () => {
+  const rec = (
+    rule: RecordRule,
+    value: number,
+    distanceKm?: number,
+  ): RecordCategory => ({
+    ...category("x", rule, value),
+    record: {
+      value,
+      ...(distanceKm !== undefined && { distanceKm }),
+      pilot: "A B",
+      route: "",
+      glider: "G",
+      date: "2020-01-01",
+    },
+  });
+
+  it("shows a speed with its distance", () => {
+    expect(formatRecordValue(rec(orRule, 116.6, 515.25))).toBe(
+      "116.6 km/h (515.3 km)",
+    );
+  });
+  it("shows a speed without a distance", () => {
+    expect(formatRecordValue(rec(orRule, 102.5))).toBe("102.5 km/h");
+  });
+  it("shows a distance in km", () => {
+    expect(
+      formatRecordValue(rec({ kind: "distance", shape: "any" }, 981.68)),
+    ).toBe("981.7 km");
+  });
+  it("shows a height in feet with a thousands separator", () => {
+    expect(formatRecordValue(rec({ kind: "height" }, 12992))).toBe("12,992 ft");
+  });
+  it("shows No claim without a record", () => {
+    expect(formatRecordValue(category("x", orRule, null))).toBe("No claim");
   });
 });
