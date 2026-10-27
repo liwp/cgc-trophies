@@ -195,3 +195,43 @@ export interface TrophiesConfig {
   excludedFlights?: ExcludedFlights;
   trophies: Trophy[];
 }
+
+export type RecordRule =
+  | { kind: "distance"; shape: "any" | "triangle"; maxTurnpoints?: number }
+  | {
+      kind: "speed";
+      shape: "any" | "triangle" | "out-and-return";
+      minDistanceKm: number;
+    }
+  | { kind: "height" };
+
+export interface ClubRecord {
+  /** km, km/h or ft, per the rule kind */
+  value: number;
+  /** Speed records only */
+  distanceKm?: number;
+  pilot: string;
+  route: string;
+  glider: string;
+  /** ISO yyyy-mm-dd */
+  date: string;
+  /** BGA Ladder flight id */
+  flightId?: string;
+}
+
+export interface RecordCategory {
+  id: string;
+  label: string;
+  rule: RecordRule;
+  /** null = "No claim" */
+  record: ClubRecord | null;
+  /** Oldest first */
+  superseded: ClubRecord[];
+  ukRecord?: { status: "current" | "former"; lists: string[] };
+}
+
+export interface CandidateRecord {
+  category: RecordCategory;
+  flight: Flight;
+  value: number;
+}
