@@ -56,6 +56,7 @@ function makeFlight(overrides: {
       handicappedSpeedKph: 85.3,
       scoringSpeedKph: 80,
       taskShape: "triangle",
+      triangleLegsPct: { shortest: 33, longest: 34 },
       launchSite: "Gransden Lodge",
       start,
       finish,
