@@ -3,9 +3,12 @@
  * List ladder flights that would beat the club records in records.config.ts.
  *
  * Only eligible flights count (club's own, launched at its site, declared and
- * completed) and speeds are actual speeds. Height records are never derived
- * from ladder data. Prints one block per category that has a candidate, for a
- * human to approve; it never edits records.config.ts.
+ * completed) and speeds are actual speeds. Flights are walked in date order
+ * under the FAI SC3 rules: a new record must beat the standing one by 1 km or
+ * 1 km/h, triangles need FAI geometry, and speed flights must stay within the
+ * 1000 m height-loss limit. Height records are never derived from ladder data.
+ * Prints each candidate (later ones supersede earlier ones in a category), for
+ * a human to approve; it never edits records.config.ts.
  *
  * Usage: bun run scripts/club-records.ts [lastSeason]
  */
@@ -39,12 +42,10 @@ async function main() {
     console.log("No candidate records.");
     return;
   }
-  const blocks = candidates.map(({ category, flight, value }) => {
-    const current = category.record
-      ? category.record.value.toFixed(1)
-      : "No claim";
+  const blocks = candidates.map(({ category, flight, value, beats }) => {
+    const beaten = beats === null ? "No claim" : beats.toFixed(1);
     return [
-      `${category.label}: ${value.toFixed(1)} (current: ${current})`,
+      `${category.label}: ${value.toFixed(1)} (beats: ${beaten})`,
       `  ${flight.pilot}, ${flight.date.toISOString().slice(0, 10)}, ${flight.glider.type}, ${flight.task.scoringDistanceKm.toFixed(1)} km`,
       `  ${flightDetailsUrl(flight.id)}`,
     ].join("\n");

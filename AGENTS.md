@@ -79,7 +79,7 @@ Defined in `src/App.tsx`; the season is a `?season=` query param.
 - `src/lib/stats.ts` — Season statistics (completion rates, distance calculations)
 - `scripts/pilot-milestones.ts` — Derives `pilotMilestones` (first season with a declared, completed 300 km / 500 km task) from the club's BGA Ladder history and reports differences from `trophies.config.ts`; rerun each season. Changing milestones can change past results, so review the golden snapshot diff
 - `records.config.ts` — The club's records by category (current record plus superseded ones); edited by hand, only after a person approves a candidate
-- `src/lib/records.ts` — Record eligibility, per-category values and `findCandidates` (ladder flights that beat the current records)
+- `src/lib/records.ts` — Record eligibility, per-category values and `findCandidates` (walks ladder flights in date order under the FAI SC3 margin, triangle-geometry and height-loss rules)
 - `scripts/club-records.ts` — Lists candidate club records from the club's BGA Ladder history for a human to approve; never writes the config; rerun each season
 - `scripts/update-turnpoints.py` — Generates `src/lib/turnpoints.ts` (code → name, with `added`/`removed` seasons) from the BGA's yearly turnpoint `.cup` release only; never add turnpoints from other sources or edit the file by hand. See README "Yearly turnpoint update"
 
