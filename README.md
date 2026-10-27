@@ -172,6 +172,21 @@ the BGA updates about once a year, so after each new release:
    its `history` (see AGENTS.md, "Season-scoped trophy history").
 4. Commit `turnpoints.ts` as generated; don't edit it by hand.
 
+## Club records
+
+`records.config.ts` holds the club's records (fastest speeds over set distances,
+distance records and heights). To find ladder flights that would beat them:
+
+```bash
+bun run scripts/club-records.ts 2026
+```
+
+It fetches every season from 2007 to the one given and lists, per category, the
+best eligible flight (the club's own, launched at its site, declared and
+completed) that beats the current record, using actual speeds. Height records
+are never derived from ladder data. The script only prints; a person approves
+each candidate and edits `records.config.ts` by hand.
+
 ## License
 
 [MIT](LICENSE)
