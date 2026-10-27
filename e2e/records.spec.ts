@@ -33,7 +33,7 @@ test("a record links to its BGA Ladder flight", async ({ page }) => {
   const row = page.locator("tr", { hasText: "Fastest 100 km O/R" });
   await expect(row.getByRole("link")).toHaveAttribute(
     "href",
-    "https://www.bgaladder.net/flightdetails/44774",
+    "https://www.bgaladder.net/flightdetails/53036",
   );
 });
 
