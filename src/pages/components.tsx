@@ -54,6 +54,8 @@ function makeFlight(overrides: {
       taskAchievement: isCompleted ? "100%" : "75%",
       handicappedDistanceKm: scoringDistanceKm * 1.08,
       handicappedSpeedKph: 85.3,
+      scoringSpeedKph: 80,
+      taskShape: "triangle",
       launchSite: "Gransden Lodge",
       start,
       finish,

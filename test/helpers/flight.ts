@@ -38,6 +38,8 @@ export function makeFlight({
       taskAchievement: "100% Completed",
       handicappedDistanceKm: 200,
       handicappedSpeedKph: 80,
+      scoringSpeedKph: 80,
+      taskShape: "triangle",
       launchSite: "Gransden Lodge",
       start: "GRL",
       finish: "GRL",

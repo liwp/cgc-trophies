@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import Papa from "papaparse";
 import {
   type FieldSpec,
   parseBoolean,
@@ -261,6 +262,41 @@ c1,c2,c1
       expect(() => csv.parseCsv(SPEC, renamed)).toThrow(
         'Missing CSV column "Completed?"',
       );
+    });
+
+    describe("speed and task shape", () => {
+      const fixture = readFileSync(
+        new URL("../../e2e/fixtures/2025.csv", import.meta.url),
+        "utf8",
+      );
+      const [header, firstRow] = fixture.split("\n");
+      const { data: columns } = Papa.parse<string[]>(header);
+      const { data: cells } = Papa.parse<string[]>(firstRow);
+
+      function parseWith(speed: string, shape: string) {
+        const row = [...cells[0]];
+        row[columns[0].indexOf("Scoring Speed (kph)")] = speed;
+        row[columns[0].indexOf("Task Shape")] = shape;
+        return csv.parseCsv(SPEC, `${header}\n${Papa.unparse([row])}`)[0].task;
+      }
+
+      it("parses actual speed and task shape", () => {
+        const task = parseWith("122.869", "Out and Return");
+        expect(task.scoringSpeedKph).toBe(122.869);
+        expect(task.taskShape).toBe("out-and-return");
+      });
+
+      it("maps triangle shapes", () => {
+        expect(parseWith("80", "16%/50% Triangle").taskShape).toBe("triangle");
+        expect(parseWith("80", "32.8%/33.7% Triangle").taskShape).toBe(
+          "triangle",
+        );
+      });
+
+      it("maps other and blank shapes to other", () => {
+        expect(parseWith("80", "Convex Polygon").taskShape).toBe("other");
+        expect(parseWith("80", "").taskShape).toBe("other");
+      });
     });
 
     it("parses the flight spec to a Flight", () => {

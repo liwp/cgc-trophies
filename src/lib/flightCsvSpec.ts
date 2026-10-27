@@ -1,5 +1,5 @@
 import { capitalize } from "lodash";
-import type { Flight } from "../types";
+import type { Flight, TaskShape } from "../types";
 import type { FieldSpec } from "./csv";
 
 const GLIDER_SPEC = {
@@ -92,6 +92,20 @@ const TASK_SPEC = {
     handicappedDistanceKm: {
       src: "Handicapped Distance (km)",
       type: "number",
+    },
+    scoringSpeedKph: {
+      src: "Scoring Speed (kph)",
+      type: "number",
+    },
+    taskShape: {
+      src: "Task Shape",
+      type: "string",
+      xform: (shape: string): TaskShape => {
+        const trimmed = shape.trim();
+        if (trimmed.endsWith("Triangle")) return "triangle";
+        if (trimmed === "Out and Return") return "out-and-return";
+        return "other";
+      },
     },
     handicappedSpeedKph: {
       src: "Handicapped Speed (kph)",
