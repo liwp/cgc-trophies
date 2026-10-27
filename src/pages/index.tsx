@@ -1,4 +1,4 @@
-import { Settings } from "lucide-react";
+import { Settings, Trophy } from "lucide-react";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
@@ -97,6 +97,14 @@ const TrophiesPage = () => {
           </h1>
           <div className="flex items-center gap-4">
             <Season season={season} />
+            <Tooltip text="Club records" asLabel>
+              <Link
+                to="/records"
+                className="p-2 rounded-lg text-gray-400 hover:text-cambridge hover:bg-cambridge-light transition-colors"
+              >
+                <Trophy size={18} />
+              </Link>
+            </Tooltip>
             <Tooltip text="Admin view" asLabel>
               <Link
                 to={`/admin?season=${season}`}
