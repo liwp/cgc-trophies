@@ -90,6 +90,44 @@ test("expanding a row shows its history", async ({ page }) => {
   );
 });
 
+test("clicking a record's body toggles its history", async ({ page }) => {
+  await page.goto("/records");
+  const history = page.getByRole("list", { name: "Earlier 200km O/R records" });
+  const pilot = recordFor(page, "200km O/R").getByText("Graham Drury");
+  await pilot.click();
+  await expect(history).toBeVisible();
+  await pilot.click();
+  await expect(history).toBeHidden();
+});
+
+test("clicking a record's ladder link leaves its history closed", async ({
+  page,
+  context,
+}) => {
+  await context.route("https://www.bgaladder.net/**", (route) =>
+    route.fulfill({ body: "" }),
+  );
+  await page.goto("/records");
+  const popup = page.waitForEvent("popup");
+  await recordFor(page, "200km O/R")
+    .getByRole("link", { name: /km\/h/ })
+    .click();
+  await (await popup).close();
+  await expect(
+    page.getByRole("list", { name: "Earlier 200km O/R records" }),
+  ).toBeHidden();
+});
+
+test("a record with history shows a pointer cursor", async ({ page }) => {
+  await page.goto("/records");
+  const row = recordFor(page, "200km O/R");
+  await expect(row).toHaveCSS("cursor", "pointer");
+  await expect(
+    row.getByRole("button", { name: "Show earlier records" }),
+  ).toHaveCSS("cursor", "pointer");
+  await expect(recordFor(page, "600km O/R")).not.toHaveCSS("cursor", "pointer");
+});
+
 test("history links only entries with a ladder flight", async ({ page }) => {
   await page.goto("/records");
   await recordFor(page, "200km O/R")
@@ -108,6 +146,15 @@ test("history links only entries with a ladder flight", async ({ page }) => {
 
 test.describe("on a touch phone", () => {
   test.use(TOUCH_PHONE);
+
+  test("tapping a card's body toggles its history", async ({ page }) => {
+    await page.goto("/records");
+    const history = page.getByRole("list", {
+      name: "Earlier 200km O/R records",
+    });
+    await recordFor(page, "200km O/R").getByText("Graham Drury").tap();
+    await expect(history).toBeVisible();
+  });
 
   test("a tap shows and hides a tooltip", async ({ page }) => {
     await page.goto("/records");

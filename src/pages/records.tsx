@@ -4,7 +4,7 @@ import {
   ChevronRight,
   ExternalLink,
 } from "lucide-react";
-import { Fragment, useState } from "react";
+import { Fragment, type MouseEvent, useState } from "react";
 import { Link } from "react-router-dom";
 
 import CONFIG from "trophies-config";
@@ -92,6 +92,22 @@ const RecordValue = ({
   );
 };
 
+/**
+ * Click handling for a record with history: a click anywhere on it toggles
+ * the history, except on a link or button, which do their own thing.
+ * Keyboard users have the HistoryToggle button.
+ */
+const toggleOnClick = (hasHistory: boolean, toggle: () => void) =>
+  hasHistory
+    ? {
+        onClick: (e: MouseEvent) => {
+          if ((e.target as Element).closest("a, button")) return;
+          toggle();
+        },
+        className: "cursor-pointer",
+      }
+    : { onClick: undefined, className: "" };
+
 const HistoryToggle = ({
   open,
   onToggle,
@@ -104,7 +120,7 @@ const HistoryToggle = ({
     aria-expanded={open}
     aria-label={open ? "Hide earlier records" : "Show earlier records"}
     onClick={onToggle}
-    className="text-gray-400 hover:text-gray-600"
+    className="cursor-pointer text-gray-400 hover:text-gray-600"
   >
     {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
   </button>
@@ -130,9 +146,13 @@ const RecordRow = ({ category }: { category: RecordCategory }) => {
   const [open, setOpen] = useState(false);
   const { record } = category;
   const hasHistory = category.superseded.length > 0;
+  const click = toggleOnClick(hasHistory, () => setOpen((o) => !o));
   return (
     <>
-      <tr className="border-t border-gray-100 align-top">
+      <tr
+        onClick={click.onClick}
+        className={`border-t border-gray-100 align-top ${click.className}`}
+      >
         <td className="py-3 pl-3">
           {hasHistory && (
             <HistoryToggle open={open} onToggle={() => setOpen((o) => !o)} />
@@ -175,8 +195,13 @@ const RecordCard = ({ category }: { category: RecordCategory }) => {
   const [open, setOpen] = useState(false);
   const { record } = category;
   const hasHistory = category.superseded.length > 0;
+  const click = toggleOnClick(hasHistory, () => setOpen((o) => !o));
   return (
-    <li className="flex flex-col gap-0.5 border-t border-gray-100 px-3 py-2.5 first:border-t-0">
+    // biome-ignore lint/a11y/useKeyWithClickEvents: HistoryToggle is the keyboard control
+    <li
+      onClick={click.onClick}
+      className={`flex flex-col gap-0.5 border-t border-gray-100 px-3 py-2.5 first:border-t-0 ${click.className}`}
+    >
       <div className="flex items-baseline justify-between gap-2">
         <TaskCode category={category} />
         <span className="font-semibold whitespace-nowrap">
