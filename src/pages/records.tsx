@@ -42,7 +42,11 @@ const RecordRow = ({ category }: { category: RecordCategory }) => {
         )}
       </td>
       <td className="px-4 py-3 text-gray-700">{record?.pilot}</td>
-      <td className="px-4 py-3 text-gray-700">{record?.route}</td>
+      <td className="px-4 py-3 text-gray-700">
+        {record?.turnpoints
+          .map((tp) => (typeof tp === "string" ? tp : tp.name))
+          .join(" – ")}
+      </td>
       <td className="px-4 py-3 text-gray-700">{record?.glider}</td>
       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
         {record ? formatDate(record.date) : ""}

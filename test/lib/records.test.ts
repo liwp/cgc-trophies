@@ -22,11 +22,19 @@ function category(
   return {
     id,
     label: id,
+    code: id,
+    group: "distance",
     rule,
     record:
       value === null
         ? null
-        : { value, pilot: "P", route: "R", glider: "G", date: "2000-01-01" },
+        : {
+            value,
+            pilot: "P",
+            turnpoints: [],
+            glider: "G",
+            date: "2000-01-01",
+          },
     superseded: [],
   };
 }
@@ -303,7 +311,7 @@ describe("formatRecordValue", () => {
       value,
       ...(distanceKm !== undefined && { distanceKm }),
       pilot: "A B",
-      route: "",
+      turnpoints: [],
       glider: "G",
       date: "2020-01-01",
     },
