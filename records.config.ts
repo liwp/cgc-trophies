@@ -41,6 +41,37 @@ const outAndReturn300: ClubRecord = {
   flightId: "104680",
 };
 
+// Sarah Kelman's 2003 O/R, over 500 km, also held the 300 km O/R record.
+const outAndReturn500: ClubRecord = {
+  value: 106.89,
+  distanceKm: 509.7,
+  pilot: "Sarah Kelman",
+  turnpoints: ["NRT"],
+  glider: "ASW 28",
+  date: "2003-08-14",
+};
+
+// Great Malvern O/Rs that held the 300 and 200 km O/R records in turn.
+const outAndReturnJeffery2010: ClubRecord = {
+  value: 110.9,
+  distanceKm: 302.5,
+  pilot: "Phil Jeffery",
+  turnpoints: ["GRM"],
+  glider: "Ventus 2cx",
+  date: "2010-08-31",
+  flightId: "29151",
+};
+
+const outAndReturnBaker2013: ClubRecord = {
+  value: 118.3,
+  distanceKm: 302.5,
+  pilot: "Iain Baker",
+  turnpoints: ["GRM"],
+  glider: "Antares",
+  date: "2013-08-31",
+  flightId: "44883",
+};
+
 const speed = (
   shape: "any" | "triangle" | "out-and-return",
   minDistanceKm: number,
@@ -154,14 +185,7 @@ const categories: RecordCategory[] = [
     code: "500km O/R",
     group: "out-and-return",
     rule: speed("out-and-return", 500),
-    record: {
-      value: 106.89,
-      distanceKm: 509.7,
-      pilot: "Sarah Kelman",
-      turnpoints: ["NRT"],
-      glider: "ASW 28",
-      date: "2003-08-14",
-    },
+    record: { ...outAndReturn500 },
     superseded: [],
     ukRecord: { status: "current", lists: ["UK Standard", "UK Feminine Open"] },
   },
@@ -217,7 +241,12 @@ const categories: RecordCategory[] = [
     group: "out-and-return",
     rule: speed("out-and-return", 300),
     record: { ...outAndReturn300 },
-    superseded: [],
+    // Records flown over at least 300 km in the other O/R categories.
+    superseded: [
+      { ...outAndReturn500 },
+      { ...outAndReturnJeffery2010 },
+      { ...outAndReturnBaker2013 },
+    ],
   },
   {
     id: "fastest-200-triangle",
@@ -244,24 +273,8 @@ const categories: RecordCategory[] = [
         glider: "LS8",
         date: "1996-08-19",
       },
-      {
-        value: 110.9,
-        distanceKm: 302.5,
-        pilot: "Phil Jeffery",
-        turnpoints: ["GRM"],
-        glider: "Ventus 2cx",
-        date: "2010-08-31",
-        flightId: "29151",
-      },
-      {
-        value: 118.3,
-        distanceKm: 302.5,
-        pilot: "Iain Baker",
-        turnpoints: ["GRM"],
-        glider: "Antares",
-        date: "2013-08-31",
-        flightId: "44883",
-      },
+      { ...outAndReturnJeffery2010 },
+      { ...outAndReturnBaker2013 },
     ],
   },
   {
