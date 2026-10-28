@@ -6,6 +6,7 @@
 *.tsbuildinfo
 .serena/
 /docs/superpowers/
+/.superpowers/
 
 # Local env files (per-developer, not for publishing)
 .env*.local

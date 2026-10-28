@@ -207,13 +207,19 @@ export type RecordRule =
     }
   | { kind: "height" };
 
+/** A BGA turnpoint code, or a custom turnpoint that isn't in the BGA list */
+export type RecordTurnpoint = string | { name: string };
+
+export type RecordGroup = "distance" | "triangle" | "out-and-return" | "height";
+
 export interface ClubRecord {
   /** km, km/h or ft, per the rule kind */
   value: number;
   /** Speed records only */
   distanceKm?: number;
   pilot: string;
-  route: string;
+  /** The route's turnpoints, without the start and finish */
+  turnpoints: RecordTurnpoint[];
   glider: string;
   /** ISO yyyy-mm-dd */
   date: string;
@@ -223,7 +229,11 @@ export interface ClubRecord {
 
 export interface RecordCategory {
   id: string;
+  /** Full name, e.g. "Fastest 600 km triangle" */
   label: string;
+  /** Short name within its group, e.g. "600km △" */
+  code: string;
+  group: RecordGroup;
   rule: RecordRule;
   /** null = "No claim" */
   record: ClubRecord | null;

@@ -1,4 +1,30 @@
 import categories from "../../records.config";
+import { currentSeason } from "../../src/lib/season";
+import TURNPOINTS from "../../src/lib/turnpoints";
+
+const records = categories.flatMap((c) =>
+  [...(c.record ? [c.record] : []), ...c.superseded].map((r) => ({
+    category: c.id,
+    record: r,
+  })),
+);
+
+// Every BGA code in a record's route must have been in the BGA list in the
+// season the record was flown.
+const turnpointCases = records.flatMap(({ category, record }) =>
+  record.turnpoints.flatMap((tp) =>
+    typeof tp === "string"
+      ? [
+          {
+            category,
+            date: record.date,
+            code: tp,
+            season: currentSeason(new Date(record.date)),
+          },
+        ]
+      : [],
+  ),
+);
 
 describe("records.config", () => {
   it("has the spec's 17 ids in order", () => {
@@ -48,4 +74,49 @@ describe("records.config", () => {
       categories.find((x) => x.id === "fastest-600-or")?.record,
     ).toBeNull();
   });
+
+  it("gives every category a code and group", () => {
+    expect(categories.map((c) => [c.id, c.code, c.group])).toEqual([
+      ["longest-distance", "3TP", "distance"],
+      ["largest-triangle", "FAI △", "distance"],
+      ["fastest-750", "750km", "distance"],
+      ["fastest-600-triangle", "600km △", "triangle"],
+      ["fastest-600-or", "600km O/R", "out-and-return"],
+      ["fastest-500-triangle", "500km △", "triangle"],
+      ["fastest-500-or", "500km O/R", "out-and-return"],
+      ["fastest-400-triangle", "400km △", "triangle"],
+      ["fastest-400-or", "400km O/R", "out-and-return"],
+      ["fastest-300-triangle", "300km △", "triangle"],
+      ["fastest-300-or", "300km O/R", "out-and-return"],
+      ["fastest-200-triangle", "200km △", "triangle"],
+      ["fastest-200-or", "200km O/R", "out-and-return"],
+      ["fastest-100-triangle", "100km △", "triangle"],
+      ["fastest-100-or", "100km O/R", "out-and-return"],
+      ["absolute-height", "Abs", "height"],
+      ["height-gain", "Gain", "height"],
+    ]);
+  });
+
+  it("uses custom turnpoints only for Molesworth", () => {
+    const custom = records.flatMap(({ record }) =>
+      record.turnpoints.filter((tp) => typeof tp !== "string"),
+    );
+    expect(custom).toEqual([{ name: "Molesworth" }]);
+  });
+
+  it.each(turnpointCases)(
+    "$category $date: $code is a BGA turnpoint in $season",
+    ({ code, season }) => {
+      const turnpoint = TURNPOINTS[code];
+      expect(turnpoint, `unknown turnpoint ${code}`).toBeDefined();
+      expect(
+        turnpoint.added ?? season,
+        `${code} was added in ${turnpoint.added}`,
+      ).toBeLessThanOrEqual(season);
+      expect(
+        turnpoint.removed ?? Number.POSITIVE_INFINITY,
+        `${code} was removed in ${turnpoint.removed}`,
+      ).toBeGreaterThan(season);
+    },
+  );
 });
