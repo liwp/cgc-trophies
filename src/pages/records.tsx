@@ -113,12 +113,14 @@ const HistoryToggle = ({
 const History = ({ category }: { category: RecordCategory }) => (
   <ul
     aria-label={`Earlier ${category.code} records`}
-    className="flex flex-col gap-1 text-xs text-gray-500"
+    className="flex flex-col gap-1 text-xs text-gray-500 sm:text-sm"
   >
     {recordHistory(category).map((r) => (
       <li key={r.date}>
         {formatDate(r.date)} · {r.pilot} ·{" "}
-        <RecordValue category={category} record={r} /> · {r.glider}
+        <RecordValue category={category} record={r} />
+        {/* Left out on a phone, where it would wrap the line */}
+        <span className="hidden sm:inline"> · {r.glider}</span>
       </li>
     ))}
   </ul>
@@ -176,12 +178,7 @@ const RecordCard = ({ category }: { category: RecordCategory }) => {
   return (
     <li className="flex flex-col gap-0.5 border-t border-gray-100 px-3 py-2.5 first:border-t-0">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="inline-flex items-center gap-1">
-          {hasHistory && (
-            <HistoryToggle open={open} onToggle={() => setOpen((o) => !o)} />
-          )}
-          <TaskCode category={category} />
-        </span>
+        <TaskCode category={category} />
         <span className="font-semibold whitespace-nowrap">
           <RecordValue category={category} record={record} />
         </span>
@@ -194,13 +191,18 @@ const RecordCard = ({ category }: { category: RecordCategory }) => {
               {formatDate(record.date)}
             </span>
           </div>
-          <div className="text-xs text-gray-500">
-            {record.turnpoints.length > 0 && (
-              <>
-                <Route record={record} /> ·{" "}
-              </>
+          <div className="flex items-center justify-between gap-2 text-xs text-gray-500">
+            <span>
+              {record.turnpoints.length > 0 && (
+                <>
+                  <Route record={record} /> ·{" "}
+                </>
+              )}
+              {record.glider}
+            </span>
+            {hasHistory && (
+              <HistoryToggle open={open} onToggle={() => setOpen((o) => !o)} />
             )}
-            {record.glider}
           </div>
         </>
       )}
