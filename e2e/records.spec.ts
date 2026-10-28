@@ -18,7 +18,9 @@ const recordFor = (page: Page, code: string) =>
 
 const fitsViewport = (page: Page) =>
   page.evaluate(
-    () => document.documentElement.scrollWidth <= window.innerWidth,
+    () =>
+      document.documentElement.scrollWidth <=
+      document.documentElement.clientWidth,
   );
 
 test("the records page shows the four groups", async ({ page }) => {
@@ -121,11 +123,25 @@ test.describe("on a touch phone", () => {
     page,
   }) => {
     await page.goto("/records");
-    await recordFor(page, "750km").getByRole("button", { name: "CHD" }).tap();
-    await expect(
-      page.getByRole("tooltip", { name: "Chesterfield" }),
-    ).toBeVisible();
-    expect(await fitsViewport(page)).toBe(true);
+    // The longest tooltip, which would otherwise pass the right edge.
+    const uk = recordFor(page, "500km O/R").getByRole("button", { name: "UK" });
+    const tip = page.getByRole("tooltip", {
+      name: "Current UK record: UK Standard, UK Feminine Open",
+    });
+    const edge = PHONE.width - 8;
+    // Open it twice: the second placement must start from the natural edge.
+    for (let i = 0; i < 2; i++) {
+      await uk.tap();
+      await expect(tip).toBeVisible();
+      await expect
+        .poll(async () => {
+          const box = await tip.boundingBox();
+          return Math.round((box?.x ?? 0) + (box?.width ?? 0));
+        })
+        .toBeLessThanOrEqual(edge);
+      expect(await fitsViewport(page)).toBe(true);
+      await uk.tap();
+    }
   });
 });
 

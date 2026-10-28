@@ -28,8 +28,11 @@ const Tip = ({
     requestAnimationFrame(() => {
       const el = tipRef.current;
       if (!el) return;
-      const right = el.getBoundingClientRect().right - shift;
-      setShift(Math.max(0, right - (window.innerWidth - EDGE)));
+      // The rect already includes the current shift; undo it to get the natural edge.
+      const right = el.getBoundingClientRect().right + shift;
+      setShift(
+        Math.max(0, right - (document.documentElement.clientWidth - EDGE)),
+      );
     });
 
   return (
