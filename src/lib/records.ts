@@ -5,6 +5,7 @@ import type {
   RecordCategory,
   RecordRule,
 } from "../types";
+import { formatClubRecordValue } from "./recordDisplay";
 
 /** Filed under the club, launched at its site, declared and completed. */
 export function isEligible(flight: Flight): boolean {
@@ -113,19 +114,8 @@ export function findCandidates(
   return candidates;
 }
 
-/** A record's achievement as shown on the records page. */
+/** A category's current record as shown on the records page. */
 export function formatRecordValue(category: RecordCategory): string {
   const { record, rule } = category;
-  if (!record) return "No claim";
-  switch (rule.kind) {
-    case "speed":
-      // Speeds keep their curated precision (e.g. 106.89); distances round.
-      return record.distanceKm === undefined
-        ? `${record.value} km/h`
-        : `${record.value} km/h (${record.distanceKm.toFixed(1)} km)`;
-    case "distance":
-      return `${record.value.toFixed(1)} km`;
-    case "height":
-      return `${record.value.toLocaleString("en-GB")} ft`;
-  }
+  return record ? formatClubRecordValue(rule, record) : "No claim";
 }
