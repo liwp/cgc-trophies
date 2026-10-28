@@ -44,6 +44,18 @@ test("a category without a record shows No claim", async ({ page }) => {
   await expect(row.getByRole("button", { name: /earlier/ })).toHaveCount(0);
 });
 
+test("a task code that is its full name has no tooltip", async ({ page }) => {
+  await page.goto("/records");
+  const row = recordFor(page, "Gain of height");
+  await expect(row).toBeVisible();
+  await expect(row.getByRole("button", { name: "Gain of height" })).toHaveCount(
+    0,
+  );
+  await expect(
+    recordFor(page, "600km △").getByRole("button", { name: "600km △" }),
+  ).toBeVisible();
+});
+
 test("a route shows turnpoint codes on one line", async ({ page }) => {
   await page.goto("/records");
   await expect(recordFor(page, "600km △")).toContainText("TAL – BLW", {

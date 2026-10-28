@@ -456,8 +456,8 @@ const categories: RecordCategory[] = [
   },
   {
     id: "absolute-height",
-    label: "Absolute height",
-    code: "Abs",
+    label: "Absolute altitude",
+    code: "Absolute altitude",
     group: "height",
     rule: { kind: "height" },
     record: {
@@ -471,8 +471,8 @@ const categories: RecordCategory[] = [
   },
   {
     id: "height-gain",
-    label: "Height gain",
-    code: "Gain",
+    label: "Gain of height",
+    code: "Gain of height",
     group: "height",
     rule: { kind: "height" },
     record: {

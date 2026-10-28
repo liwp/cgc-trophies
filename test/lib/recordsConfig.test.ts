@@ -93,8 +93,8 @@ describe("records.config", () => {
       ["fastest-200-or", "200km O/R", "out-and-return"],
       ["fastest-100-triangle", "100km △", "triangle"],
       ["fastest-100-or", "100km O/R", "out-and-return"],
-      ["absolute-height", "Abs", "height"],
-      ["height-gain", "Gain", "height"],
+      ["absolute-height", "Absolute altitude", "height"],
+      ["height-gain", "Gain of height", "height"],
     ]);
   });
 
