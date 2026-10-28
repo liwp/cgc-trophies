@@ -306,4 +306,11 @@ const categories: RecordCategory[] = [
   },
 ];
 
+/**
+ * The last season `scripts/club-records.ts` was run over and its candidates
+ * reviewed. The script starts from this season (inclusive, as it may not have
+ * been complete); bump it after each review.
+ */
+export const checkedThroughSeason = 2026;
+
 export default categories;
