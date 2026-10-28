@@ -45,9 +45,14 @@ const UkBadge = ({ category }: { category: RecordCategory }) => {
 /** The task code with its UK badge, centred on the code's text. */
 const TaskCode = ({ category }: { category: RecordCategory }) => (
   <span className="inline-flex items-center gap-1.5">
-    <Tip tip={category.label} className="font-semibold text-gray-900">
-      {category.code}
-    </Tip>
+    {/* A code that spells out its full name needs no tooltip */}
+    {category.code === category.label ? (
+      <span className="font-semibold text-gray-900">{category.code}</span>
+    ) : (
+      <Tip tip={category.label} className="font-semibold text-gray-900">
+        {category.code}
+      </Tip>
+    )}
     <UkBadge category={category} />
   </span>
 );
