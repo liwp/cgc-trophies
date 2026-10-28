@@ -58,25 +58,8 @@ A trophy's headline `description`/`expr` describe the CURRENT task definition. W
 }
 ```
 
-### Routes (React Router)
+### Scripts
 
-Defined in `src/App.tsx`; the season is a `?season=` query param.
-
-- `/` — Trophy winners summary table for the season
-- `/trophy/:trophyId` — Detailed results for a single trophy
-- `/admin` — Admin view (copy-to-clipboard, expanded results)
-- `/components` — Component showcase page
-- `*` — unknown paths redirect to `/`
-
-### Key Files
-
-- `src/types.ts` — All shared types (Flight, Trophy, LadderResult, ScoredFlight, etc.)
-- `src/lib/eval.ts` — Core scoring logic
-- `trophies.config.ts` — Club config (name, code, launch site) and trophy definitions
-- `src/lib/csv.ts` — CSV parser (papaparse + custom spec-based field parsing)
-- `src/lib/fetchFlights.ts` — fetches + parses BGA CSV directly from the client
-- `src/lib/trophyCopyData.ts` — Clipboard copy formatting for trophy results
-- `src/lib/stats.ts` — Season statistics (completion rates, distance calculations)
 - `scripts/pilot-milestones.ts` — Derives `pilotMilestones` (first season with a declared, completed 300 km / 500 km task) from the club's BGA Ladder history and reports differences from `trophies.config.ts`; rerun each season. Changing milestones can change past results, so review the golden snapshot diff
 - `records.config.ts` — The club's records by category (current record plus superseded ones); edited by hand, only after a person approves a candidate
 - `src/lib/records.ts` — Record eligibility, per-category values and `findCandidates` (walks ladder flights in date order under the FAI SC3 margin, triangle-geometry and height-loss rules)
@@ -95,13 +78,6 @@ Defined in `src/App.tsx`; the season is a `?season=` query param.
 ### Lodash
 
 Lodash may be imported either as a default import (`import _ from "lodash"`, then destructure) or named (`import { chain } from "lodash"`) — both work under Vite. (The old default-import-only rule was a Next.js `optimizePackageImports` workaround and no longer applies.)
-
-### Styling
-
-- Tailwind CSS v4 via the `@tailwindcss/vite` plugin (configured in `vite.config.ts`)
-- Global CSS at `src/styles/globals.css` with just `@import "tailwindcss"`
-- No component library — plain HTML + Tailwind utility classes
-- Icons from `lucide-react` without prefix: `Check`, `Copy`, `ExternalLink`, etc.
 
 ### Testing
 
