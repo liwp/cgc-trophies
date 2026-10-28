@@ -54,19 +54,19 @@ test("a route's tooltip names its turnpoints", async ({ page }) => {
   const row = recordFor(page, "500km △");
   await expect(row).toContainText("BIC ’26");
   await expect(
-    row.getByRole("button", {
-      name: "Bicester Control Tower (removed 2026) – Scunthorpe N – Garboldisham",
-    }),
-  ).toBeVisible();
+    row.getByRole("button", { name: "BIC ’26 – SCU – GAB" }),
+  ).toHaveAccessibleDescription(
+    "Bicester Control Tower (removed 2026) – Scunthorpe N – Garboldisham",
+  );
 });
 
 test("a UK record shows its lists in a tooltip", async ({ page }) => {
   await page.goto("/records");
   await expect(
-    recordFor(page, "500km O/R").getByRole("button", {
-      name: "Current UK record: UK Standard, UK Feminine Open",
-    }),
-  ).toBeVisible();
+    recordFor(page, "500km O/R").getByRole("button", { name: "UK" }),
+  ).toHaveAccessibleDescription(
+    "Current UK record: UK Standard, UK Feminine Open",
+  );
 });
 
 test("a record links to its BGA Ladder flight", async ({ page }) => {
@@ -109,12 +109,23 @@ test.describe("on a touch phone", () => {
 
   test("a tap shows and hides a tooltip", async ({ page }) => {
     await page.goto("/records");
-    const code = page.getByRole("button", { name: "Fastest 600 km triangle" });
+    const code = page.getByRole("button", { name: "600km △" });
     const tip = page.getByRole("tooltip", { name: "Fastest 600 km triangle" });
     await code.tap();
     await expect(tip).toBeVisible();
     await code.tap();
     await expect(tip).toBeHidden();
+  });
+
+  test("a tooltip near the right edge stays in the viewport", async ({
+    page,
+  }) => {
+    await page.goto("/records");
+    await recordFor(page, "750km").getByRole("button", { name: "CHD" }).tap();
+    await expect(
+      page.getByRole("tooltip", { name: "Chesterfield" }),
+    ).toBeVisible();
+    expect(await fitsViewport(page)).toBe(true);
   });
 });
 
