@@ -10,17 +10,19 @@
  * Prints each candidate (later ones supersede earlier ones in a category), for
  * a human to approve; it never edits records.config.ts.
  *
+ * Seasons from `checkedThroughSeason` in records.config.ts onwards are
+ * fetched; earlier ones were reviewed when the records were last updated.
+ *
  * Usage: bun run scripts/club-records.ts [lastSeason]
  */
 import CONFIG from "trophies-config";
-import records from "../records.config";
+import records, { checkedThroughSeason } from "../records.config";
 import { parseCsv } from "../src/lib/csv";
 import { SPEC } from "../src/lib/flightCsvSpec";
 import { flightDetailsUrl } from "../src/lib/links";
 import { findCandidates } from "../src/lib/records";
 import type { Flight } from "../src/types";
 
-const FIRST_SEASON = 2007;
 const URL = "https://api.bgaladder.net/api/getlogfilescsv";
 
 const lastSeason = Number(process.argv[2] ?? new Date().getFullYear());
@@ -33,7 +35,7 @@ async function flightsFor(year: number): Promise<Flight[]> {
 
 async function main() {
   const flights: Flight[] = [];
-  for (let year = FIRST_SEASON; year <= lastSeason; year++) {
+  for (let year = checkedThroughSeason; year <= lastSeason; year++) {
     flights.push(...(await flightsFor(year)));
   }
 
