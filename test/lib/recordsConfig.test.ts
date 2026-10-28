@@ -1,4 +1,5 @@
 import categories from "../../records.config";
+import { RECORD_MARGIN } from "../../src/lib/records";
 import { currentSeason } from "../../src/lib/season";
 import TURNPOINTS from "../../src/lib/turnpoints";
 
@@ -119,4 +120,26 @@ describe("records.config", () => {
       ).toBeGreaterThan(season);
     },
   );
+
+  it("keeps each category's history in date order, each beating the last", () => {
+    for (const { id, record, superseded } of categories) {
+      const chain = [...superseded, ...(record ? [record] : [])];
+      for (let i = 1; i < chain.length; i++) {
+        const [prev, next] = [chain[i - 1], chain[i]];
+        expect(next.date > prev.date, `${id}: ${next.date}`).toBe(true);
+        expect(next.value, `${id}: ${next.date}`).toBeGreaterThan(
+          prev.value + RECORD_MARGIN,
+        );
+      }
+    }
+  });
+
+  it("lists the 300 km O/R records Drury's flight replaced", () => {
+    const c = categories.find((x) => x.id === "fastest-300-or");
+    expect(c?.superseded.map((r) => [r.date, r.pilot, r.value])).toEqual([
+      ["2003-08-14", "Sarah Kelman", 106.89],
+      ["2010-08-31", "Phil Jeffery", 110.9],
+      ["2013-08-31", "Iain Baker", 118.3],
+    ]);
+  });
 });
