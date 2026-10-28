@@ -5,6 +5,11 @@
  * Holswilder's unverified "Proposed Revision" of 11 July 2026 (not merged).
  * Speeds are actual speeds. Records approved on 2026-10-27 from the ladder
  * (FAI SC3 rules) replace the baseline, which is kept in `superseded`.
+ * Histories (approved 2026-10-28) list the records before 2007 that the 2023
+ * document gives, then the ladder flights from 2007 that beat them in turn; a
+ * longer flight counts for the shorter categories too. The 400 km O/R keeps
+ * Bridge's 2004 flight, as the document does, although Kelman's faster 2003
+ * O/R also qualified.
  * Candidate new records come from
  * `scripts/club-records.ts`, which never edits this file; update it by hand.
  */
@@ -70,6 +75,67 @@ const outAndReturnBaker2013: ClubRecord = {
   glider: "Antares",
   date: "2013-08-31",
   flightId: "44883",
+};
+
+// Ladder triangles from 2007-08 that held several triangle records in turn.
+const bridgeTriangle2007: ClubRecord = {
+  value: 85.5,
+  distanceKm: 517.9,
+  pilot: "John Bridge",
+  turnpoints: ["NEW", "WKE", "NMT"],
+  glider: "LS6c (17.5)",
+  date: "2007-07-30",
+  flightId: "11992",
+};
+
+const jefferyTriangle2007a: ClubRecord = {
+  value: 92.5,
+  distanceKm: 393.2,
+  pilot: "Phil Jeffery",
+  turnpoints: ["OXF", "NWK", "NMT"],
+  glider: "LS8",
+  date: "2007-07-29",
+  flightId: "11852",
+};
+
+const jefferyTriangle2007b: ClubRecord = {
+  value: 97.7,
+  distanceKm: 305.6,
+  pilot: "Phil Jeffery",
+  turnpoints: ["SOH", "EAW", "CAL"],
+  glider: "LS8",
+  date: "2007-08-10",
+  flightId: "12694",
+};
+
+const jefferyTriangle2008a: ClubRecord = {
+  value: 99.8,
+  distanceKm: 414.4,
+  pilot: "Phil Jeffery",
+  turnpoints: ["AND", "GRM"],
+  glider: "Ventus 2cx",
+  date: "2008-06-16",
+  flightId: "15856",
+};
+
+const jefferyTriangle2008b: ClubRecord = {
+  value: 109.1,
+  distanceKm: 405.4,
+  pilot: "Phil Jeffery",
+  turnpoints: ["BIC", "NWK", "BSE"],
+  glider: "Ventus 2cx",
+  date: "2008-08-15",
+  flightId: "17187",
+};
+
+// John Birch's 1996 O/R held the 200 and 100 km O/R records.
+const outAndReturnBirch1996: ClubRecord = {
+  value: 109.0,
+  distanceKm: 221.6,
+  pilot: "John Birch",
+  turnpoints: ["NWK"],
+  glider: "LS8",
+  date: "1996-08-19",
 };
 
 const speed = (
@@ -151,6 +217,15 @@ const categories: RecordCategory[] = [
     },
     superseded: [
       {
+        value: 90.8,
+        distanceKm: 607.5,
+        pilot: "Phil Jeffery",
+        turnpoints: ["BS2", "LYR", "ROS"],
+        glider: "Ventus 2cx",
+        date: "2010-05-28",
+        flightId: "26462",
+      },
+      {
         value: 96.9,
         distanceKm: 607.46,
         pilot: "Phil Jeffery",
@@ -176,7 +251,18 @@ const categories: RecordCategory[] = [
     group: "triangle",
     rule: speed("triangle", 500),
     record: { ...triangle500 },
-    superseded: [],
+    superseded: [
+      { ...bridgeTriangle2007 },
+      {
+        value: 91.1,
+        distanceKm: 504.9,
+        pilot: "Phil Jeffery",
+        turnpoints: ["LRI", "NWK", "TIB"],
+        glider: "Ventus 2cx",
+        date: "2008-07-04",
+        flightId: "16248",
+      },
+    ],
     ukRecord: { status: "former", lists: ["UK Open"] },
   },
   {
@@ -196,7 +282,20 @@ const categories: RecordCategory[] = [
     group: "triangle",
     rule: speed("triangle", 400),
     record: { ...triangle500 },
-    superseded: [],
+    superseded: [
+      {
+        value: 81.0,
+        distanceKm: 400.8,
+        pilot: "John Bridge",
+        turnpoints: ["WEC", "OSB", "DIS"],
+        glider: "LS6c (17.5)",
+        date: "2007-07-08",
+        flightId: "11449",
+      },
+      { ...bridgeTriangle2007 },
+      { ...jefferyTriangle2008a },
+      { ...jefferyTriangle2008b },
+    ],
     ukRecord: { status: "former", lists: ["UK Open"] },
   },
   {
@@ -232,7 +331,31 @@ const categories: RecordCategory[] = [
     group: "triangle",
     rule: speed("triangle", 300),
     record: { ...triangle300 },
-    superseded: [{ ...triangle500 }],
+    superseded: [
+      {
+        value: 69.8,
+        distanceKm: 305.6,
+        pilot: "John Bridge",
+        turnpoints: ["SOH", "EAW", "CAL"],
+        glider: "LS6c (17.5)",
+        date: "2007-04-08",
+        flightId: "10156",
+      },
+      {
+        value: 80.7,
+        distanceKm: 300.7,
+        pilot: "John Bridge",
+        turnpoints: ["DID", "LEI"],
+        glider: "LS6c (17.5)",
+        date: "2007-06-02",
+        flightId: "11027",
+      },
+      { ...jefferyTriangle2007a },
+      { ...jefferyTriangle2007b },
+      { ...jefferyTriangle2008a },
+      { ...jefferyTriangle2008b },
+      { ...triangle500 },
+    ],
   },
   {
     id: "fastest-300-or",
@@ -255,7 +378,22 @@ const categories: RecordCategory[] = [
     group: "triangle",
     rule: speed("triangle", 200),
     record: { ...triangle300 },
-    superseded: [{ ...triangle500 }],
+    superseded: [
+      {
+        value: 81.2,
+        distanceKm: 205.1,
+        pilot: "John Bridge",
+        turnpoints: ["BIC", "HUS"],
+        glider: "LS6c (17.5)",
+        date: "2007-04-07",
+        flightId: "10155",
+      },
+      { ...jefferyTriangle2007a },
+      { ...jefferyTriangle2007b },
+      { ...jefferyTriangle2008a },
+      { ...jefferyTriangle2008b },
+      { ...triangle500 },
+    ],
   },
   {
     id: "fastest-200-or",
@@ -265,14 +403,7 @@ const categories: RecordCategory[] = [
     rule: speed("out-and-return", 200),
     record: { ...outAndReturn300 },
     superseded: [
-      {
-        value: 109.0,
-        distanceKm: 221.6,
-        pilot: "John Birch",
-        turnpoints: ["NWK"],
-        glider: "LS8",
-        date: "1996-08-19",
-      },
+      { ...outAndReturnBirch1996 },
       { ...outAndReturnJeffery2010 },
       { ...outAndReturnBaker2013 },
     ],
@@ -310,6 +441,8 @@ const categories: RecordCategory[] = [
       flightId: "53036",
     },
     superseded: [
+      { ...outAndReturnBirch1996 },
+      { ...outAndReturnJeffery2010 },
       {
         value: 118.8,
         distanceKm: 105.8,
