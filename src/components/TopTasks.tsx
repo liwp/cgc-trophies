@@ -3,37 +3,24 @@ import type { TopTask } from "../lib/stats";
 import TURNPOINTS from "../lib/turnpoints";
 import type { Flight } from "../types";
 import ExpandButton from "./ExpandButton";
-import FlightRow, { PenaltyWarning } from "./FlightRow";
+import FlightRow, { FlightSpeed, kph } from "./FlightRow";
 import Th from "./Th";
 import Tip from "./Tip";
 
 const routeNames = (route: string[]) =>
   route.map((code) => TURNPOINTS[code]?.name ?? code).join(" – ");
 
-const kph = (v: number | null) => (v === null ? "" : `${v.toFixed(1)} kph`);
-
 const completedOf = (completed: number, total: number) =>
   `${completed} / ${total}`;
 
-const TaskFlightRow = ({ flight }: { flight: Flight }) => {
-  const { task } = flight;
-  const completed = task.isCompleted && task.isDeclared;
-  return (
-    <FlightRow flight={flight} span={3} detail={flight.glider.type}>
-      <td className="px-4 py-1.5 text-right tabular-nums whitespace-nowrap">
-        <span className="inline-flex items-center gap-1.5">
-          <PenaltyWarning flight={flight} />
-          {completed ? (
-            kph(task.handicappedSpeedKph)
-          ) : (
-            <span className="text-gray-400 italic">Not completed</span>
-          )}
-        </span>
-      </td>
-      <td />
-    </FlightRow>
-  );
-};
+const TaskFlightRow = ({ flight }: { flight: Flight }) => (
+  <FlightRow flight={flight} span={3} detail={flight.glider.type}>
+    <td className="px-4 py-1.5 text-right tabular-nums whitespace-nowrap">
+      <FlightSpeed flight={flight} />
+    </td>
+    <td />
+  </FlightRow>
+);
 
 const TaskRow = ({ task }: { task: TopTask }) => {
   const [expanded, setExpanded] = useState(false);

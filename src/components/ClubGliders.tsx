@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { ClubGliderStats } from "../lib/stats";
 import type { Flight } from "../types";
 import ExpandButton from "./ExpandButton";
-import FlightRow, { PenaltyWarning } from "./FlightRow";
+import FlightRow, { FlightSpeed, kph } from "./FlightRow";
 import Th from "./Th";
 
 const whole = (v: number) => Math.round(v).toLocaleString("en-GB");
@@ -12,28 +12,29 @@ const cell =
 const flightCell = "px-4 py-1.5 text-right tabular-nums whitespace-nowrap";
 
 const route = ({ task }: Flight) =>
-  [task.start, ...task.turnpoints, task.finish].join(" – ");
+  [task.start, ...task.turnpoints, task.finish].join("-");
 
 const GliderFlightRow = ({ flight }: { flight: Flight }) => (
   <FlightRow
     flight={flight}
     span={2}
-    detail={<span className="font-mono">{route(flight)}</span>}
+    // Long routes wrap, so they don't widen the table
+    detail={
+      <span className="font-mono whitespace-normal">{route(flight)}</span>
+    }
   >
     <td className={flightCell}>
-      <span className="inline-flex items-center gap-1.5">
-        <PenaltyWarning flight={flight} />
-        {whole(flight.task.scoringDistanceKm)}
-      </span>
+      <FlightSpeed flight={flight} />
     </td>
+    <td className={flightCell}>{whole(flight.task.scoringDistanceKm)}</td>
     <td className={flightCell}>{whole(flight.task.crossCountryPoints)}</td>
-    <td colSpan={2} />
+    <td />
   </FlightRow>
 );
 
 const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
   const [expanded, setExpanded] = useState(false);
-  const { glider, flights, scoringKm, points, pilots } = stats;
+  const { glider, flights, avgSpeedKph, scoringKm, points } = stats;
   const name = `${glider.name} ${glider.compNo}`;
   const flown = flights.length > 0;
   const toggle = () => setExpanded(!expanded);
@@ -50,9 +51,9 @@ const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
           <span className="text-xs text-gray-500">{glider.registration}</span>
         </td>
         <td className={cell}>{flights.length}</td>
+        <td className={cell}>{kph(avgSpeedKph)}</td>
         <td className={cell}>{whole(scoringKm)}</td>
         <td className={cell}>{whole(points)}</td>
-        <td className={cell}>{pilots}</td>
         <td className="py-2 pr-4">
           {flown && (
             <ExpandButton
@@ -83,9 +84,9 @@ const ClubGliders = ({ stats }: { stats: ClubGliderStats[] }) => (
           <tr className="border-b border-gray-200 bg-gray-50">
             <Th>Glider</Th>
             <Th align="right">Flights</Th>
+            <Th align="right">Avg speed</Th>
             <Th align="right">Km</Th>
             <Th align="right">Points</Th>
-            <Th align="right">Pilots</Th>
             <Th />
           </tr>
         </thead>

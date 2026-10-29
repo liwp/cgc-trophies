@@ -492,10 +492,10 @@ export interface ClubGliderStats {
   glider: ClubGlider;
   /** Its flights, in date order */
   flights: Flight[];
+  /** Mean handicapped speed of completed tasks; null without any. */
+  avgSpeedKph: number | null;
   scoringKm: number;
   points: number;
-  /** Distinct pilots who flew it */
-  pilots: number;
 }
 
 /** Whether a flight was in the club glider, by registration or comp number. */
@@ -521,12 +521,15 @@ function clubGliderStats(
     const gliderFlights = sortBy(claimed.filter(isClubGlider(glider)), (f) =>
       f.date.getTime(),
     );
+    const completed = gliderFlights.filter(isCompletedTask);
     return {
       glider,
       flights: gliderFlights,
+      avgSpeedKph: completed.length
+        ? meanBy(completed, (f) => f.task.handicappedSpeedKph)
+        : null,
       scoringKm: sumBy(gliderFlights, (f) => f.task.scoringDistanceKm),
       points: sumBy(gliderFlights, (f) => f.task.crossCountryPoints),
-      pilots: new Set(gliderFlights.map((f) => f.pilot)).size,
     };
   });
 }

@@ -719,7 +719,6 @@ describe("clubGliderStats", () => {
       glider: k21,
       scoringKm: 600,
       points: 3600,
-      pilots: 2,
     });
     expect(stats.flights.map((f) => f.glider.registration)).toEqual([
       "G-CHTV",
@@ -751,6 +750,24 @@ describe("clubGliderStats", () => {
     );
 
     expect(stats.flights).toHaveLength(0);
+  });
+
+  it("averages the handicapped speed of completed tasks", () => {
+    const [flown, unflown] = clubGliderStats(
+      [
+        flight("HTV", "ASK 21", { task: { handicappedSpeedKph: 60 } }),
+        flight("HTV", "ASK 21", { task: { handicappedSpeedKph: 80 } }),
+        flight("HTV", "ASK 21", {
+          task: { handicappedSpeedKph: 10, isCompleted: false },
+        }),
+      ],
+      2025,
+      calendar,
+      [k21, perkoz],
+    );
+
+    expect(flown.avgSpeedKph).toBe(70);
+    expect(unflown.avgSpeedKph).toBeNull();
   });
 
   it("lists a glider's flights in date order", () => {
