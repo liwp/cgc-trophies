@@ -213,3 +213,48 @@ test("a top task expands to its flights", async ({ page }) => {
     .click();
   await expect(rows).toHaveCount(10);
 });
+
+test("the season awards show each card's winner", async ({ page }) => {
+  await page.goto("/stats?season=2024");
+  const awards = page.getByRole("region", { name: "Season awards" });
+  const card = (title: string) =>
+    awards.getByRole("listitem").filter({ hasText: title });
+  await expect(card("Most flights")).toBeVisible();
+  await expect(card("Most flights")).toContainText("28 flights");
+  await expect(card("Most flights")).toContainText("Wendy Head");
+  await expect(card("Longest flight")).toContainText("758.2 km");
+  await expect(
+    card("Longest flight").getByRole("link", { name: "Alex Holswilder" }),
+  ).toHaveAttribute("href", /bgaladder\.net\/flightdetails/);
+  await expect(card("Top scoring flight")).toContainText("pts");
+  await expect(card("Longest FAI triangle")).toContainText("km");
+  await expect(awards.locator("> ul > li")).toHaveCount(8);
+
+  // A lone first flight shows its pilot directly
+  const first = awards
+    .locator("> ul > li")
+    .filter({ hasText: "First flights" });
+  await expect(first).toContainText("26 Mar");
+  await expect(
+    first.getByRole("link", { name: "Paul Bonhomme" }),
+  ).toBeVisible();
+  await expect(first.getByRole("button")).toHaveCount(0);
+});
+
+test("a day award with several pilots expands to them", async ({ page }) => {
+  await page.goto("/stats?season=2025");
+  const first = page
+    .getByRole("region", { name: "Season awards" })
+    .locator("> ul > li")
+    .filter({ hasText: "First flights" });
+  await expect(first).toContainText("15 Mar");
+  await expect(first).toContainText("3 pilots");
+  await expect(first.getByRole("link")).toHaveCount(0);
+  await first
+    .getByRole("button", { name: "First flights: all flights" })
+    .click();
+  await expect(first.getByRole("link")).toHaveCount(3);
+  await expect(
+    first.getByRole("link", { name: "Alex Holswilder" }),
+  ).toBeVisible();
+});
