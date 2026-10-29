@@ -23,7 +23,7 @@ const fitsViewport = (page: Page) =>
       document.documentElement.clientWidth,
   );
 
-test("the records page shows the four groups", async ({ page }) => {
+test("the records page shows the five groups", async ({ page }) => {
   await page.goto("/records");
 
   await expect(
@@ -31,8 +31,9 @@ test("the records page shows the four groups", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByRole("heading", { level: 2 })).toHaveText([
     "Distance",
-    "Triangles",
-    "Out-and-returns",
+    "Speed: triangles",
+    "Speed: out-and-returns",
+    "Speed: any course",
     "Height",
   ]);
 });
@@ -215,7 +216,7 @@ test("the phone layout fits the viewport", async ({ page }) => {
 test("the desktop layout fits the viewport", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/records");
-  await expect(page.locator("table:visible")).toHaveCount(4);
+  await expect(page.locator("table:visible")).toHaveCount(5);
   expect(await fitsViewport(page)).toBe(true);
 });
 

@@ -110,11 +110,12 @@ describe("groupCategories", () => {
     const groups = groupCategories(records);
     expect(groups.map((g) => g.heading)).toEqual([
       "Distance",
-      "Triangles",
-      "Out-and-returns",
+      "Speed: triangles",
+      "Speed: out-and-returns",
+      "Speed: any course",
       "Height",
     ]);
-    expect(groups.map((g) => g.categories.length)).toEqual([3, 6, 6, 2]);
+    expect(groups.map((g) => g.categories.length)).toEqual([2, 6, 6, 1, 2]);
     expect(groups[1].categories.map((c) => c.code)).toEqual([
       "600km △",
       "500km △",

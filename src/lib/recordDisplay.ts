@@ -56,8 +56,9 @@ export function ukRecordTooltip(category: RecordCategory): string | null {
 
 export const RECORD_GROUPS: { group: RecordGroup; heading: string }[] = [
   { group: "distance", heading: "Distance" },
-  { group: "triangle", heading: "Triangles" },
-  { group: "out-and-return", heading: "Out-and-returns" },
+  { group: "triangle", heading: "Speed: triangles" },
+  { group: "out-and-return", heading: "Speed: out-and-returns" },
+  { group: "any-course", heading: "Speed: any course" },
   { group: "height", heading: "Height" },
 ];
 
