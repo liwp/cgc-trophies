@@ -72,7 +72,8 @@ test("the stats fit a phone screen", async ({ page }) => {
   ).toBe(true);
 });
 
-const pilotRows = (page: Page) => page.getByRole("table").locator("tbody tr");
+const pilotRows = (page: Page) =>
+  page.getByRole("region", { name: "Pilots" }).locator("tbody tr");
 
 test("the pilot table lists pilots by points and sorts by any column", async ({
   page,
@@ -128,4 +129,27 @@ test("the monthly charts show each month's flights and km", async ({
   await expect(km).toContainText("27,881 km");
   await km.getByRole("img", { name: /July 2024/ }).focus();
   await expect(km.getByText("July 2024: 27,881 km")).toBeVisible();
+});
+
+test("best days ranks the season's days by total km", async ({ page }) => {
+  await page.goto("/stats?season=2024");
+  const rows = page
+    .getByRole("region", { name: "Best days" })
+    .locator("tbody tr");
+  await expect(rows).toHaveCount(10);
+  await expect(rows.first()).toContainText("Sun 28 Jul");
+  await expect(rows.first()).toContainText("6,647 km");
+  await expect(
+    rows.first().getByRole("link", { name: "Graham Drury" }),
+  ).toHaveAttribute("href", /bgaladder\.net\/flightdetails/);
+
+  const expand = rows
+    .first()
+    .getByRole("button", { name: "All flights on Sun 28 Jul" });
+  await expect(rows.first().locator("li")).toHaveCount(1);
+  await expand.click();
+  await expect(expand).toHaveAttribute("aria-expanded", "true");
+  await expect(rows.first().locator("li")).toHaveCount(15);
+  await expand.click();
+  await expect(rows.first().locator("li")).toHaveCount(1);
 });
