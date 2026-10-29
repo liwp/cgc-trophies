@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 import CONFIG from "trophies-config";
 import BestDays from "../components/BestDays";
+import ClubGliders from "../components/ClubGliders";
 import CompletionChart from "../components/CompletionChart";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
@@ -16,6 +17,7 @@ import Toggle from "../components/Toggle";
 import TopTasks from "../components/TopTasks";
 import {
   bestDays,
+  clubGliderStats,
   monthlyActivity,
   pilotStats,
   type SeasonSummary,
@@ -160,6 +162,12 @@ const StatsPage = () => {
       topTasks: topTasks(flights, state.season, CONFIG.season),
       days: bestDays(flights, state.season, CONFIG.season),
       pilots: pilotStats(flights, state.season, CONFIG.season),
+      clubGliders: clubGliderStats(
+        flights,
+        state.season,
+        CONFIG.season,
+        CONFIG.clubGliders ?? [],
+      ),
       months: monthlyActivity(flights, state.season, CONFIG.season),
       previousMonths: monthlyActivity(flights, state.season - 1, CONFIG.season),
     };
@@ -251,6 +259,9 @@ const StatsPage = () => {
         <TopTasks tasks={summaries.topTasks} />
         <BestDays days={summaries.days} />
         <PilotStatsTable stats={summaries.pilots} />
+        {summaries.clubGliders.length > 0 && (
+          <ClubGliders stats={summaries.clubGliders} />
+        )}
       </div>
     </PageLayout>
   );
