@@ -39,6 +39,14 @@ import type { TrophiesConfig } from "./src/types";
 //   next-best flight counts instead, and are listed with the reason on the
 //   trophy and admin pages. Include the season in the reason.
 //
+// clubGliders:
+//   The club's own gliders, for the stats page's club glider table. A flight
+//   counts for a glider when its registration is the glider's registration or
+//   competition number (ignoring case) and its glider type matches `type`, a
+//   case-insensitive regex (pilots enter either; `type` keeps out a private
+//   glider entered with the same competition number). Registrations checked on
+//   G-INFO, owner Cambridge Gliding Club Ltd, 2026-10-29.
+//
 // trophies:
 //   An array of trophy definitions. There are two types:
 //
@@ -252,6 +260,16 @@ const config: TrophiesConfig = {
     131406:
       "Second declared task claimed from the same IGC file as 131403 (2026)",
   },
+  clubGliders: [
+    { name: "K21", compNo: "HTV", registration: "G-CHTV", type: "ask\\s*21" },
+    { name: "K21", compNo: "KFY", registration: "G-CKFY", type: "ask\\s*21" },
+    { name: "Puchacz", compNo: "JEC", registration: "G-CJEC", type: "puchacz" },
+    { name: "Perkoz", compNo: "PZ", registration: "G-PCGC", type: "perkoz" },
+    { name: "Discus", compNo: "DM", registration: "G-CJXR", type: "discus" },
+    { name: "Pegase", compNo: "FVV", registration: "G-CFVV", type: "pegase" },
+    { name: "Junior", compNo: "HDU", registration: "G-CHDU", type: "junior" },
+    { name: "Junior", compNo: "VB", registration: "G-CLYL", type: "junior" },
+  ],
   trophies: [
     // --- Ladder trophies ---
     {
