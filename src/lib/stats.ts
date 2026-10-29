@@ -368,6 +368,126 @@ function topTasks(
   ).slice(0, limit);
 }
 
+export type Superlative = {
+  key: string;
+  title: string;
+  /** The headline figure, e.g. "758.2 km". */
+  value: string;
+} & (
+  | { pilot: string; flight?: Flight }
+  /** A card for a day: its flights, longest first. */
+  | { dayFlights: Flight[] }
+);
+
+const fmtKm = (v: number) =>
+  `${v.toLocaleString("en-GB", { maximumFractionDigits: 1, minimumFractionDigits: 1 })} km`;
+
+/**
+ * The season's award cards. Ties go to the earlier flight (or the pilot
+ * first by name); a card is left out when nothing qualifies.
+ */
+function superlatives(
+  flights: Flight[],
+  season: number,
+  seasonConfig: SeasonConfig,
+): Superlative[] {
+  const claimed = sortBy(claimedInSeason(flights, season, seasonConfig), (f) =>
+    f.date.getTime(),
+  );
+  const pilots = pilotStats(flights, season, seasonConfig);
+  // orderBy is stable, so equal flights keep date order
+  const top = (fs: Flight[], value: (f: Flight) => number) =>
+    orderBy(fs, value, "desc")[0];
+  const topPilot = (value: (p: PilotStats) => number) =>
+    orderBy(pilots, [value, "pilot"], ["desc", "asc"])[0];
+
+  const cards: (Superlative | undefined)[] = [];
+  const flightCard = (
+    key: string,
+    title: string,
+    flight: Flight | undefined,
+    value: (f: Flight) => string,
+  ) =>
+    cards.push(
+      flight && {
+        key,
+        title,
+        pilot: flight.pilot,
+        value: value(flight),
+        flight,
+      },
+    );
+  const pilotCard = (
+    key: string,
+    title: string,
+    stat: PilotStats | undefined,
+    value: (p: PilotStats) => string,
+  ) =>
+    cards.push(stat && { key, title, pilot: stat.pilot, value: value(stat) });
+
+  pilotCard(
+    "mostFlights",
+    "Most flights",
+    topPilot((p) => p.flights),
+    (p) => `${p.flights} flights`,
+  );
+  pilotCard(
+    "mostKm",
+    "Most km",
+    topPilot((p) => p.scoringKm),
+    (p) => `${Math.round(p.scoringKm).toLocaleString("en-GB")} km`,
+  );
+  flightCard(
+    "longest",
+    "Longest flight",
+    top(claimed, (f) => f.task.scoringDistanceKm),
+    (f) => fmtKm(f.task.scoringDistanceKm),
+  );
+  flightCard(
+    "fastest",
+    "Fastest task",
+    top(claimed.filter(isCompletedTask), (f) => f.task.handicappedSpeedKph),
+    (f) => `${f.task.handicappedSpeedKph.toFixed(1)} kph`,
+  );
+  const dayMonth = (f: Flight) =>
+    f.date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    });
+  const dayCard = (key: string, title: string, day: Flight | undefined) =>
+    cards.push(
+      day && {
+        key,
+        title,
+        value: dayMonth(day),
+        dayFlights: orderBy(
+          claimed.filter((f) => f.date.getTime() === day.date.getTime()),
+          (f) => f.task.scoringDistanceKm,
+          "desc",
+        ),
+      },
+    );
+  flightCard(
+    "topScoring",
+    "Top scoring flight",
+    top(claimed, (f) => f.task.crossCountryPoints),
+    (f) => `${f.task.crossCountryPoints.toLocaleString("en-GB")} pts`,
+  );
+  flightCard(
+    "longestFai",
+    "Longest FAI triangle",
+    top(
+      claimed.filter((f) => f.task.isFaiTriangle),
+      (f) => f.task.scoringDistanceKm,
+    ),
+    (f) => fmtKm(f.task.scoringDistanceKm),
+  );
+  dayCard("earliest", "First flights", claimed[0]);
+  dayCard("latest", "Last flights", claimed.at(-1));
+  return cards.filter((c): c is Superlative => c !== undefined);
+}
+
 export interface PilotColumn {
   key: string;
   label: string;
@@ -468,6 +588,7 @@ export {
   pilotStats,
   pilotStatsCopyData,
   seasonSummary,
+  superlatives,
   taskBreakdown,
   topTasks,
   updateCategory,
