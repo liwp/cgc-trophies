@@ -715,11 +715,7 @@ describe("clubGliderStats", () => {
       [k21],
     );
 
-    expect(stats).toMatchObject({
-      glider: k21,
-      scoringKm: 600,
-      points: 3600,
-    });
+    expect(stats).toMatchObject({ glider: k21, scoringKm: 600 });
     expect(stats.flights.map((f) => f.glider.registration)).toEqual([
       "G-CHTV",
       "htv",

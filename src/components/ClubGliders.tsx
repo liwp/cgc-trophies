@@ -27,14 +27,13 @@ const GliderFlightRow = ({ flight }: { flight: Flight }) => (
       <FlightSpeed flight={flight} />
     </td>
     <td className={flightCell}>{whole(flight.task.scoringDistanceKm)}</td>
-    <td className={flightCell}>{whole(flight.task.crossCountryPoints)}</td>
     <td />
   </FlightRow>
 );
 
 const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
   const [expanded, setExpanded] = useState(false);
-  const { glider, flights, avgSpeedKph, scoringKm, points } = stats;
+  const { glider, flights, avgSpeedKph, scoringKm } = stats;
   const name = `${glider.name} ${glider.compNo}`;
   const flown = flights.length > 0;
   const toggle = () => setExpanded(!expanded);
@@ -53,7 +52,6 @@ const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
         <td className={cell}>{flights.length}</td>
         <td className={cell}>{kph(avgSpeedKph)}</td>
         <td className={cell}>{whole(scoringKm)}</td>
-        <td className={cell}>{whole(points)}</td>
         <td className="py-2 pr-4">
           {flown && (
             <ExpandButton
@@ -86,7 +84,6 @@ const ClubGliders = ({ stats }: { stats: ClubGliderStats[] }) => (
             <Th align="right">Flights</Th>
             <Th align="right">Avg speed</Th>
             <Th align="right">Km</Th>
-            <Th align="right">Points</Th>
             <Th />
           </tr>
         </thead>
