@@ -148,6 +148,21 @@ export type PilotMilestones = Record<string, Record<string, number>>;
 /** {flightId: "reason"} map of flights excluded from scoring. */
 export type ExcludedFlights = Record<string, string>;
 
+/** A glider the club owns, for the stats page's club glider table. */
+export interface ClubGlider {
+  /** Short type name, e.g. "K21" */
+  name: string;
+  /** Competition number, e.g. "HTV" */
+  compNo: string;
+  /** e.g. "G-CHTV" */
+  registration: string;
+  /**
+   * Case-insensitive regex tested against flight.glider.type, so another
+   * glider entered with the same competition number doesn't count.
+   */
+  type: string;
+}
+
 export type Trophy = FlightTrophy | LadderTrophy;
 
 export interface ScoredFlight extends Flight {
@@ -199,6 +214,7 @@ export interface TrophiesConfig {
   season: SeasonConfig;
   pilotMilestones?: PilotMilestones;
   excludedFlights?: ExcludedFlights;
+  clubGliders?: ClubGlider[];
   trophies: Trophy[];
 }
 
