@@ -68,3 +68,43 @@ test("the stats fit a phone screen", async ({ page }) => {
     ),
   ).toBe(true);
 });
+
+const pilotRows = (page: Page) => page.getByRole("table").locator("tbody tr");
+
+test("the pilot table lists pilots by points and sorts by any column", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  await expect(pilotRows(page)).toHaveCount(10);
+  await page.getByRole("switch", { name: "Top 10 only" }).click();
+  await expect(pilotRows(page)).toHaveCount(43);
+  const pointsHeader = page.getByRole("columnheader", { name: "Points" });
+  await expect(pointsHeader).toHaveAttribute("aria-sort", "descending");
+
+  await page.getByRole("button", { name: "Pilot", exact: true }).click();
+  await expect(
+    page.getByRole("columnheader", { name: "Pilot" }),
+  ).toHaveAttribute("aria-sort", "ascending");
+  const names = await pilotRows(page)
+    .locator("td:first-child")
+    .allTextContents();
+  expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+
+  await page.getByRole("button", { name: "Pilot", exact: true }).click();
+  await expect(
+    page.getByRole("columnheader", { name: "Pilot" }),
+  ).toHaveAttribute("aria-sort", "descending");
+});
+
+test("the pilot table scrolls inside its card on a phone", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto("/stats?season=2024");
+  await expect(pilotRows(page).first()).toBeVisible();
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+});

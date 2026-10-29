@@ -6,9 +6,10 @@ import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";
 import PageNav from "../components/PageNav";
+import PilotStatsTable from "../components/PilotStatsTable";
 import Season from "../components/Season";
 import Toggle from "../components/Toggle";
-import { type SeasonSummary, seasonSummary } from "../lib/stats";
+import { pilotStats, type SeasonSummary, seasonSummary } from "../lib/stats";
 import useFlights from "../lib/useFlights";
 
 const TILES: {
@@ -121,6 +122,7 @@ const StatsPage = () => {
     return {
       current: seasonSummary(flights, state.season, CONFIG.season),
       previous: seasonSummary(flights, state.season - 1, CONFIG.season),
+      pilots: pilotStats(flights, state.season, CONFIG.season),
     };
   }, [state, homeOnly]);
 
@@ -151,6 +153,7 @@ const StatsPage = () => {
           previous={summaries.previous}
           season={season}
         />
+        <PilotStatsTable stats={summaries.pilots} />
       </div>
     </PageLayout>
   );
