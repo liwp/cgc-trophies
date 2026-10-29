@@ -490,7 +490,8 @@ function superlatives(
 
 export interface ClubGliderStats {
   glider: ClubGlider;
-  flights: number;
+  /** Its flights, in date order */
+  flights: Flight[];
   scoringKm: number;
   points: number;
   /** Distinct pilots who flew it */
@@ -517,10 +518,12 @@ function clubGliderStats(
 ): ClubGliderStats[] {
   const claimed = claimedInSeason(flights, season, seasonConfig);
   return gliders.map((glider) => {
-    const gliderFlights = claimed.filter(isClubGlider(glider));
+    const gliderFlights = sortBy(claimed.filter(isClubGlider(glider)), (f) =>
+      f.date.getTime(),
+    );
     return {
       glider,
-      flights: gliderFlights.length,
+      flights: gliderFlights,
       scoringKm: sumBy(gliderFlights, (f) => f.task.scoringDistanceKm),
       points: sumBy(gliderFlights, (f) => f.task.crossCountryPoints),
       pilots: new Set(gliderFlights.map((f) => f.pilot)).size,

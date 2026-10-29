@@ -715,13 +715,17 @@ describe("clubGliderStats", () => {
       [k21],
     );
 
-    expect(stats).toEqual({
+    expect(stats).toMatchObject({
       glider: k21,
-      flights: 3,
       scoringKm: 600,
       points: 3600,
       pilots: 2,
     });
+    expect(stats.flights.map((f) => f.glider.registration)).toEqual([
+      "G-CHTV",
+      "htv",
+      "HTV",
+    ]);
   });
 
   it("leaves out another type with the same comp number", () => {
@@ -732,7 +736,7 @@ describe("clubGliderStats", () => {
       [perkoz],
     );
 
-    expect(stats.flights).toBe(1);
+    expect(stats.flights).toHaveLength(1);
   });
 
   it("only counts the season's claimed flights", () => {
@@ -746,7 +750,21 @@ describe("clubGliderStats", () => {
       [k21],
     );
 
-    expect(stats.flights).toBe(0);
+    expect(stats.flights).toHaveLength(0);
+  });
+
+  it("lists a glider's flights in date order", () => {
+    const [stats] = clubGliderStats(
+      [
+        flight("HTV", "ASK 21", { id: "2", date: new Date("2025-07-01") }),
+        flight("HTV", "ASK 21", { id: "1", date: new Date("2025-05-01") }),
+      ],
+      2025,
+      calendar,
+      [k21],
+    );
+
+    expect(stats.flights.map((f) => f.id)).toEqual(["1", "2"]);
   });
 
   it("lists every glider in config order, unflown ones too", () => {
@@ -755,7 +773,7 @@ describe("clubGliderStats", () => {
       perkoz,
     ]);
 
-    expect(stats.map((s) => [s.glider.compNo, s.flights])).toEqual([
+    expect(stats.map((s) => [s.glider.compNo, s.flights.length])).toEqual([
       ["HTV", 0],
       ["PZ", 1],
     ]);

@@ -282,7 +282,30 @@ test("the club glider table lists each club glider's season", async ({
     "821",
     "5,110",
     "3",
+    "",
   ]);
   // Unflown club gliders are listed too
   await expect(row("Puchacz JEC").getByRole("cell").nth(1)).toHaveText("0");
+});
+
+test("a club glider row expands to its flights", async ({ page }) => {
+  await page.goto("/stats?season=2024");
+  const section = page.getByRole("region", { name: "Club gliders" });
+  const rows = section.getByRole("row");
+  await expect(rows).toHaveCount(9);
+
+  const expand = section.getByRole("button", { name: "Flights in Discus DM" });
+  await expand.click();
+  await expect(expand).toHaveAttribute("aria-expanded", "true");
+  await expect(rows).toHaveCount(9 + 7);
+  await expect(
+    section.getByRole("link", { name: /\w/ }).first(),
+  ).toHaveAttribute("href", /bgaladder\.net\/flightdetails\//);
+
+  await expand.click();
+  await expect(rows).toHaveCount(9);
+  // An unflown glider has nothing to expand
+  await expect(
+    section.getByRole("button", { name: "Flights in Puchacz JEC" }),
+  ).toHaveCount(0);
 });
