@@ -302,6 +302,13 @@ const RecordsPage = () => (
         Records are for flights launched from Gransden Lodge and flown under BGA
         Ladder rules. Speeds are actual (not handicapped).
       </p>
+      <p className="text-sm text-gray-500">
+        <span className="font-semibold">Note:</span> Earlier records, shown when
+        you expand a record, are for information only and may not be accurate.
+        Those before 2007 come from the club's 2023 records document. Later ones
+        were worked out from BGA Ladder flights using the record rules, and
+        weren't necessarily claimed or approved as club records at the time.
+      </p>
     </div>
   </PageLayout>
 );
