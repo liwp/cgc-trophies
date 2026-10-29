@@ -219,6 +219,17 @@ test("the desktop layout fits the viewport", async ({ page }) => {
   expect(await fitsViewport(page)).toBe(true);
 });
 
+test("the page warns that earlier records are for information only", async ({
+  page,
+}) => {
+  await page.goto("/records");
+  await expect(
+    page.getByText(
+      "Earlier records, shown when you expand a record, are for information only and may not be accurate.",
+    ),
+  ).toBeVisible();
+});
+
 test("the home page links to the records page", async ({ page }) => {
   await page.goto("/?season=2024");
   await page.getByRole("link", { name: "Club records" }).click();
