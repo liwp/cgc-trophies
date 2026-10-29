@@ -1,4 +1,3 @@
-import { Settings, Trophy } from "lucide-react";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
@@ -6,10 +5,10 @@ import CONFIG from "trophies-config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import PageLayout from "../components/PageLayout";
+import PageNav from "../components/PageNav";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Th from "../components/Th";
-import Tooltip from "../components/Tooltip";
 import { evaluateTrophy, winnerName, winnerScore } from "../lib/results";
 import { resolveTrophies } from "../lib/trophyHistory";
 import useFlights from "../lib/useFlights";
@@ -97,22 +96,7 @@ const TrophiesPage = () => {
           </h1>
           <div className="flex items-center gap-4">
             <Season season={season} />
-            <Tooltip text="Club records" asLabel>
-              <Link
-                to="/records"
-                className="p-2 rounded-lg text-gray-400 hover:text-cambridge hover:bg-cambridge-light transition-colors"
-              >
-                <Trophy size={18} />
-              </Link>
-            </Tooltip>
-            <Tooltip text="Admin view" asLabel>
-              <Link
-                to={`/admin?season=${season}`}
-                className="p-2 rounded-lg text-gray-400 hover:text-cambridge hover:bg-cambridge-light transition-colors"
-              >
-                <Settings size={18} />
-              </Link>
-            </Tooltip>
+            <PageNav current="home" season={season} />
           </div>
         </div>
         <Stats flights={flights} season={season} />
