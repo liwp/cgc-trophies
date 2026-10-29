@@ -107,6 +107,13 @@ const TASK_SPEC = {
         return "other";
       },
     },
+    isFaiTriangle: {
+      src: "Triangle Shape",
+      type: "string",
+      // The BGA's classification: 2 is an FAI triangle (1.08 shape factor),
+      // 1 a near-FAI one (1.05) and 0 any other triangle.
+      xform: (code: string) => code.trim() === "2",
+    },
     triangleLegsPct: {
       src: "Task Shape",
       type: "string",
@@ -161,6 +168,10 @@ const TASK_SPEC = {
     },
     heightLoss: {
       src: "Height loss",
+      type: "number",
+    },
+    distancePenaltyKm: {
+      src: "Distance Penalty",
       type: "number",
     },
   },

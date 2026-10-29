@@ -17,6 +17,8 @@ export interface Flight {
     handicappedSpeedKph: number;
     scoringSpeedKph: number;
     taskShape: "triangle" | "out-and-return" | "other";
+    /** The BGA classes the task as an FAI triangle ("Triangle Shape" 2). */
+    isFaiTriangle: boolean;
     /** A triangle's shortest and longest legs as % of the course, else null. */
     triangleLegsPct: { shortest: number; longest: number } | null;
     launchSite: string;
@@ -24,6 +26,8 @@ export interface Flight {
     finish: string;
     turnpoints: string[];
     heightLoss: number;
+    /** Km taken off the scoring distance for losing over 1000 m height. */
+    distancePenaltyKm: number;
   };
 }
 
