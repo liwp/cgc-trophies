@@ -1,6 +1,7 @@
 import {
   calculateStats,
   categories,
+  monthlyActivity,
   pilotStats,
   pilotStatsCopyData,
   seasonSummary,
@@ -340,5 +341,57 @@ describe("pilotStatsCopyData", () => {
       "1",
       "G-AAAA, G-BBBB",
     ]);
+  });
+});
+
+describe("monthlyActivity", () => {
+  const flight = (date: string, km = 100, claimType = "C") =>
+    baseFlight({
+      date: new Date(date),
+      task: { scoringDistanceKm: km, claimType },
+    });
+
+  it("totals each month of a calendar season, including empty ones", () => {
+    const months = monthlyActivity(
+      [
+        flight("2025-04-30", 300),
+        flight("2025-04-01", 50.5),
+        flight("2025-06-15"),
+        flight("2025-06-16", 100, "P"),
+        flight("2026-01-01"),
+      ],
+      2025,
+      { start: { month: 1, day: 1 }, end: { month: 12, day: 31 } },
+    );
+    expect(months).toHaveLength(12);
+    expect(months[0]).toEqual({
+      year: 2025,
+      month: 1,
+      flights: 0,
+      scoringKm: 0,
+    });
+    expect(months[3]).toEqual({
+      year: 2025,
+      month: 4,
+      flights: 2,
+      scoringKm: 350.5,
+    });
+    expect(months[5].flights).toBe(1);
+  });
+
+  it("runs into the next year for a winter season", () => {
+    const months = monthlyActivity([flight("2026-02-10")], 2025, {
+      start: { month: 10, day: 1 },
+      end: { month: 3, day: 31 },
+    });
+    expect(months.map((m) => `${m.year}-${m.month}`)).toEqual([
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-1",
+      "2026-2",
+      "2026-3",
+    ]);
+    expect(months[4].flights).toBe(1);
   });
 });

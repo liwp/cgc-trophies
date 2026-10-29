@@ -177,6 +177,42 @@ function pilotStats(
   return orderBy(stats, ["points", "pilot"], ["desc", "asc"]);
 }
 
+export interface MonthActivity {
+  /** UTC year and month (1-12). */
+  year: number;
+  month: number;
+  flights: number;
+  scoringKm: number;
+}
+
+/**
+ * Claimed flights and scoring km per calendar month of the season, from the
+ * season's first month to its last, including months without flights.
+ */
+function monthlyActivity(
+  flights: Flight[],
+  season: number,
+  seasonConfig: SeasonConfig,
+): MonthActivity[] {
+  const claimed = claimedInSeason(flights, season, seasonConfig);
+  const { start, end } = seasonConfig;
+  const months = ((end.month - start.month + 12) % 12) + 1;
+  return Array.from({ length: months }, (_, i) => {
+    const date = new Date(Date.UTC(season, start.month - 1 + i, 1));
+    const [year, month] = [date.getUTCFullYear(), date.getUTCMonth() + 1];
+    const inMonth = claimed.filter(
+      (f) =>
+        f.date.getUTCFullYear() === year && f.date.getUTCMonth() + 1 === month,
+    );
+    return {
+      year,
+      month,
+      flights: inMonth.length,
+      scoringKm: sumBy(inMonth, (f) => f.task.scoringDistanceKm),
+    };
+  });
+}
+
 export interface PilotColumn {
   key: string;
   label: string;
@@ -271,6 +307,7 @@ function pilotStatsCopyData(stats: PilotStats[]): string[][] {
 export {
   calculateStats,
   categories,
+  monthlyActivity,
   pilotColumns,
   pilotStats,
   pilotStatsCopyData,
