@@ -24,9 +24,9 @@ const ExcludedFlights = ({
       >
         Excluded flights
       </h3>
-      <div className="rounded-lg border border-gray-200 bg-white overflow-x-auto">
+      <div className="rounded-lg border border-gray-200 bg-white">
         <table
-          className={`w-full table-auto border-collapse ${compact ? "text-sm" : ""}`}
+          className={`hidden w-full table-auto sm:table border-collapse ${compact ? "text-sm" : ""}`}
         >
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -57,6 +57,30 @@ const ExcludedFlights = ({
             ))}
           </tbody>
         </table>
+        <ul className="sm:hidden">
+          {flights.map((f) => (
+            <li
+              key={f.id}
+              className="flex flex-col gap-0.5 border-t border-gray-100 px-3 py-2.5 first:border-t-0"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-gray-900">
+                  {formatPilotName(f.pilot)}
+                </span>
+                <span className="whitespace-nowrap font-semibold text-gray-700">
+                  {formatScore(f.score)}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500">{f.exclude}</div>
+              <div className="flex items-center justify-between gap-2 text-xs text-gray-500">
+                {formatDate(f.date)}
+                <div className="inline-flex items-center gap-1">
+                  <FlightLinks flightId={f.id} />
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
