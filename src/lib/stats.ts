@@ -495,7 +495,6 @@ export interface ClubGliderStats {
   /** Mean handicapped speed of completed tasks; null without any. */
   avgSpeedKph: number | null;
   scoringKm: number;
-  points: number;
 }
 
 /** Whether a flight was in the club glider, by registration or comp number. */
@@ -529,7 +528,6 @@ function clubGliderStats(
         ? meanBy(completed, (f) => f.task.handicappedSpeedKph)
         : null,
       scoringKm: sumBy(gliderFlights, (f) => f.task.scoringDistanceKm),
-      points: sumBy(gliderFlights, (f) => f.task.crossCountryPoints),
     };
   });
 }

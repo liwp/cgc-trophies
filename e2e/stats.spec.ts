@@ -281,7 +281,6 @@ test("the club glider table lists each club glider's season", async ({
     "7",
     "67.4 kph",
     "821",
-    "5,110",
     "",
   ]);
   // Unflown club gliders are listed too
