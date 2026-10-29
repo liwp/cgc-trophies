@@ -26,6 +26,24 @@ export const PenaltyWarning = ({ flight }: { flight: Flight }) => {
   );
 };
 
+export const kph = (v: number | null) =>
+  v === null ? "" : `${v.toFixed(1)} kph`;
+
+/** A flight's handicapped speed, if it completed its task, and any penalty. */
+export const FlightSpeed = ({ flight }: { flight: Flight }) => {
+  const { task } = flight;
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <PenaltyWarning flight={flight} />
+      {task.isCompleted && task.isDeclared ? (
+        kph(task.handicappedSpeedKph)
+      ) : (
+        <span className="text-gray-400 italic">Not completed</span>
+      )}
+    </span>
+  );
+};
+
 /**
  * One flight under an expanded stats row: its date, pilot (linking to the
  * ladder) and `detail`, across the row's first `span` columns, followed by

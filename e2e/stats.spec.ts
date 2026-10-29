@@ -279,9 +279,9 @@ test("the club glider table lists each club glider's season", async ({
   await expect(row("Discus DM").getByRole("cell")).toHaveText([
     /Discus DM\s*G-CJXR/,
     "7",
+    "67.4 kph",
     "821",
     "5,110",
-    "3",
     "",
   ]);
   // Unflown club gliders are listed too
@@ -298,6 +298,11 @@ test("a club glider row expands to its flights", async ({ page }) => {
   await expand.click();
   await expect(expand).toHaveAttribute("aria-expanded", "true");
   await expect(rows).toHaveCount(9 + 7);
+  // Each flight shows its speed, or that it didn't complete its task
+  const flightRows = rows.filter({ has: page.getByRole("link") });
+  await expect(
+    flightRows.filter({ hasText: /\d kph|Not completed/ }),
+  ).toHaveCount(7);
   await expect(
     section.getByRole("link", { name: /\w/ }).first(),
   ).toHaveAttribute("href", /bgaladder\.net\/flightdetails\//);
