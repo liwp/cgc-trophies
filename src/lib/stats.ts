@@ -1,5 +1,5 @@
 import { groupBy, meanBy, orderBy, sortBy, sumBy, uniq } from "lodash";
-import type { Flight, SeasonConfig, TaskShape } from "../types";
+import type { ClubGlider, Flight, SeasonConfig, TaskShape } from "../types";
 import { inSeasonPredicate } from "./eval";
 import { formatPilotName } from "./trophyCopyData";
 
@@ -488,6 +488,46 @@ function superlatives(
   return cards.filter((c): c is Superlative => c !== undefined);
 }
 
+export interface ClubGliderStats {
+  glider: ClubGlider;
+  flights: number;
+  scoringKm: number;
+  points: number;
+  /** Distinct pilots who flew it */
+  pilots: number;
+}
+
+/** Whether a flight was in the club glider, by registration or comp number. */
+const isClubGlider = (glider: ClubGlider) => {
+  const type = new RegExp(glider.type, "i");
+  const ids = [glider.registration, glider.compNo].map((id) =>
+    id.toUpperCase(),
+  );
+  return (f: Flight) =>
+    ids.includes(f.glider.registration.trim().toUpperCase()) &&
+    type.test(f.glider.type);
+};
+
+/** Each club glider's season, in the order configured, unflown ones too. */
+function clubGliderStats(
+  flights: Flight[],
+  season: number,
+  seasonConfig: SeasonConfig,
+  gliders: ClubGlider[],
+): ClubGliderStats[] {
+  const claimed = claimedInSeason(flights, season, seasonConfig);
+  return gliders.map((glider) => {
+    const gliderFlights = claimed.filter(isClubGlider(glider));
+    return {
+      glider,
+      flights: gliderFlights.length,
+      scoringKm: sumBy(gliderFlights, (f) => f.task.scoringDistanceKm),
+      points: sumBy(gliderFlights, (f) => f.task.crossCountryPoints),
+      pilots: new Set(gliderFlights.map((f) => f.pilot)).size,
+    };
+  });
+}
+
 export interface PilotColumn {
   key: string;
   label: string;
@@ -583,6 +623,7 @@ export {
   bestDays,
   calculateStats,
   categories,
+  clubGliderStats,
   monthlyActivity,
   pilotColumns,
   pilotStats,

@@ -2,6 +2,7 @@ import {
   bestDays,
   calculateStats,
   categories,
+  clubGliderStats,
   monthlyActivity,
   pilotStats,
   pilotStatsCopyData,
@@ -664,5 +665,99 @@ describe("superlatives", () => {
     expect(cards.fastest).toBeUndefined();
     expect(cards.longestFai).toBeUndefined();
     expect(cards.longest).toBeDefined();
+  });
+});
+
+describe("clubGliderStats", () => {
+  const calendar = {
+    start: { month: 1, day: 1 },
+    end: { month: 12, day: 31 },
+  };
+  const k21 = {
+    name: "K21",
+    compNo: "HTV",
+    registration: "G-CHTV",
+    type: "ask\\s*21",
+  };
+  const perkoz = {
+    name: "Perkoz",
+    compNo: "PZ",
+    registration: "G-PCGC",
+    type: "perkoz",
+  };
+  const flight = (
+    registration: string,
+    type: string,
+    overrides: Parameters<typeof baseFlight>[0] = {},
+  ) =>
+    baseFlight({
+      date: new Date("2025-06-01"),
+      ...overrides,
+      glider: { registration, type },
+    });
+
+  it("totals each glider's flights by registration or comp number", () => {
+    const [stats] = clubGliderStats(
+      [
+        flight("G-CHTV", "ASK 21", {
+          pilot: "A",
+          task: { scoringDistanceKm: 300, crossCountryPoints: 3000 },
+        }),
+        flight("htv", "ASK21", {
+          pilot: "B",
+          task: { scoringDistanceKm: 100, crossCountryPoints: 500 },
+        }),
+        flight("HTV", "ASK 21", { pilot: "A" }),
+        flight("G-CKFY", "ASK 21"),
+      ],
+      2025,
+      calendar,
+      [k21],
+    );
+
+    expect(stats).toEqual({
+      glider: k21,
+      flights: 3,
+      scoringKm: 600,
+      points: 3600,
+      pilots: 2,
+    });
+  });
+
+  it("leaves out another type with the same comp number", () => {
+    const [stats] = clubGliderStats(
+      [flight("PZ", "SZD54-2 PERKOZ (20.0)"), flight("PZ", "DG 800S (18.0)")],
+      2025,
+      calendar,
+      [perkoz],
+    );
+
+    expect(stats.flights).toBe(1);
+  });
+
+  it("only counts the season's claimed flights", () => {
+    const [stats] = clubGliderStats(
+      [
+        flight("HTV", "ASK 21", { date: new Date("2024-06-01") }),
+        flight("HTV", "ASK 21", { task: { claimType: "H" } }),
+      ],
+      2025,
+      calendar,
+      [k21],
+    );
+
+    expect(stats.flights).toBe(0);
+  });
+
+  it("lists every glider in config order, unflown ones too", () => {
+    const stats = clubGliderStats([flight("PZ", "Perkoz")], 2025, calendar, [
+      k21,
+      perkoz,
+    ]);
+
+    expect(stats.map((s) => [s.glider.compNo, s.flights])).toEqual([
+      ["HTV", 0],
+      ["PZ", 1],
+    ]);
   });
 });
