@@ -1,7 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-
 import CONFIG from "trophies-config";
 import CopyButton from "../components/CopyButton";
 import ExcludedFlights from "../components/ExcludedFlights";
@@ -16,6 +15,7 @@ import PageLayout from "../components/PageLayout";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Th from "../components/Th";
+import { formatDate } from "../lib/formatDate";
 import { missingLadderFlights } from "../lib/missingLadderFlights";
 import {
   evaluateTrophy,
@@ -53,9 +53,7 @@ const FlightResultEntry = ({
       <td className="px-4 py-2 text-gray-500 text-sm">{rank}</td>
       <td className="px-4 py-2 text-gray-700">{formatPilotName(pilot)}</td>
       <td className="px-4 py-2 text-gray-700">{scoreDisplay}</td>
-      <td className="px-4 py-2 text-gray-500 text-sm">
-        {date.toLocaleDateString()}
-      </td>
+      <td className="px-4 py-2 text-gray-500 text-sm">{formatDate(date)}</td>
       <td className="px-4 py-2 text-gray-500 text-sm">{tps}</td>
       <td className="px-4 py-2">
         <div className="inline-flex items-center gap-1">
@@ -88,7 +86,7 @@ const LadderFlightRow = ({
       {formatScore({ value: flight.task.crossCountryPoints, unit: "pts" })}
     </td>
     <td className="px-4 py-1.5 text-gray-500 text-sm">
-      {flight.date.toLocaleDateString()}
+      {formatDate(flight.date)}
     </td>
     <td className="px-4 py-1.5" />
     <td className="px-4 py-1.5">

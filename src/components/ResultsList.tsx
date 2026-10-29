@@ -1,5 +1,6 @@
 import { uniqBy } from "lodash";
 import { useState } from "react";
+import { formatDate } from "../lib/formatDate";
 import { formatScore } from "../lib/results";
 import { flightCopyData, formatPilotName } from "../lib/trophyCopyData";
 import TURNPOINTS from "../lib/turnpoints";
@@ -44,7 +45,7 @@ const Result = ({ result, rank }: { result: ScoredFlight; rank: number }) => {
   return (
     <tr className={rank === 1 ? "bg-cambridge-light" : ""}>
       <td className="px-4 py-3 text-gray-700">{formatPilotName(pilot)}</td>
-      <td className="px-4 py-3 text-gray-500">{date.toLocaleDateString()}</td>
+      <td className="px-4 py-3 text-gray-500">{formatDate(date)}</td>
       <td className="px-4 py-3 text-gray-700">
         <Score value={value} unit={unit} />
       </td>

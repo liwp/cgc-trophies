@@ -1,3 +1,4 @@
+import { formatDate } from "../lib/formatDate";
 import type { MissingLadderFlights as Missing } from "../lib/missingLadderFlights";
 import { formatScore } from "../lib/results";
 import { formatPilotName } from "../lib/trophyCopyData";
@@ -54,7 +55,7 @@ const MissingLadderFlights = ({
                     {m.flights.map((f) => (
                       <li key={f.id} className="flex items-center gap-2">
                         <span>
-                          {f.date.toLocaleDateString()} ·{" "}
+                          {formatDate(f.date)} ·{" "}
                           {pts(f.task.crossCountryPoints)}
                           {f.clubName !== clubName &&
                             ` · filed under ${f.clubName}`}
