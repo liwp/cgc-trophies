@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 
 import CONFIG from "trophies-config";
 import records from "../../records.config";
+import HeightLossWarning from "../components/HeightLossWarning";
 import PageLayout from "../components/PageLayout";
 import Th from "../components/Th";
 import Tip from "../components/Tip";
@@ -22,6 +23,7 @@ import {
   turnpointText,
   ukRecordTooltip,
 } from "../lib/recordDisplay";
+import { MAX_HEIGHT_LOSS_M } from "../lib/records";
 import type { ClubRecord, RecordCategory } from "../types";
 
 /** ISO date (yyyy-mm-dd) as dd/mm/yyyy, without any timezone conversion. */
@@ -83,17 +85,27 @@ const RecordValue = ({
 }) => {
   if (!record) return <span className="text-gray-400 italic">No claim</span>;
   const value = formatClubRecordValue(category.rule, record);
-  return record.flightId ? (
-    <a
-      href={flightDetailsUrl(record.flightId)}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 text-cambridge hover:text-cambridge-dark transition-colors"
-    >
-      {value} <ExternalLink size={12} />
-    </a>
-  ) : (
-    <span>{value}</span>
+  if (!record.flightId) return <span>{value}</span>;
+  return (
+    <span className="inline-flex items-center gap-1">
+      <a
+        href={flightDetailsUrl(record.flightId)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 text-cambridge hover:text-cambridge-dark transition-colors"
+      >
+        {value} <ExternalLink size={12} />
+      </a>
+      {/* Speed records must stay within the height-loss limit, which the
+          ladder's reported figure can understate */}
+      {category.rule.kind === "speed" && (
+        <HeightLossWarning
+          flightId={record.flightId}
+          reportedHeightLoss={MAX_HEIGHT_LOSS_M}
+          comparedTo="limit"
+        />
+      )}
+    </span>
   );
 };
 
