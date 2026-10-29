@@ -138,3 +138,16 @@ test("the season picker stays within the available seasons", async ({
   await page.getByRole("button", { name: "Next season" }).click();
   await expect(page).toHaveURL(/season=2007/);
 });
+
+test("the home page fits a phone screen", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto("/?season=2024");
+  await expect(page.getByRole("link", { name: "Glass Jug" })).toBeVisible();
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+});

@@ -14,6 +14,31 @@ import { resolveTrophies } from "../lib/trophyHistory";
 import useFlights from "../lib/useFlights";
 import type { Flight } from "../types";
 
+type Evaluated = ReturnType<typeof evaluateTrophy>;
+
+const TrophyName = ({
+  evaluated: { trophy },
+  season,
+}: {
+  evaluated: Evaluated;
+  season: number;
+}) => (
+  <>
+    <Link
+      to={`/trophy/${trophy.id}?season=${season}`}
+      className="font-medium text-cambridge hover:text-cambridge-dark transition-colors"
+    >
+      {trophy.name}
+    </Link>
+    <div className="text-xs text-gray-400 mt-0.5">{trophy.description}</div>
+  </>
+);
+
+const Winner = ({ evaluated }: { evaluated: Evaluated }) =>
+  winnerName(evaluated) ?? (
+    <span className="text-gray-400 italic">No qualifying flights</span>
+  );
+
 const TrophyList = ({
   flights,
   allFlights,
@@ -33,7 +58,7 @@ const TrophyList = ({
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <table className="w-full table-auto border-collapse">
+      <table className="hidden w-full table-auto border-collapse sm:table">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
             <Th>Trophy</Th>
@@ -42,40 +67,42 @@ const TrophyList = ({
           </tr>
         </thead>
         <tbody>
-          {trophies.map((evaluated) => {
-            const { trophy } = evaluated;
-            const winner = winnerName(evaluated);
-            return (
-              <tr
-                key={trophy.id}
-                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-              >
-                <td className="px-4 py-3">
-                  <Link
-                    to={`/trophy/${trophy.id}?season=${season}`}
-                    className="font-medium text-cambridge hover:text-cambridge-dark transition-colors"
-                  >
-                    {trophy.name}
-                  </Link>
-                  <div className="text-xs text-gray-400 mt-0.5">
-                    {trophy.description}
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-gray-700">
-                  {winner ?? (
-                    <span className="text-gray-400 italic">
-                      No qualifying flights
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right text-gray-500 whitespace-nowrap">
-                  {winnerScore(evaluated) ?? ""}
-                </td>
-              </tr>
-            );
-          })}
+          {trophies.map((evaluated) => (
+            <tr
+              key={evaluated.trophy.id}
+              className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <td className="px-4 py-3">
+                <TrophyName evaluated={evaluated} season={season} />
+              </td>
+              <td className="px-4 py-3 text-gray-700">
+                <Winner evaluated={evaluated} />
+              </td>
+              <td className="px-4 py-3 text-right text-gray-500 whitespace-nowrap">
+                {winnerScore(evaluated) ?? ""}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
+      <ul className="sm:hidden">
+        {trophies.map((evaluated) => (
+          <li
+            key={evaluated.trophy.id}
+            className="flex flex-col gap-0.5 border-t border-gray-100 px-3 py-2.5 first:border-t-0"
+          >
+            <TrophyName evaluated={evaluated} season={season} />
+            <div className="flex items-baseline justify-between gap-2 text-sm">
+              <span className="text-gray-700">
+                <Winner evaluated={evaluated} />
+              </span>
+              <span className="text-gray-500 whitespace-nowrap">
+                {winnerScore(evaluated) ?? ""}
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
@@ -90,7 +117,7 @@ const TrophiesPage = () => {
   return (
     <PageLayout>
       <div className="flex flex-col gap-8">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <h1 className="text-2xl font-bold text-gray-900">
             {CONFIG.club.shortName} {season} Trophies
           </h1>
