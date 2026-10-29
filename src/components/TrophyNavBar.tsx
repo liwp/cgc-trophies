@@ -16,7 +16,7 @@ const TrophyNavBar = ({
     <div className="flex items-center justify-between">
       <Link
         to={`/?season=${season}`}
-        className="inline-flex items-center gap-1 text-cambridge hover:text-cambridge-dark transition-colors"
+        className="inline-flex items-center gap-1 whitespace-nowrap text-cambridge hover:text-cambridge-dark transition-colors"
       >
         <ArrowLeft size={16} /> <span>All Trophies</span>
       </Link>
@@ -26,7 +26,8 @@ const TrophyNavBar = ({
             to={`/trophy/${prev.id}?season=${season}`}
             className="inline-flex items-center gap-1 text-gray-500 hover:text-cambridge transition-colors"
           >
-            <ChevronLeft size={16} /> {prev.name}
+            <ChevronLeft size={16} />{" "}
+            <span className="sr-only sm:not-sr-only">{prev.name}</span>
           </Link>
         ) : (
           <span />
@@ -37,7 +38,8 @@ const TrophyNavBar = ({
             to={`/trophy/${next.id}?season=${season}`}
             className="inline-flex items-center gap-1 text-gray-500 hover:text-cambridge transition-colors"
           >
-            {next.name} <ChevronRight size={16} />
+            <span className="sr-only sm:not-sr-only">{next.name}</span>{" "}
+            <ChevronRight size={16} />
           </Link>
         ) : (
           <span />
