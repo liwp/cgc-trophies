@@ -1,6 +1,8 @@
 import {
   calculateStats,
   categories,
+  pilotStats,
+  pilotStatsCopyData,
   seasonSummary,
   updateCategory,
   updateStats,
@@ -207,5 +209,136 @@ describe("seasonSummary", () => {
       winter,
     );
     expect(summary.flights).toBe(1);
+  });
+});
+
+describe("pilotStats", () => {
+  const calendar = {
+    start: { month: 1, day: 1 },
+    end: { month: 12, day: 31 },
+  };
+  const flight = (overrides: Parameters<typeof baseFlight>[0] = {}) =>
+    baseFlight({ date: new Date("2025-06-01"), ...overrides });
+
+  it("totals each pilot's season, most points first", () => {
+    const [jane, joe] = pilotStats(
+      [
+        flight({
+          pilot: "Doe, Joe",
+          task: { crossCountryPoints: 100, isCompleted: false },
+        }),
+        flight({
+          pilot: "Doe, Jane",
+          date: new Date("2025-07-01"),
+          glider: { registration: "G-BBBB" },
+          task: {
+            scoringDistanceKm: 510,
+            taskDistanceKm: 510,
+            crossCountryPoints: 5000,
+            handicappedSpeedKph: 90,
+          },
+        }),
+        flight({
+          pilot: "Doe, Jane",
+          date: new Date("2025-05-01"),
+          glider: { registration: "G-AAAA" },
+          task: {
+            scoringDistanceKm: 300,
+            taskDistanceKm: 300,
+            crossCountryPoints: 3000,
+            handicappedSpeedKph: 70,
+          },
+        }),
+        flight({
+          pilot: "Doe, Jane",
+          glider: { registration: "G-AAAA" },
+          task: {
+            scoringDistanceKm: 120,
+            taskDistanceKm: 400,
+            crossCountryPoints: 600,
+            handicappedSpeedKph: 0,
+            isCompleted: false,
+          },
+        }),
+      ],
+      2025,
+      calendar,
+    );
+    expect(jane).toEqual({
+      pilot: "Doe, Jane",
+      flights: 3,
+      scoringKm: 930,
+      points: 8600,
+      bestKm: 510,
+      bestPoints: 5000,
+      completed: 2,
+      completionPct: (100 * 2) / 3,
+      avgSpeedKph: 80,
+      completed300: 2,
+      completed500: 1,
+      gliders: ["G-AAAA", "G-BBBB"],
+    });
+    expect(joe).toMatchObject({
+      pilot: "Doe, Joe",
+      completed: 0,
+      avgSpeedKph: null,
+    });
+  });
+
+  it("only counts the season's claimed flights", () => {
+    expect(
+      pilotStats(
+        [
+          flight({ task: { claimType: "P" } }),
+          flight({ date: new Date("2024-06-01") }),
+        ],
+        2025,
+        calendar,
+      ),
+    ).toEqual([]);
+  });
+
+  it("breaks points ties by name", () => {
+    const stats = pilotStats(
+      [flight({ pilot: "B" }), flight({ pilot: "A" })],
+      2025,
+      calendar,
+    );
+    expect(stats.map((s) => s.pilot)).toEqual(["A", "B"]);
+  });
+});
+
+describe("pilotStatsCopyData", () => {
+  it("formats a header and a row per pilot", () => {
+    const [header, row] = pilotStatsCopyData([
+      {
+        pilot: "Doe, Jane",
+        flights: 3,
+        scoringKm: 1234.56,
+        points: 8600,
+        bestKm: 510.04,
+        bestPoints: 5000,
+        completed: 2,
+        completionPct: 66.67,
+        avgSpeedKph: null,
+        completed300: 2,
+        completed500: 1,
+        gliders: ["G-AAAA", "G-BBBB"],
+      },
+    ]);
+    expect(header[0]).toBe("Pilot");
+    expect(row).toEqual([
+      "Jane Doe",
+      "3",
+      "1,235",
+      "8,600",
+      "510.0",
+      "5,000",
+      "67%",
+      "",
+      "2",
+      "1",
+      "G-AAAA, G-BBBB",
+    ]);
   });
 });

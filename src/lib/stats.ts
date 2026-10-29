@@ -1,6 +1,7 @@
-import { sumBy } from "lodash";
+import { groupBy, meanBy, orderBy, sortBy, sumBy, uniq } from "lodash";
 import type { Flight, SeasonConfig } from "../types";
 import { inSeasonPredicate } from "./eval";
+import { formatPilotName } from "./trophyCopyData";
 
 interface CategoryStat {
   completed: number;
@@ -84,6 +85,18 @@ export interface SeasonSummary {
   declaredPct: number;
 }
 
+/** A season's claimed ("C") flights, the ones the stats page counts. */
+function claimedInSeason(
+  flights: Flight[],
+  season: number,
+  seasonConfig: SeasonConfig,
+): Flight[] {
+  const inSeason = inSeasonPredicate(season, seasonConfig);
+  return flights.filter((f) => f.task.claimType === "C" && inSeason(f));
+}
+
+const isCompletedTask = (f: Flight) => f.task.isCompleted && f.task.isDeclared;
+
 /**
  * Club totals for one season's claimed ("C") flights. Completed counts
  * declared, completed tasks, as in the distance categories above.
@@ -93,10 +106,7 @@ function seasonSummary(
   season: number,
   seasonConfig: SeasonConfig,
 ): SeasonSummary {
-  const inSeason = inSeasonPredicate(season, seasonConfig);
-  const claimed = flights.filter(
-    (f) => f.task.claimType === "C" && inSeason(f),
-  );
+  const claimed = claimedInSeason(flights, season, seasonConfig);
   const count = (pred: (f: Flight) => boolean) => claimed.filter(pred).length;
   return {
     flights: claimed.length,
@@ -104,16 +114,166 @@ function seasonSummary(
     gliders: new Set(claimed.map((f) => f.glider.registration)).size,
     scoringKm: sumBy(claimed, (f) => f.task.scoringDistanceKm),
     points: sumBy(claimed, (f) => f.task.crossCountryPoints),
-    completed: count((f) => f.task.isCompleted && f.task.isDeclared),
+    completed: count(isCompletedTask),
     declaredPct: claimed.length
       ? (100 * count((f) => f.task.isDeclared)) / claimed.length
       : 0,
   };
 }
 
+export interface PilotStats {
+  pilot: string;
+  flights: number;
+  scoringKm: number;
+  points: number;
+  bestKm: number;
+  bestPoints: number;
+  /** Declared, completed tasks. */
+  completed: number;
+  /** Percentage of flights that were declared, completed tasks. */
+  completionPct: number;
+  /** Mean handicapped speed of completed tasks; null without any. */
+  avgSpeedKph: number | null;
+  /** Completed tasks of at least 300 and 500 km. */
+  completed300: number;
+  completed500: number;
+  /** Registrations flown, in order of first flight. */
+  gliders: string[];
+}
+
+/** Per-pilot totals for a season's claimed flights, most points first. */
+function pilotStats(
+  flights: Flight[],
+  season: number,
+  seasonConfig: SeasonConfig,
+): PilotStats[] {
+  const byPilot = groupBy(
+    sortBy(claimedInSeason(flights, season, seasonConfig), (f) => f.date),
+    (f) => f.pilot,
+  );
+  const stats = Object.entries(byPilot).map(([pilot, pilotFlights]) => {
+    const completed = pilotFlights.filter(isCompletedTask);
+    const completedOver = (km: number) =>
+      completed.filter((f) => f.task.taskDistanceKm >= km).length;
+    return {
+      pilot,
+      flights: pilotFlights.length,
+      scoringKm: sumBy(pilotFlights, (f) => f.task.scoringDistanceKm),
+      points: sumBy(pilotFlights, (f) => f.task.crossCountryPoints),
+      bestKm: Math.max(...pilotFlights.map((f) => f.task.scoringDistanceKm)),
+      bestPoints: Math.max(
+        ...pilotFlights.map((f) => f.task.crossCountryPoints),
+      ),
+      completed: completed.length,
+      completionPct: (100 * completed.length) / pilotFlights.length,
+      avgSpeedKph: completed.length
+        ? meanBy(completed, (f) => f.task.handicappedSpeedKph)
+        : null,
+      completed300: completedOver(300),
+      completed500: completedOver(500),
+      gliders: uniq(pilotFlights.map((f) => f.glider.registration)),
+    };
+  });
+  return orderBy(stats, ["points", "pilot"], ["desc", "asc"]);
+}
+
+export interface PilotColumn {
+  key: string;
+  label: string;
+  /** The column's tooltip, when the label needs explaining. */
+  title?: string;
+  /** The value sorted on; null sorts last. */
+  value: (s: PilotStats) => number | string | null;
+  format: (s: PilotStats) => string;
+  /** Only in the spreadsheet copy, as it's too wide for the table. */
+  copyOnly?: boolean;
+}
+
+const decimal = (digits: number) => (v: number) =>
+  v.toLocaleString("en-GB", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
+const whole = decimal(0);
+
+const column = (
+  key: string,
+  label: string,
+  value: (s: PilotStats) => number,
+  format: (v: number) => string = whole,
+  title?: string,
+): PilotColumn => ({
+  key,
+  label,
+  title,
+  value,
+  format: (s) => format(value(s)),
+});
+
+/** The per-pilot table's columns, also used for the spreadsheet copy. */
+const pilotColumns: PilotColumn[] = [
+  {
+    key: "pilot",
+    label: "Pilot",
+    value: (s) => formatPilotName(s.pilot),
+    format: (s) => formatPilotName(s.pilot),
+  },
+  column("flights", "Flights", (s) => s.flights),
+  column("scoringKm", "Km", (s) => s.scoringKm, whole, "Total scoring km"),
+  column("points", "Points", (s) => s.points),
+  column("bestKm", "Best km", (s) => s.bestKm, decimal(1)),
+  column("bestPoints", "Best pts", (s) => s.bestPoints),
+  column(
+    "completionPct",
+    "Completed",
+    (s) => s.completionPct,
+    (v) => `${whole(v)}%`,
+    "Flights that were declared, completed tasks",
+  ),
+  {
+    key: "avgSpeedKph",
+    label: "Avg kph",
+    title: "Mean handicapped speed of completed tasks",
+    value: (s) => s.avgSpeedKph,
+    format: (s) => (s.avgSpeedKph === null ? "" : decimal(1)(s.avgSpeedKph)),
+  },
+  column(
+    "completed300",
+    "300+",
+    (s) => s.completed300,
+    whole,
+    "Completed tasks of 300 km or more",
+  ),
+  column(
+    "completed500",
+    "500+",
+    (s) => s.completed500,
+    whole,
+    "Completed tasks of 500 km or more",
+  ),
+  {
+    key: "gliders",
+    label: "Gliders",
+    value: (s) => s.gliders.join(", "),
+    format: (s) => s.gliders.join(", "),
+    copyOnly: true,
+  },
+];
+
+/** The table as tab-separatable rows, headed by the column labels. */
+function pilotStatsCopyData(stats: PilotStats[]): string[][] {
+  return [
+    pilotColumns.map((c) => c.label),
+    ...stats.map((s) => pilotColumns.map((c) => c.format(s))),
+  ];
+}
+
 export {
   calculateStats,
   categories,
+  pilotColumns,
+  pilotStats,
+  pilotStatsCopyData,
   seasonSummary,
   updateCategory,
   updateStats,
