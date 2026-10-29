@@ -280,7 +280,7 @@ test("the club glider table lists each club glider's season", async ({
     /Discus DM\s*G-CJXR/,
     "7",
     "67.4 kph",
-    "821",
+    "821 km",
     "",
   ]);
   // Unflown club gliders are listed too

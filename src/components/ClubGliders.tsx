@@ -5,7 +5,7 @@ import ExpandButton from "./ExpandButton";
 import FlightRow, { FlightSpeed, kph } from "./FlightRow";
 import Th from "./Th";
 
-const whole = (v: number) => Math.round(v).toLocaleString("en-GB");
+const km = (v: number) => `${Math.round(v).toLocaleString("en-GB")} km`;
 
 const cell =
   "px-4 py-2 text-right tabular-nums whitespace-nowrap text-gray-700";
@@ -26,7 +26,7 @@ const GliderFlightRow = ({ flight }: { flight: Flight }) => (
     <td className={flightCell}>
       <FlightSpeed flight={flight} />
     </td>
-    <td className={flightCell}>{whole(flight.task.scoringDistanceKm)}</td>
+    <td className={flightCell}>{km(flight.task.scoringDistanceKm)}</td>
     <td />
   </FlightRow>
 );
@@ -51,7 +51,7 @@ const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
         </td>
         <td className={cell}>{flights.length}</td>
         <td className={cell}>{kph(avgSpeedKph)}</td>
-        <td className={cell}>{whole(scoringKm)}</td>
+        <td className={cell}>{km(scoringKm)}</td>
         <td className="py-2 pr-4">
           {flown && (
             <ExpandButton
@@ -83,7 +83,7 @@ const ClubGliders = ({ stats }: { stats: ClubGliderStats[] }) => (
             <Th>Glider</Th>
             <Th align="right">Flights</Th>
             <Th align="right">Avg speed</Th>
-            <Th align="right">Km</Th>
+            <Th align="right">Distance</Th>
             <Th />
           </tr>
         </thead>
