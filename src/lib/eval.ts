@@ -40,7 +40,7 @@ function utcDay(year: number, { month, day, offsetDays = 0 }: SeasonDate) {
 
 // Both the start and end days are part of the season. A season whose start is
 // later in the year than its end (e.g. Oct-Mar) ends in the following year.
-function inSeasonPredicate(
+export function inSeasonPredicate(
   season: number,
   config: SeasonConfig,
 ): (flight: { date: Date }) => boolean {

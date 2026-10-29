@@ -1,4 +1,6 @@
-import type { Flight } from "../types";
+import { sumBy } from "lodash";
+import type { Flight, SeasonConfig } from "../types";
+import { inSeasonPredicate } from "./eval";
 
 interface CategoryStat {
   completed: number;
@@ -71,4 +73,48 @@ function calculateStats(flights: Flight[]) {
   return flights.reduce(updateStats, {});
 }
 
-export { calculateStats, categories, updateCategory, updateStats };
+export interface SeasonSummary {
+  flights: number;
+  pilots: number;
+  gliders: number;
+  scoringKm: number;
+  points: number;
+  completed: number;
+  /** Percentage of flights with a declared task (0 when there are none). */
+  declaredPct: number;
+}
+
+/**
+ * Club totals for one season's claimed ("C") flights. Completed counts
+ * declared, completed tasks, as in the distance categories above.
+ */
+function seasonSummary(
+  flights: Flight[],
+  season: number,
+  seasonConfig: SeasonConfig,
+): SeasonSummary {
+  const inSeason = inSeasonPredicate(season, seasonConfig);
+  const claimed = flights.filter(
+    (f) => f.task.claimType === "C" && inSeason(f),
+  );
+  const count = (pred: (f: Flight) => boolean) => claimed.filter(pred).length;
+  return {
+    flights: claimed.length,
+    pilots: new Set(claimed.map((f) => f.pilot)).size,
+    gliders: new Set(claimed.map((f) => f.glider.registration)).size,
+    scoringKm: sumBy(claimed, (f) => f.task.scoringDistanceKm),
+    points: sumBy(claimed, (f) => f.task.crossCountryPoints),
+    completed: count((f) => f.task.isCompleted && f.task.isDeclared),
+    declaredPct: claimed.length
+      ? (100 * count((f) => f.task.isDeclared)) / claimed.length
+      : 0,
+  };
+}
+
+export {
+  calculateStats,
+  categories,
+  seasonSummary,
+  updateCategory,
+  updateStats,
+};

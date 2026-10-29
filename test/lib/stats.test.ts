@@ -1,6 +1,7 @@
 import {
   calculateStats,
   categories,
+  seasonSummary,
   updateCategory,
   updateStats,
 } from "../../src/lib/stats";
@@ -129,5 +130,82 @@ describe("stats", () => {
       expect(stats["400km"].total).toBe(1);
       expect(stats["500km"]).toBeUndefined();
     });
+  });
+});
+
+describe("seasonSummary", () => {
+  const calendar = {
+    start: { month: 1, day: 1 },
+    end: { month: 12, day: 31 },
+  };
+  const flight = (overrides: Parameters<typeof baseFlight>[0] = {}) =>
+    baseFlight({ date: new Date("2025-06-01"), ...overrides });
+
+  it("totals the season's claimed flights", () => {
+    const summary = seasonSummary(
+      [
+        flight({
+          pilot: "A",
+          glider: { registration: "G-AAAA" },
+          task: { scoringDistanceKm: 300, crossCountryPoints: 3000 },
+        }),
+        flight({
+          pilot: "A",
+          glider: { registration: "G-BBBB" },
+          task: {
+            scoringDistanceKm: 100.5,
+            crossCountryPoints: 500,
+            isCompleted: false,
+          },
+        }),
+        flight({
+          pilot: "B",
+          glider: { registration: "G-AAAA" },
+          task: {
+            scoringDistanceKm: 50,
+            crossCountryPoints: 100,
+            isDeclared: false,
+          },
+        }),
+      ],
+      2025,
+      calendar,
+    );
+    expect(summary).toEqual({
+      flights: 3,
+      pilots: 2,
+      gliders: 2,
+      scoringKm: 450.5,
+      points: 3600,
+      completed: 1,
+      declaredPct: (100 * 2) / 3,
+    });
+  });
+
+  it("ignores unclaimed and out-of-season flights", () => {
+    const summary = seasonSummary(
+      [
+        flight({ task: { claimType: "P" } }),
+        flight({ date: new Date("2024-12-31") }),
+        flight({ date: new Date("2026-01-01") }),
+      ],
+      2025,
+      calendar,
+    );
+    expect(summary.flights).toBe(0);
+    expect(summary.declaredPct).toBe(0);
+  });
+
+  it("uses the configured season boundaries", () => {
+    const winter = {
+      start: { month: 10, day: 1 },
+      end: { month: 3, day: 31 },
+    };
+    const summary = seasonSummary(
+      [flight({ date: new Date("2026-02-01") })],
+      2025,
+      winter,
+    );
+    expect(summary.flights).toBe(1);
   });
 });
