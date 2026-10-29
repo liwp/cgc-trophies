@@ -305,6 +305,27 @@ c1,c2,c1
         expect(parseWith("80", "Convex Polygon").taskShape).toBe("other");
         expect(parseWith("80", "").taskShape).toBe("other");
       });
+
+      it("takes FAI triangles from the BGA's triangle shape code", () => {
+        const parseCode = (code: string) => {
+          const row = [...cells[0]];
+          row[columns[0].indexOf("Triangle Shape")] = code;
+          return csv.parseCsv(SPEC, `${header}\n${Papa.unparse([row])}`)[0].task
+            .isFaiTriangle;
+        };
+        expect(parseCode("2")).toBe(true);
+        expect(parseCode("1")).toBe(false);
+        expect(parseCode("0")).toBe(false);
+      });
+
+      it("parses the height loss distance penalty", () => {
+        const row = [...cells[0]];
+        row[columns[0].indexOf("Distance Penalty")] = "15.873";
+        expect(
+          csv.parseCsv(SPEC, `${header}\n${Papa.unparse([row])}`)[0].task
+            .distancePenaltyKm,
+        ).toBe(15.873);
+      });
     });
 
     it("parses the flight spec to a Flight", () => {
