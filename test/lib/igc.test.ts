@@ -131,6 +131,14 @@ describe("computeHeightLoss", () => {
       track: [
         // On the ground at GRL, before take-off
         { time: "095000", lat: 52.19, lon: -0.1, baroAlt: 0, gpsAlt: 0 },
+        // Released from tow
+        {
+          time: "095500",
+          lat: 52.19,
+          lon: -0.1,
+          baroAlt: startAlt + 50,
+          gpsAlt: startAlt + 50,
+        },
         // Before start line (approaching from behind)
         {
           time: "100000",
@@ -179,7 +187,7 @@ describe("computeHeightLoss", () => {
           baroAlt: finishAlt,
           gpsAlt: finishAlt,
         },
-        // Past finish, within the finish line's 1km radius
+        // Past finish, within the finish line's 5km radius
         {
           time: "140100",
           lat: 52.186,
@@ -340,22 +348,63 @@ describe("computeHeightLoss", () => {
   it("finishes up to 5km from the finish point, like the BGA Ladder", () => {
     const data = makeIgcData(500, 400);
     // Move the fix past the finish line to ~3km beyond GRL
-    data.track[7] = { ...data.track[7], lat: 52.2, lon: -0.08 };
-    data.track[8] = { ...data.track[8], lat: 52.2, lon: -0.08 };
-    data.track[9] = { ...data.track[9], lat: 52.2, lon: -0.08 };
+    for (const i of [8, 9, 10]) {
+      data.track[i] = { ...data.track[i], lat: 52.2, lon: -0.08 };
+    }
 
     expect(computeHeightLoss(data)?.heightLoss).toBeCloseTo(100, -1);
   });
 
+  it("uses the valid start that gives the least height loss", () => {
+    const data = makeIgcData(800, 400);
+    // An earlier, lower start: out across the line at 600m, then back behind
+    // it before the start at 800m
+    const behind = data.track[2];
+    const across = data.track[3];
+    data.track.splice(
+      2,
+      0,
+      { ...behind, baroAlt: 600, gpsAlt: 600 },
+      { ...across, baroAlt: 600, gpsAlt: 600 },
+    );
+
+    expect(computeHeightLoss(data)?.startAltitude).toBe(600);
+  });
+
+  it("ignores start-line crossings before release from the launch", () => {
+    const data = makeIgcData(500, 400);
+    // No drop after take-off: still on tow at the start crossing
+    data.track[1] = { ...data.track[1], baroAlt: 450, gpsAlt: 450 };
+    data.track[2] = { ...data.track[2], baroAlt: 480, gpsAlt: 480 };
+
+    expect(computeHeightLoss(data)).toBeNull();
+  });
+
+  it("finishes by landing on the finish airfield", () => {
+    const data = makeIgcData(500, 400);
+    // Land 500m short of the finish point, without crossing the finish line
+    const short = { lat: 52.179, lon: -0.116 };
+    data.track.splice(
+      7,
+      4,
+      { ...data.track[7], ...short, baroAlt: 100, gpsAlt: 100 },
+      { ...data.track[8], ...short, baroAlt: 50, gpsAlt: 50 },
+      { ...data.track[9], ...short, baroAlt: 50, gpsAlt: 50 },
+    );
+
+    // The landing is the last fix before the final descent
+    expect(computeHeightLoss(data)?.finishAltitude).toBe(100);
+  });
+
   // Flight 104680 (300km O/R GRL-GRM, 14/08/2022): the glider crossed the
-  // start line's extension 7.4km out, high up, before the real start at
-  // 12:59:50. Values from igcviewer.bgaladder.net "Analyse task".
-  it("matches the BGA IGC viewer on a recorded flight", () => {
+  // start line's extension 7.4km out, high up, before its starts at 12:54
+  // and 12:59 (the BGA IGC viewer takes the later one, 867m height loss).
+  it("computes a recorded flight's height loss", () => {
     const igc = readFileSync(`${__dirname}/../fixtures/104680.igc`, "utf8");
     const result = computeHeightLoss(parseIgc(igc));
 
-    expect(result?.startAltitude).toBe(1335);
+    expect(result?.startAltitude).toBe(1262);
     expect(result?.finishAltitude).toBe(468);
-    expect(result?.heightLoss).toBe(867);
+    expect(result?.heightLoss).toBe(794);
   });
 });

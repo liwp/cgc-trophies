@@ -8,14 +8,15 @@
  * 1000m limit) by a clear margin, which suggests the pilot-reported figure was
  * understated to dodge the limit.
  *
- * computeHeightLoss follows the BGA IGC viewer's "Analyse task"
- * (igcviewer.bgaladder.net) with the ladder's 5km finish radius. On the club's
- * 2022-2025 flights that BGA recorded over the limit (where its figure is the
- * actual loss), it matched BGA within 15m for 31 of the 33 it could compute.
- * It gives no result when the declared task in the IGC file wasn't flown
- * (e.g. Cloud Rally variable barrels), so we accept missing some real cases.
- * 100m is a deliberately sensitive margin — a borderline case can still flag
- * for a human to check in the viewer.
+ * computeHeightLoss applies the BGA Ladder's start and finish rules to the
+ * IGC file, taking the valid start that gives the least height loss, as the
+ * pilot may choose it (rule 5.1 Note 1). So it's the least height loss the
+ * pilot could have claimed: a warning means no valid start gets within the
+ * reported figure. Flights whose IGC declaration wasn't flown (e.g. Cloud
+ * Rally variable barrels) give no result, so we accept missing some real
+ * cases. On the club's 2022-2025 flights, 4 warn. 100m is a deliberately
+ * sensitive margin — a borderline case can still flag for a human to check in
+ * the IGC viewer.
  */
 export const HEIGHT_LOSS_MARGIN_M = 100;
 
