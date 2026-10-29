@@ -147,7 +147,7 @@ const categories: RecordCategory[] = [
   {
     id: "longest-distance",
     label: "Longest distance (up to 3 TPs)",
-    code: "3TP",
+    code: "Up to 3 turnpoints",
     group: "distance",
     rule: { kind: "distance", shape: "any", maxTurnpoints: 3 },
     record: {
@@ -162,7 +162,7 @@ const categories: RecordCategory[] = [
   {
     id: "largest-triangle",
     label: "Largest triangle",
-    code: "FAI △",
+    code: "FAI triangle",
     group: "distance",
     rule: { kind: "distance", shape: "triangle" },
     record: {
@@ -178,7 +178,7 @@ const categories: RecordCategory[] = [
     id: "fastest-750",
     label: "Fastest 750 km",
     code: "750km",
-    group: "distance",
+    group: "any-course",
     rule: speed("any", 750),
     record: {
       value: 99.0,

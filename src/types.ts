@@ -210,7 +210,12 @@ export type RecordRule =
 /** A BGA turnpoint code, or a custom turnpoint that isn't in the BGA list */
 export type RecordTurnpoint = string | { name: string };
 
-export type RecordGroup = "distance" | "triangle" | "out-and-return" | "height";
+export type RecordGroup =
+  | "distance"
+  | "triangle"
+  | "out-and-return"
+  | "any-course"
+  | "height";
 
 export interface ClubRecord {
   /** km, km/h or ft, per the rule kind */

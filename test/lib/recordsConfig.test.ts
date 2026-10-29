@@ -78,9 +78,9 @@ describe("records.config", () => {
 
   it("gives every category a code and group", () => {
     expect(categories.map((c) => [c.id, c.code, c.group])).toEqual([
-      ["longest-distance", "3TP", "distance"],
-      ["largest-triangle", "FAI △", "distance"],
-      ["fastest-750", "750km", "distance"],
+      ["longest-distance", "Up to 3 turnpoints", "distance"],
+      ["largest-triangle", "FAI triangle", "distance"],
+      ["fastest-750", "750km", "any-course"],
       ["fastest-600-triangle", "600km △", "triangle"],
       ["fastest-600-or", "600km O/R", "out-and-return"],
       ["fastest-500-triangle", "500km △", "triangle"],
