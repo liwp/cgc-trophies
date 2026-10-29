@@ -8,11 +8,12 @@
  * 1000m limit) by a clear margin, which suggests the pilot-reported figure was
  * understated to dodge the limit.
  *
- * Calibrated against real flights: computeHeightLoss matches BGA within a few
- * metres for ~half of flights and otherwise UNDER-reads (so we accept missing
- * some real cases). Its largest observed OVER-read was ~130m; 100m is a
- * deliberately sensitive margin — a borderline over-read can still flag for a
- * human to check via the tooltip.
+ * computeHeightLoss reproduces the "Analyse task" height loss of the BGA's IGC
+ * viewer (igcviewer.bgaladder.net, default zones), checked to within 5m on 21
+ * of the club's 2022-2025 flights. It gives no result when the declared task
+ * in the IGC file wasn't flown, so we accept missing some real cases. 100m is a
+ * deliberately sensitive margin — a borderline case can still flag for a human
+ * to check in the viewer.
  */
 export const HEIGHT_LOSS_MARGIN_M = 100;
 
