@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatDate } from "../lib/formatDate";
 import { formatScore } from "../lib/results";
 import { formatPilotName, ladderCopyData } from "../lib/trophyCopyData";
 import type { Flight, LadderResult } from "../types";
@@ -20,9 +21,7 @@ const LadderFlightRow = ({
   return (
     <tr className="bg-gray-50">
       <td></td>
-      <td className="px-4 py-2 text-gray-500">
-        {flight.date.toLocaleDateString()}
-      </td>
+      <td className="px-4 py-2 text-gray-500">{formatDate(flight.date)}</td>
       {isSyndicate && (
         <td className="px-4 py-2 text-gray-500">
           {formatPilotName(flight.pilot)}

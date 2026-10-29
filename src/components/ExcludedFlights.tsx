@@ -1,3 +1,4 @@
+import { formatDate } from "../lib/formatDate";
 import { formatScore } from "../lib/results";
 import { formatPilotName } from "../lib/trophyCopyData";
 import type { ExcludedFlight } from "../types";
@@ -43,7 +44,7 @@ const ExcludedFlights = ({
                   {formatPilotName(f.pilot)}
                 </td>
                 <td className={`${cell} text-gray-500`}>
-                  {f.date.toLocaleDateString()}
+                  {formatDate(f.date)}
                 </td>
                 <td className={`${cell} text-gray-700`}>
                   {formatScore(f.score)}
