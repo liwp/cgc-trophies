@@ -7,6 +7,27 @@ import Th from "./Th";
 
 const pts = (value: number) => formatScore({ value, unit: "pts" });
 
+/** A pilot's Open Ladder flights that aren't on the club ladder. */
+const MissingFlights = ({
+  missing,
+  clubName,
+}: {
+  missing: Missing;
+  clubName: string;
+}) => (
+  <ul className="flex flex-col gap-1">
+    {missing.flights.map((f) => (
+      <li key={f.id} className="flex items-center gap-2">
+        <span>
+          {formatDate(f.date)} · {pts(f.task.crossCountryPoints)}
+          {f.clubName !== clubName && ` · filed under ${f.clubName}`}
+        </span>
+        <FlightLinks flightId={f.id} iconSize={14} inline />
+      </li>
+    ))}
+  </ul>
+);
+
 /** Eligible pilots whose Open Ladder flights aren't on a club ladder. */
 const MissingLadderFlights = ({
   missing,
@@ -28,8 +49,8 @@ const MissingLadderFlights = ({
         Pilots eligible for this trophy whose Open Ladder flights aren't on its
         ladder. Remind them to add the flights before the awards.
       </p>
-      <div className="rounded-lg border border-gray-200 bg-white overflow-x-auto">
-        <table className="w-full table-auto border-collapse text-sm">
+      <div className="rounded-lg border border-gray-200 bg-white">
+        <table className="hidden w-full table-auto border-collapse text-sm sm:table">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
               <Th compact>Pilot</Th>
@@ -51,24 +72,33 @@ const MissingLadderFlights = ({
                   {pts(m.potentialScore)}
                 </td>
                 <td className="px-4 py-2 text-gray-500">
-                  <ul className="flex flex-col gap-1">
-                    {m.flights.map((f) => (
-                      <li key={f.id} className="flex items-center gap-2">
-                        <span>
-                          {formatDate(f.date)} ·{" "}
-                          {pts(f.task.crossCountryPoints)}
-                          {f.clubName !== clubName &&
-                            ` · filed under ${f.clubName}`}
-                        </span>
-                        <FlightLinks flightId={f.id} iconSize={14} inline />
-                      </li>
-                    ))}
-                  </ul>
+                  <MissingFlights missing={m} clubName={clubName} />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        <ul className="sm:hidden">
+          {missing.map((m) => (
+            <li
+              key={m.pilot}
+              className="flex flex-col gap-1 border-t border-gray-100 px-3 py-2.5 text-sm first:border-t-0"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-gray-900">
+                  {formatPilotName(m.pilot)}
+                </span>
+                <span className="whitespace-nowrap text-gray-500">
+                  {pts(m.currentScore)} →{" "}
+                  <span className="text-gray-700">{pts(m.potentialScore)}</span>
+                </span>
+              </div>
+              <div className="text-xs text-gray-500">
+                <MissingFlights missing={m} clubName={clubName} />
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
