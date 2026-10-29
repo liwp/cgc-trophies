@@ -166,3 +166,18 @@ for (const id of ["1", "L1", "L5"]) {
     ).toBe(true);
   });
 }
+
+test("the admin page fits a phone screen", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto("/admin?season=2024");
+  await expect(
+    page.getByRole("heading", { name: /Open Ladder flights missing/ }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+});

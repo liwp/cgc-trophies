@@ -220,7 +220,7 @@ const TrophySection = ({
 
   return (
     <div id={`trophy-${trophy.id}`} className="scroll-mt-4">
-      <div className="flex items-baseline justify-between gap-4 mb-2">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 mb-2">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold text-gray-900">{trophy.name}</h3>
           {winnerFlights(evaluated).map((f) => (
@@ -231,7 +231,7 @@ const TrophySection = ({
             />
           ))}
         </div>
-        <span className="text-sm text-gray-500 shrink-0">{winnerLabel}</span>
+        <span className="text-sm text-gray-500">{winnerLabel}</span>
       </div>
       <p className="text-sm text-gray-400 mb-3">{trophy.description}</p>
 
@@ -313,8 +313,8 @@ const AdminPage = () => {
   return (
     <PageLayout>
       <div className="flex flex-col gap-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <Link
               to={`/?season=${season}`}
               className="inline-flex items-center gap-1 text-cambridge hover:text-cambridge-dark transition-colors"
