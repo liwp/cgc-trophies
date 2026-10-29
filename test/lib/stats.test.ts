@@ -6,6 +6,7 @@ import {
   pilotStats,
   pilotStatsCopyData,
   seasonSummary,
+  superlatives,
   taskBreakdown,
   topTasks,
   updateCategory,
@@ -563,5 +564,105 @@ describe("topTasks", () => {
       1,
     );
     expect(tasks.map((t) => t.route)).toEqual([["GRL", "MEN", "GRL"]]);
+  });
+});
+
+describe("superlatives", () => {
+  const calendar = {
+    start: { month: 1, day: 1 },
+    end: { month: 12, day: 31 },
+  };
+  const flight = (
+    id: string,
+    pilot: string,
+    date: string,
+    task: Partial<Flight["task"]> = {},
+  ) => baseFlight({ id, pilot, date: new Date(date), task });
+  const byKey = (cards: ReturnType<typeof superlatives>) =>
+    Object.fromEntries(cards.map((c) => [c.key, c]));
+
+  const flights = [
+    flight("1", "Doe, Jane", "2025-04-02", {
+      scoringDistanceKm: 512.34,
+      crossCountryPoints: 5000,
+      handicappedSpeedKph: 80,
+      turnpoints: ["A", "B", "C"],
+    }),
+    flight("2", "Doe, Jane", "2025-06-01", {
+      isFaiTriangle: true,
+      scoringDistanceKm: 300,
+      crossCountryPoints: 3000,
+      handicappedSpeedKph: 95,
+    }),
+    flight("3", "Roe, Rick", "2025-03-15", {
+      scoringDistanceKm: 700,
+      crossCountryPoints: 7000,
+      handicappedSpeedKph: 120,
+      isCompleted: false,
+      turnpoints: ["A", "B", "C"],
+    }),
+    flight("4", "Roe, Rick", "2025-09-20", { scoringDistanceKm: 50 }),
+    flight("5", "Roe, Rick", "2025-08-01", { scoringDistanceKm: 60 }),
+    flight("6", "Doe, Jane", "2024-06-01", { crossCountryPoints: 1000 }),
+    flight("7", "Roe, Rick", "2024-06-01", { crossCountryPoints: 9000 }),
+  ];
+
+  it("picks each card's pilot and figure", () => {
+    const cards = byKey(superlatives(flights, 2025, calendar));
+    expect(cards.mostFlights).toMatchObject({
+      pilot: "Roe, Rick",
+      value: "3 flights",
+    });
+    expect(cards.mostKm).toMatchObject({ pilot: "Doe, Jane", value: "812 km" });
+    expect(cards.longest).toMatchObject({
+      pilot: "Roe, Rick",
+      value: "700.0 km",
+    });
+    // The faster flight wasn't completed
+    expect(cards.fastest).toMatchObject({ flight: { id: "2" } });
+    expect(cards.fastest.value).toBe("95.0 kph");
+    expect(cards.earliest).toMatchObject({ value: "15 Mar" });
+    expect(cards.latest).toMatchObject({ value: "20 Sept" });
+    expect(cards.topScoring).toMatchObject({
+      pilot: "Roe, Rick",
+      value: "7,000 pts",
+    });
+    expect(cards.longestFai).toMatchObject({
+      pilot: "Doe, Jane",
+      value: "300.0 km",
+    });
+    expect(cards.mostImproved).toBeUndefined();
+    expect(cards.mostTurnpoints).toBeUndefined();
+  });
+
+  it("lists every flight on the first and last days, longest first", () => {
+    const cards = byKey(
+      superlatives(
+        [
+          ...flights,
+          flight("8", "Poe, Pat", "2025-03-15", { scoringDistanceKm: 900 }),
+        ],
+        2025,
+        calendar,
+      ),
+    );
+    const ids = (card: (typeof cards)[string]) =>
+      "dayFlights" in card ? card.dayFlights.map((f) => f.id) : [];
+    expect(ids(cards.earliest)).toEqual(["8", "3"]);
+    expect(ids(cards.latest)).toEqual(["4"]);
+  });
+
+  it("leaves out cards nothing qualifies for", () => {
+    expect(superlatives([], 2025, calendar)).toEqual([]);
+    const cards = byKey(
+      superlatives(
+        [flight("1", "New, Nina", "2025-05-01", { isCompleted: false })],
+        2025,
+        calendar,
+      ),
+    );
+    expect(cards.fastest).toBeUndefined();
+    expect(cards.longestFai).toBeUndefined();
+    expect(cards.longest).toBeDefined();
   });
 });
