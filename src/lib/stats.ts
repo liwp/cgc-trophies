@@ -15,6 +15,10 @@ const categories = [
     pred: () => true,
   },
   {
+    key: "under300km",
+    pred: ({ task: { taskDistanceKm } }: Flight) => taskDistanceKm < 300,
+  },
+  {
     key: "300km",
     pred: ({ task: { taskDistanceKm } }: Flight) =>
       300 <= taskDistanceKm && taskDistanceKm < 400,
@@ -27,7 +31,12 @@ const categories = [
   {
     key: "500km",
     pred: ({ task: { taskDistanceKm } }: Flight) =>
-      500 <= taskDistanceKm && taskDistanceKm < 750,
+      500 <= taskDistanceKm && taskDistanceKm < 600,
+  },
+  {
+    key: "600km",
+    pred: ({ task: { taskDistanceKm } }: Flight) =>
+      600 <= taskDistanceKm && taskDistanceKm < 750,
   },
   {
     key: "750km",
