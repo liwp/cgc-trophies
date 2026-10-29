@@ -4,12 +4,18 @@ import { useSearchParams } from "react-router-dom";
 import CONFIG from "trophies-config";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
+import MonthlyChart from "../components/MonthlyChart";
 import PageLayout from "../components/PageLayout";
 import PageNav from "../components/PageNav";
 import PilotStatsTable from "../components/PilotStatsTable";
 import Season from "../components/Season";
 import Toggle from "../components/Toggle";
-import { pilotStats, type SeasonSummary, seasonSummary } from "../lib/stats";
+import {
+  monthlyActivity,
+  pilotStats,
+  type SeasonSummary,
+  seasonSummary,
+} from "../lib/stats";
 import useFlights from "../lib/useFlights";
 
 const TILES: {
@@ -72,7 +78,10 @@ const SummaryTiles = ({
   season: number;
 }) => (
   <div className="flex flex-col gap-2">
-    <ul className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+    <ul
+      aria-label="Season summary"
+      className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3"
+    >
       {TILES.map(({ key, label, format = defaultFormat }) => (
         <li
           key={key}
@@ -123,6 +132,8 @@ const StatsPage = () => {
       current: seasonSummary(flights, state.season, CONFIG.season),
       previous: seasonSummary(flights, state.season - 1, CONFIG.season),
       pilots: pilotStats(flights, state.season, CONFIG.season),
+      months: monthlyActivity(flights, state.season, CONFIG.season),
+      previousMonths: monthlyActivity(flights, state.season - 1, CONFIG.season),
     };
   }, [state, homeOnly]);
 
@@ -153,6 +164,27 @@ const StatsPage = () => {
           previous={summaries.previous}
           season={season}
         />
+        <section className="flex flex-col gap-2">
+          <h2 className="text-lg font-semibold text-gray-900">By month</h2>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <MonthlyChart
+              title="Flights"
+              season={season}
+              months={summaries.months}
+              previous={summaries.previousMonths}
+              value={(m) => m.flights}
+              format={(v) => `${v} ${v === 1 ? "flight" : "flights"}`}
+            />
+            <MonthlyChart
+              title="Scoring km"
+              season={season}
+              months={summaries.months}
+              previous={summaries.previousMonths}
+              value={(m) => m.scoringKm}
+              format={(v) => `${Math.round(v).toLocaleString("en-GB")} km`}
+            />
+          </div>
+        </section>
         <PilotStatsTable stats={summaries.pilots} />
       </div>
     </PageLayout>
