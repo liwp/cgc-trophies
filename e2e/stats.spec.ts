@@ -6,7 +6,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 const tile = (page: Page, label: string) =>
-  page.getByRole("listitem").filter({ hasText: label });
+  page
+    .getByRole("list", { name: "Season summary" })
+    .getByRole("listitem")
+    .filter({ hasText: label });
 
 test("the home page links to the season's stats", async ({ page }) => {
   await page.goto("/?season=2024");
@@ -107,4 +110,22 @@ test("the pilot table scrolls inside its card on a phone", async ({ page }) => {
         document.documentElement.clientWidth,
     ),
   ).toBe(true);
+});
+
+test("the monthly charts show each month's flights and km", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  const flights = page.getByRole("figure", { name: "Flights" });
+  await expect(flights.getByRole("img")).toHaveCount(12);
+  await expect(
+    flights.getByRole("img", {
+      name: /^May 2024: 53 flights, May 2023: \d+ flights$/,
+    }),
+  ).toBeVisible();
+
+  const km = page.getByRole("figure", { name: "Scoring km" });
+  await expect(km).toContainText("27,881 km");
+  await km.getByRole("img", { name: /July 2024/ }).focus();
+  await expect(km.getByText("July 2024: 27,881 km")).toBeVisible();
 });
