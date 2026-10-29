@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import CONFIG from "trophies-config";
+import BestDays from "../components/BestDays";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import MonthlyChart from "../components/MonthlyChart";
@@ -11,6 +12,7 @@ import PilotStatsTable from "../components/PilotStatsTable";
 import Season from "../components/Season";
 import Toggle from "../components/Toggle";
 import {
+  bestDays,
   monthlyActivity,
   pilotStats,
   type SeasonSummary,
@@ -131,6 +133,7 @@ const StatsPage = () => {
     return {
       current: seasonSummary(flights, state.season, CONFIG.season),
       previous: seasonSummary(flights, state.season - 1, CONFIG.season),
+      days: bestDays(flights, state.season, CONFIG.season),
       pilots: pilotStats(flights, state.season, CONFIG.season),
       months: monthlyActivity(flights, state.season, CONFIG.season),
       previousMonths: monthlyActivity(flights, state.season - 1, CONFIG.season),
@@ -185,6 +188,7 @@ const StatsPage = () => {
             />
           </div>
         </section>
+        <BestDays days={summaries.days} />
         <PilotStatsTable stats={summaries.pilots} />
       </div>
     </PageLayout>

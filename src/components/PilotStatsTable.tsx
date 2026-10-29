@@ -83,9 +83,11 @@ const PilotStatsTable = ({ stats }: { stats: PilotStats[] }) => {
     );
 
   return (
-    <section className="flex flex-col gap-2">
+    <section aria-labelledby="pilots" className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Pilots</h2>
+        <h2 id="pilots" className="text-lg font-semibold text-gray-900">
+          Pilots
+        </h2>
         <div className="flex items-center gap-4">
           <Toggle
             id="top-pilots"
