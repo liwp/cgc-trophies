@@ -490,7 +490,7 @@ function superlatives(
 
 export interface ClubGliderStats {
   glider: ClubGlider;
-  /** Its flights, in date order */
+  /** Its flights, most points first (then earliest) */
   flights: Flight[];
   /** Mean handicapped speed of completed tasks; null without any. */
   avgSpeedKph: number | null;
@@ -517,8 +517,10 @@ function clubGliderStats(
 ): ClubGliderStats[] {
   const claimed = claimedInSeason(flights, season, seasonConfig);
   return gliders.map((glider) => {
-    const gliderFlights = sortBy(claimed.filter(isClubGlider(glider)), (f) =>
-      f.date.getTime(),
+    const gliderFlights = orderBy(
+      claimed.filter(isClubGlider(glider)),
+      [(f) => f.task.crossCountryPoints, (f) => f.date.getTime()],
+      ["desc", "asc"],
     );
     const completed = gliderFlights.filter(isCompletedTask);
     return {

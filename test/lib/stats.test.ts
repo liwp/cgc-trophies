@@ -766,18 +766,31 @@ describe("clubGliderStats", () => {
     expect(unflown.avgSpeedKph).toBeNull();
   });
 
-  it("lists a glider's flights in date order", () => {
+  it("lists a glider's flights by most points, then date", () => {
     const [stats] = clubGliderStats(
       [
-        flight("HTV", "ASK 21", { id: "2", date: new Date("2025-07-01") }),
-        flight("HTV", "ASK 21", { id: "1", date: new Date("2025-05-01") }),
+        flight("HTV", "ASK 21", {
+          id: "late",
+          date: new Date("2025-07-01"),
+          task: { crossCountryPoints: 500 },
+        }),
+        flight("HTV", "ASK 21", {
+          id: "best",
+          date: new Date("2025-08-01"),
+          task: { crossCountryPoints: 900 },
+        }),
+        flight("HTV", "ASK 21", {
+          id: "early",
+          date: new Date("2025-05-01"),
+          task: { crossCountryPoints: 500 },
+        }),
       ],
       2025,
       calendar,
       [k21],
     );
 
-    expect(stats.flights.map((f) => f.id)).toEqual(["1", "2"]);
+    expect(stats.flights.map((f) => f.id)).toEqual(["best", "early", "late"]);
   });
 
   it("lists every glider in config order, unflown ones too", () => {
