@@ -337,6 +337,16 @@ describe("computeHeightLoss", () => {
     expect(result?.heightLoss).toBeCloseTo(100, -1);
   });
 
+  it("finishes up to 5km from the finish point, like the BGA Ladder", () => {
+    const data = makeIgcData(500, 400);
+    // Move the fix past the finish line to ~3km beyond GRL
+    data.track[7] = { ...data.track[7], lat: 52.2, lon: -0.08 };
+    data.track[8] = { ...data.track[8], lat: 52.2, lon: -0.08 };
+    data.track[9] = { ...data.track[9], lat: 52.2, lon: -0.08 };
+
+    expect(computeHeightLoss(data)?.heightLoss).toBeCloseTo(100, -1);
+  });
+
   // Flight 104680 (300km O/R GRL-GRM, 14/08/2022): the glider crossed the
   // start line's extension 7.4km out, high up, before the real start at
   // 12:59:50. Values from igcviewer.bgaladder.net "Analyse task".
