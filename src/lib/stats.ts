@@ -1,5 +1,5 @@
 import { groupBy, meanBy, orderBy, sortBy, sumBy, uniq } from "lodash";
-import type { Flight, SeasonConfig } from "../types";
+import type { Flight, SeasonConfig, TaskShape } from "../types";
 import { inSeasonPredicate } from "./eval";
 import { formatPilotName } from "./trophyCopyData";
 
@@ -251,6 +251,123 @@ function bestDays(
   ).slice(0, limit);
 }
 
+export interface TaskCount {
+  completed: number;
+  total: number;
+}
+
+/** A task's shape, FAI triangles (as the BGA classes them) apart. */
+export type ShapeKey = "fai-triangle" | TaskShape;
+
+const shapeOf = (f: Flight): ShapeKey =>
+  f.task.isFaiTriangle ? "fai-triangle" : f.task.taskShape;
+
+export interface TaskBreakdown {
+  /** Per distance category (see `categories`), keyed like them. */
+  bands: Record<string, TaskCount>;
+  shapes: Record<ShapeKey, TaskCount>;
+}
+
+export interface TopTask extends TaskCount {
+  /** Start, turnpoints and finish, in the direction flown most often. */
+  route: string[];
+  taskDistanceKm: number;
+  /** Mean handicapped speed of completed tasks; null without any. */
+  avgSpeedKph: number | null;
+  /** The task's completed flights fastest first, then the rest longest first. */
+  flights: Flight[];
+}
+
+const taskCount = (fs: Flight[]): TaskCount => ({
+  completed: fs.filter(isCompletedTask).length,
+  total: fs.length,
+});
+
+/** The season's tasks: completed vs attempted per distance category and shape. */
+function taskBreakdown(
+  flights: Flight[],
+  season: number,
+  seasonConfig: SeasonConfig,
+): TaskBreakdown {
+  const claimed = claimedInSeason(flights, season, seasonConfig);
+  const stats = calculateStats(claimed);
+  const byShape = groupBy(claimed, shapeOf);
+  return {
+    bands: Object.fromEntries(
+      categories.map(({ key }) => [
+        key,
+        {
+          completed: stats[key]?.completed ?? 0,
+          total: stats[key]?.total ?? 0,
+        },
+      ]),
+    ),
+    shapes: {
+      "fai-triangle": taskCount(byShape["fai-triangle"] ?? []),
+      triangle: taskCount(byShape.triangle ?? []),
+      "out-and-return": taskCount(byShape["out-and-return"] ?? []),
+      other: taskCount(byShape.other ?? []),
+    },
+  };
+}
+
+const routeOf = (f: Flight) => [
+  f.task.start,
+  ...f.task.turnpoints,
+  f.task.finish,
+];
+
+/**
+ * The season's most flown tasks, a task and its reverse counting as one (e.g.
+ * GRL-RUS-RAM-GRL and GRL-RAM-RUS-GRL). Tasks using a user-defined point (a
+ * code starting with "*") are left out, as nobody else can fly them.
+ */
+function topTasks(
+  flights: Flight[],
+  season: number,
+  seasonConfig: SeasonConfig,
+  limit = 10,
+): TopTask[] {
+  const tasks = claimedInSeason(flights, season, seasonConfig).filter((f) =>
+    routeOf(f).every((code) => code && !code.startsWith("*")),
+  );
+  const byTask = groupBy(tasks, (f) => {
+    const route = routeOf(f);
+    return [route.join("-"), [...route].reverse().join("-")].sort()[0];
+  });
+  const top = Object.values(byTask).map((taskFlights) => {
+    const byDirection = groupBy(taskFlights, (f) => routeOf(f).join("-"));
+    const [usual] = orderBy(
+      Object.values(byDirection),
+      [(fs) => fs.length, (fs) => routeOf(fs[0]).join("-")],
+      ["desc", "asc"],
+    );
+    const completed = taskFlights.filter(isCompletedTask);
+    return {
+      route: routeOf(usual[0]),
+      taskDistanceKm: usual[0].task.taskDistanceKm,
+      ...taskCount(taskFlights),
+      avgSpeedKph: completed.length
+        ? meanBy(completed, (f) => f.task.handicappedSpeedKph)
+        : null,
+      flights: orderBy(
+        taskFlights,
+        [
+          isCompletedTask,
+          (f) => (isCompletedTask(f) ? f.task.handicappedSpeedKph : 0),
+          (f) => f.task.scoringDistanceKm,
+        ],
+        ["desc", "desc", "desc"],
+      ),
+    };
+  });
+  return orderBy(
+    top,
+    ["total", (t) => t.route.join("-")],
+    ["desc", "asc"],
+  ).slice(0, limit);
+}
+
 export interface PilotColumn {
   key: string;
   label: string;
@@ -351,6 +468,8 @@ export {
   pilotStats,
   pilotStatsCopyData,
   seasonSummary,
+  taskBreakdown,
+  topTasks,
   updateCategory,
   updateStats,
 };

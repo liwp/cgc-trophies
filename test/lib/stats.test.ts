@@ -6,6 +6,8 @@ import {
   pilotStats,
   pilotStatsCopyData,
   seasonSummary,
+  taskBreakdown,
+  topTasks,
   updateCategory,
   updateStats,
 } from "../../src/lib/stats";
@@ -455,5 +457,111 @@ describe("bestDays", () => {
       "2025-06-03",
       "2025-06-01",
     ]);
+  });
+});
+
+describe("taskBreakdown", () => {
+  const calendar = {
+    start: { month: 1, day: 1 },
+    end: { month: 12, day: 31 },
+  };
+  const flight = (task: Partial<Flight["task"]>, date = "2025-06-01") =>
+    baseFlight({ date: new Date(date), task });
+
+  it("counts completed and attempted tasks per band and shape", () => {
+    const { bands, shapes } = taskBreakdown(
+      [
+        flight({
+          taskDistanceKm: 320,
+          taskShape: "triangle",
+          isFaiTriangle: true,
+        }),
+        flight({
+          taskDistanceKm: 350,
+          taskShape: "triangle",
+          isCompleted: false,
+        }),
+        flight({ taskDistanceKm: 510, taskShape: "out-and-return" }),
+        flight({ taskDistanceKm: 100, taskShape: "other", claimType: "P" }),
+        flight({ taskDistanceKm: 100, taskShape: "other" }, "2024-06-01"),
+      ],
+      2025,
+      calendar,
+    );
+    expect(bands.open).toEqual({ completed: 2, total: 3 });
+    expect(bands["300km"]).toEqual({ completed: 1, total: 2 });
+    expect(bands["400km"]).toEqual({ completed: 0, total: 0 });
+    expect(bands["500km"]).toEqual({ completed: 1, total: 1 });
+    expect(shapes).toEqual({
+      "fai-triangle": { completed: 1, total: 1 },
+      triangle: { completed: 0, total: 1 },
+      "out-and-return": { completed: 1, total: 1 },
+      other: { completed: 0, total: 0 },
+    });
+  });
+});
+
+describe("topTasks", () => {
+  const calendar = {
+    start: { month: 1, day: 1 },
+    end: { month: 12, day: 31 },
+  };
+  const flight = (turnpoints: string[], task: Partial<Flight["task"]> = {}) =>
+    baseFlight({
+      date: new Date("2025-06-01"),
+      task: { start: "GRL", finish: "GRL", turnpoints, ...task },
+    });
+
+  it("counts a task and its reverse as one, shown the usual way round", () => {
+    const tasks = topTasks(
+      [
+        flight(["RUS", "RAM"], {
+          taskDistanceKm: 301,
+          handicappedSpeedKph: 80,
+        }),
+        flight(["RAM", "RUS"], {
+          taskDistanceKm: 300,
+          handicappedSpeedKph: 70,
+        }),
+        flight(["RAM", "RUS"], {
+          isCompleted: false,
+          taskDistanceKm: 300,
+          handicappedSpeedKph: 0,
+        }),
+        flight(["GRM"]),
+      ],
+      2025,
+      calendar,
+    );
+    expect(tasks).toEqual([
+      {
+        route: ["GRL", "RAM", "RUS", "GRL"],
+        taskDistanceKm: 300,
+        completed: 2,
+        total: 3,
+        avgSpeedKph: 75,
+        flights: expect.any(Array),
+      },
+      expect.objectContaining({ route: ["GRL", "GRM", "GRL"], total: 1 }),
+    ]);
+    expect(tasks[0].flights.map((f) => f.task.handicappedSpeedKph)).toEqual([
+      80, 70, 0,
+    ]);
+  });
+
+  it("leaves out tasks with user-defined points and keeps the top N", () => {
+    const tasks = topTasks(
+      [
+        flight(["*TP1"]),
+        flight(["GRM"], { finish: "*TP5" }),
+        flight(["BUG"]),
+        flight(["MEN"]),
+        flight(["MEN"]),
+      ],
+      2025,
+      calendar,
+      1,
+    );
+    expect(tasks.map((t) => t.route)).toEqual([["GRL", "MEN", "GRL"]]);
   });
 });
