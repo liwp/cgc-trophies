@@ -60,138 +60,144 @@ export function parseIgc(content: string): IgcData {
 const DEG_TO_RAD = Math.PI / 180;
 const EARTH_RADIUS_M = 6371000;
 
-function toXY(
-  ref: { lat: number; lon: number },
-  point: { lat: number; lon: number },
-): [number, number] {
-  const dLat = (point.lat - ref.lat) * DEG_TO_RAD;
-  const dLon = (point.lon - ref.lon) * DEG_TO_RAD;
-  const cosLat = Math.cos(ref.lat * DEG_TO_RAD);
-  return [dLon * cosLat * EARTH_RADIUS_M, dLat * EARTH_RADIUS_M];
+type LatLon = { lat: number; lon: number };
+
+// Great-circle distance (m) and initial bearing (degrees) from a to b.
+function toPoint(a: LatLon, b: LatLon): { distance: number; bearing: number } {
+  const lat1 = a.lat * DEG_TO_RAD;
+  const lat2 = b.lat * DEG_TO_RAD;
+  const dLat = lat2 - lat1;
+  const dLon = (b.lon - a.lon) * DEG_TO_RAD;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  const distance =
+    2 * EARTH_RADIUS_M * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+  const y = Math.sin(dLon) * Math.cos(lat2);
+  const x =
+    Math.cos(lat1) * Math.sin(lat2) -
+    Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+  const bearing = (Math.atan2(y, x) / DEG_TO_RAD + 360) % 360;
+  return { distance, bearing };
 }
 
-function cross2D(ax: number, ay: number, bx: number, by: number): number {
-  return ax * by - ay * bx;
+/** Smallest angle (degrees, 0-180) between two bearings. */
+function angleBetween(a: number, b: number): number {
+  const d = Math.abs(a - b) % 360;
+  return d > 180 ? 360 - d : d;
 }
 
-function perpendicularLine(
-  ref: { lat: number; lon: number },
-  center: { lat: number; lon: number },
-  toward: { lat: number; lon: number },
-  lengthM: number,
-): [[number, number], [number, number]] {
-  const [cx, cy] = toXY(ref, center);
-  const [tx, ty] = toXY(ref, toward);
-
-  const dx = tx - cx;
-  const dy = ty - cy;
-  const mag = Math.sqrt(dx * dx + dy * dy);
-  if (mag === 0)
-    return [
-      [cx, cy],
-      [cx, cy],
-    ];
-
-  const px = -dy / mag;
-  const py = dx / mag;
-
-  const half = lengthM / 2;
-  return [
-    [cx + px * half, cy + py * half],
-    [cx - px * half, cy - py * half],
-  ];
+/** Bearing halfway between two bearings, on the side of the smaller angle. */
+function bisect(a: number, b: number): number {
+  const x = Math.sin(a * DEG_TO_RAD) + Math.sin(b * DEG_TO_RAD);
+  const y = Math.cos(a * DEG_TO_RAD) + Math.cos(b * DEG_TO_RAD);
+  return (Math.atan2(x, y) / DEG_TO_RAD + 360) % 360;
 }
 
-function getAltitude(pt: IgcTrackPoint): number {
-  return pt.baroAlt > 0 ? pt.baroAlt : pt.gpsAlt;
-}
+// Observation zones, as the BGA's IGC viewer (igcviewer.bgaladder.net) uses
+// them by default. Its "Analyse task" height loss is what we aim to match.
+const START_RADIUS_M = 5000; // start line half-length
+const FINISH_RADIUS_M = 1000; // finish line half-length
+const TP_BARREL_RADIUS_M = 500;
+const TP_SECTOR_RADIUS_M = 20000;
+const TP_SECTOR_HALF_ANGLE = 45;
 
-function findCrossings(
-  track: IgcTrackPoint[],
-  lineA: [number, number],
-  lineB: [number, number],
-  ref: { lat: number; lon: number },
-): { index: number; altitude: number }[] {
-  const [lax, lay] = lineA;
-  const [lbx, lby] = lineB;
-  const ldx = lbx - lax;
-  const ldy = lby - lay;
-
-  const crossings: { index: number; altitude: number }[] = [];
-  let prevSide = 0;
-
-  for (let i = 0; i < track.length; i++) {
-    const [px, py] = toXY(ref, track[i]);
-    const side = cross2D(ldx, ldy, px - lax, py - lay);
-
-    if (
-      i > 0 &&
-      prevSide !== 0 &&
-      side !== 0 &&
-      Math.sign(prevSide) !== Math.sign(side)
-    ) {
-      const t = Math.abs(prevSide) / (Math.abs(prevSide) + Math.abs(side));
-      const altA = getAltitude(track[i - 1]);
-      const altB = getAltitude(track[i]);
-      crossings.push({
-        index: i,
-        altitude: altA + t * (altB - altA),
-      });
-    }
-    prevSide = side;
-  }
-
-  return crossings;
-}
-
-const START_FINISH_LINE_LENGTH_M = 5000;
-
+/**
+ * Height loss between start and finish, assessing the flight against the
+ * declared task the way the BGA's IGC viewer does: the start is the first fix
+ * after leaving the start zone (a half-disc behind the start line) for the
+ * last time before reaching the first turnpoint, the turnpoints are rounded in
+ * order (barrel or FAI sector), and the finish is the first fix beyond the
+ * finish line after the last one. Returns null unless every turnpoint and the
+ * finish are reached, as the viewer then gives no height loss either.
+ */
 export function computeHeightLoss(data: IgcData): HeightLossResult | null {
   const { task, track } = data;
 
   // Task: TAKEOFF, start, TP1, ..., TPn, finish, LANDING (min 5 points)
   if (task.length < 5 || track.length < 2) return null;
 
-  const start = task[1];
-  const firstTP = task[2];
-  const lastTP = task[task.length - 3];
-  const finish = task[task.length - 2];
-
-  const ref = start;
-
-  const startLine = perpendicularLine(
-    ref,
-    start,
-    firstTP,
-    START_FINISH_LINE_LENGTH_M,
-  );
-  const finishLine = perpendicularLine(
-    ref,
-    finish,
-    lastTP,
-    START_FINISH_LINE_LENGTH_M,
+  const coords = task.slice(1, -1);
+  const last = coords.length - 1;
+  const legBearing = coords
+    .slice(1)
+    .map((point, i) => toPoint(coords[i], point).bearing);
+  // A turnpoint's sector faces away from the bisector of its legs.
+  const sectorBearing = coords.map((point, i) =>
+    i === 0 || i === last
+      ? 0
+      : (bisect(
+          toPoint(point, coords[i - 1]).bearing,
+          toPoint(point, coords[i + 1]).bearing,
+        ) +
+          180) %
+        360,
   );
 
-  const startCrossings = findCrossings(track, startLine[0], startLine[1], ref);
-  const finishCrossings = findCrossings(
-    track,
-    finishLine[0],
-    finishLine[1],
-    ref,
-  );
+  // Pressure altitude unless the logger recorded none.
+  const usePressure = track.some((fix) => fix.baroAlt !== 0);
+  const altitude = (fix: IgcTrackPoint) =>
+    usePressure ? fix.baroAlt : fix.gpsAlt;
 
-  if (startCrossings.length === 0 || finishCrossings.length === 0) return null;
+  // Only assess the flight itself: from the first 4m climb to the last 4m
+  // descent, so rolling past the finish after landing doesn't count.
+  let takeOff = 1;
+  for (let climb = 0; climb < 4 && takeOff < track.length; takeOff++) {
+    climb += altitude(track[takeOff]) - altitude(track[takeOff - 1]);
+  }
+  takeOff--;
+  let landing = track.length - 1;
+  for (let descent = 0; descent < 4 && landing > 1; landing--) {
+    descent += altitude(track[landing - 1]) - altitude(track[landing]);
+  }
 
-  const q1 = Math.floor(track.length / 4);
-  const q3 = Math.floor((3 * track.length) / 4);
-  const startCrossing = startCrossings.filter((c) => c.index <= q1).pop();
-  const finishCrossing = finishCrossings.find((c) => c.index >= q3);
+  const turnIndices: number[] = [];
+  let leg = -1; // -1 before the start zone, 0 in it, n heading for coords[n]
+  for (let i = takeOff; i < landing && leg <= last; i++) {
+    const fix = track[i];
+    if (leg < 2) {
+      const fromStart = toPoint(coords[0], fix);
+      const inStartZone =
+        fromStart.distance < START_RADIUS_M &&
+        angleBetween(fromStart.bearing, legBearing[0]) > 90;
+      if (inStartZone) {
+        leg = 0;
+      } else if (leg === 0) {
+        leg = 1;
+        turnIndices[0] = i;
+      }
+    }
+    if (leg < 1) continue;
 
-  if (!startCrossing || !finishCrossing) return null;
+    const target = coords[leg];
+    let reached: boolean;
+    if (leg === last) {
+      const toFinish = toPoint(fix, target);
+      reached =
+        toFinish.distance < FINISH_RADIUS_M &&
+        angleBetween(toFinish.bearing, legBearing[leg - 1]) > 90;
+    } else {
+      const fromTP = toPoint(target, fix);
+      reached =
+        fromTP.distance < TP_BARREL_RADIUS_M ||
+        (fromTP.distance < TP_SECTOR_RADIUS_M &&
+          angleBetween(fromTP.bearing, sectorBearing[leg]) <
+            TP_SECTOR_HALF_ANGLE);
+    }
+    if (reached) {
+      turnIndices[leg] = i;
+      leg++;
+    }
+  }
+
+  if (leg <= last) return null;
+
+  const startAltitude = altitude(track[turnIndices[0]]);
+  const finishAltitude = altitude(track[turnIndices[last]]);
 
   return {
-    startAltitude: startCrossing.altitude,
-    finishAltitude: finishCrossing.altitude,
-    heightLoss: startCrossing.altitude - finishCrossing.altitude,
+    startAltitude,
+    finishAltitude,
+    heightLoss: startAltitude - finishAltitude,
   };
 }

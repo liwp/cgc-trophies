@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { computeHeightLoss, parseIgc } from "../../src/lib/igc";
 
 describe("parseIgc", () => {
@@ -128,6 +129,8 @@ describe("computeHeightLoss", () => {
         { lat: 0, lon: 0, name: "LANDING" },
       ],
       track: [
+        // On the ground at GRL, before take-off
+        { time: "095000", lat: 52.19, lon: -0.1, baroAlt: 0, gpsAlt: 0 },
         // Before start line (approaching from behind)
         {
           time: "100000",
@@ -176,14 +179,23 @@ describe("computeHeightLoss", () => {
           baroAlt: finishAlt,
           gpsAlt: finishAlt,
         },
-        // Past finish
+        // Past finish, within the finish line's 1km radius
         {
           time: "140100",
+          lat: 52.186,
+          lon: -0.106,
+          baroAlt: finishAlt,
+          gpsAlt: finishAlt,
+        },
+        // Landed
+        {
+          time: "140200",
           lat: 52.19,
           lon: -0.1,
           baroAlt: finishAlt,
           gpsAlt: finishAlt,
         },
+        { time: "140300", lat: 52.19, lon: -0.1, baroAlt: 0, gpsAlt: 0 },
       ],
     };
   }
@@ -313,15 +325,27 @@ describe("computeHeightLoss", () => {
   });
 
   it("uses GPS altitude when baro is zero", () => {
-    const data = makeIgcData(0, 0);
-    data.track = data.track.map((pt, i) => ({
+    const data = makeIgcData(500, 400);
+    data.track = data.track.map((pt) => ({
       ...pt,
       baroAlt: 0,
-      gpsAlt: i <= 1 ? 500 : i >= 5 ? 400 : 1000,
+      gpsAlt: pt.baroAlt,
     }));
 
     const result = computeHeightLoss(data);
     expect(result).not.toBeNull();
     expect(result?.heightLoss).toBeCloseTo(100, -1);
+  });
+
+  // Flight 104680 (300km O/R GRL-GRM, 14/08/2022): the glider crossed the
+  // start line's extension 7.4km out, high up, before the real start at
+  // 12:59:50. Values from igcviewer.bgaladder.net "Analyse task".
+  it("matches the BGA IGC viewer on a recorded flight", () => {
+    const igc = readFileSync(`${__dirname}/../fixtures/104680.igc`, "utf8");
+    const result = computeHeightLoss(parseIgc(igc));
+
+    expect(result?.startAltitude).toBe(1335);
+    expect(result?.finishAltitude).toBe(468);
+    expect(result?.heightLoss).toBe(867);
   });
 });
