@@ -213,6 +213,35 @@ function monthlyActivity(
   });
 }
 
+export interface DayStats {
+  date: Date;
+  /** The day's flights, longest scoring distance first. */
+  flights: Flight[];
+  scoringKm: number;
+}
+
+/** The season's days with the most scoring km (then most flights), best first. */
+function bestDays(
+  flights: Flight[],
+  season: number,
+  seasonConfig: SeasonConfig,
+  limit = 10,
+): DayStats[] {
+  const byDay = groupBy(claimedInSeason(flights, season, seasonConfig), (f) =>
+    f.date.getTime(),
+  );
+  const days = Object.values(byDay).map((dayFlights) => ({
+    date: dayFlights[0].date,
+    flights: orderBy(dayFlights, (f) => f.task.scoringDistanceKm, "desc"),
+    scoringKm: sumBy(dayFlights, (f) => f.task.scoringDistanceKm),
+  }));
+  return orderBy(
+    days,
+    ["scoringKm", (d) => d.flights.length, (d) => d.date.getTime()],
+    ["desc", "desc", "asc"],
+  ).slice(0, limit);
+}
+
 export interface PilotColumn {
   key: string;
   label: string;
@@ -305,6 +334,7 @@ function pilotStatsCopyData(stats: PilotStats[]): string[][] {
 }
 
 export {
+  bestDays,
   calculateStats,
   categories,
   monthlyActivity,

@@ -1,4 +1,5 @@
 import {
+  bestDays,
   calculateStats,
   categories,
   monthlyActivity,
@@ -393,5 +394,60 @@ describe("monthlyActivity", () => {
       "2026-3",
     ]);
     expect(months[4].flights).toBe(1);
+  });
+});
+
+describe("bestDays", () => {
+  const calendar = {
+    start: { month: 1, day: 1 },
+    end: { month: 12, day: 31 },
+  };
+  const flight = (date: string, km: number, pilot = "A", claimType = "C") =>
+    baseFlight({
+      date: new Date(date),
+      pilot,
+      task: { scoringDistanceKm: km, claimType },
+    });
+
+  it("ranks days by total km, with their flights longest first", () => {
+    const days = bestDays(
+      [
+        flight("2025-05-01", 300, "A"),
+        flight("2025-05-01", 500, "B"),
+        flight("2025-06-01", 100),
+        flight("2025-06-01", 100),
+        flight("2025-06-01", 100),
+        flight("2025-07-01", 900, "C", "P"),
+        flight("2024-07-01", 900),
+      ],
+      2025,
+      calendar,
+    );
+    expect(days).toHaveLength(2);
+    expect(days[0]).toMatchObject({
+      date: new Date("2025-05-01"),
+      scoringKm: 800,
+    });
+    expect(days[0].flights.map((f) => f.pilot)).toEqual(["B", "A"]);
+    expect(days[1].flights).toHaveLength(3);
+    expect(days[1].scoringKm).toBe(300);
+  });
+
+  it("breaks ties by flights, then the earlier day, and keeps the top N", () => {
+    const days = bestDays(
+      [
+        flight("2025-06-02", 200),
+        flight("2025-06-01", 200),
+        flight("2025-06-03", 100),
+        flight("2025-06-03", 100),
+      ],
+      2025,
+      calendar,
+      2,
+    );
+    expect(days.map((d) => d.date.toISOString().slice(0, 10))).toEqual([
+      "2025-06-03",
+      "2025-06-01",
+    ]);
   });
 });
