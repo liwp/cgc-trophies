@@ -94,26 +94,30 @@ function bisect(a: number, b: number): number {
   return (Math.atan2(x, y) / DEG_TO_RAD + 360) % 360;
 }
 
-// Observation zones, as the BGA's IGC viewer (igcviewer.bgaladder.net) uses
-// them, but with the BGA Ladder's 5km finish radius (the ladder's per-flight
-// data records StartRadius and FinishRadius 5): it matches the ladder's own
-// over-limit height losses better than the viewer's 1km default. Turnpoints
-// accept the barrel or the sector whatever the flight's sector type, as the
-// ladder appears to (FAI-sector flights matched it only with the barrel).
-const START_RADIUS_M = 5000; // start line half-length
-const FINISH_RADIUS_M = 5000; // finish line half-length
+// Observation zones, per the BGA Ladder rules (bgaladder.net/FileStore/PDF/
+// RULES.pdf, 5.1 and 5.2). Turnpoints accept the 0.5km barrel or the FAI
+// sector whatever the flight's sector type, as the ladder appears to
+// (FAI-sector flights matched its height losses only with the barrel).
+const START_RADIUS_M = 5000; // half the 10km start line
+const FINISH_RADIUS_M = 5000; // half the 10km finish line
+// Landing "anywhere on the airfield" finishes; we can't know the airfield's
+// extent, so take a landing this close to the finish point.
+const FINISH_AIRFIELD_RADIUS_M = 1000;
 const TP_BARREL_RADIUS_M = 500;
 const TP_SECTOR_RADIUS_M = 20000;
-const TP_SECTOR_HALF_ANGLE = 45;
+const SECTOR_HALF_ANGLE = 45; // 90-degree start, turnpoint and finish sectors
 
 /**
- * Height loss between start and finish, assessing the flight against the
- * declared task the way the BGA's IGC viewer does: the start is the first fix
- * after leaving the start zone (a half-disc behind the start line) for the
- * last time before reaching the first turnpoint, the turnpoints are rounded in
- * order (barrel or FAI sector), and the finish is the first fix beyond the
- * finish line after the last one. Returns null unless every turnpoint and the
- * finish are reached, as the viewer then gives no height loss either.
+ * Height loss between start and finish, assessing the flight against the task
+ * declared in its IGC file under the BGA Ladder rules, in the way the BGA's
+ * IGC viewer (igcviewer.bgaladder.net) does: only fixes between take-off and
+ * landing count, a start is leaving the start zone (behind the 10km start line,
+ * or the 90-degree start sector), the turnpoints are rounded in order, and the
+ * finish is the first fix past the 10km finish line or in the finish sector
+ * after the last turnpoint, or else landing on the finish airfield. Of the
+ * valid starts before the first turnpoint, the pilot may pick any, so the one
+ * giving the least height loss is used. Returns null unless every turnpoint
+ * and the finish are reached.
  */
 export function computeHeightLoss(data: IgcData): HeightLossResult | null {
   const { task, track } = data;
@@ -155,20 +159,33 @@ export function computeHeightLoss(data: IgcData): HeightLossResult | null {
     descent += altitude(track[landing - 1]) - altitude(track[landing]);
   }
 
-  const turnIndices: number[] = [];
+  // A start must be made in free flight (ladder rule 5.1). A launch only
+  // climbs, so free flight begins with the first 20m drop below the highest
+  // altitude so far.
+  let release = takeOff;
+  for (let top = altitude(track[takeOff]); release < landing; release++) {
+    const alt = altitude(track[release]);
+    if (alt <= top - 20) break;
+    top = Math.max(top, alt);
+  }
+
+  const turnIndices: number[] = []; // fix that reached coords[n], n >= 1
+  const starts: number[] = []; // fixes where the glider left the start zone
   let leg = -1; // -1 before the start zone, 0 in it, n heading for coords[n]
   for (let i = takeOff; i < landing && leg <= last; i++) {
     const fix = track[i];
     if (leg < 2) {
       const fromStart = toPoint(coords[0], fix);
       const inStartZone =
-        fromStart.distance < START_RADIUS_M &&
-        angleBetween(fromStart.bearing, legBearing[0]) > 90;
+        (fromStart.distance < START_RADIUS_M &&
+          angleBetween(fromStart.bearing, legBearing[0]) > 90) ||
+        angleBetween(fromStart.bearing, legBearing[0]) >
+          180 - SECTOR_HALF_ANGLE;
       if (inStartZone) {
         leg = 0;
       } else if (leg === 0) {
         leg = 1;
-        turnIndices[0] = i;
+        if (i >= release) starts.push(i);
       }
     }
     if (leg < 1) continue;
@@ -178,15 +195,16 @@ export function computeHeightLoss(data: IgcData): HeightLossResult | null {
     if (leg === last) {
       const toFinish = toPoint(fix, target);
       reached =
-        toFinish.distance < FINISH_RADIUS_M &&
-        angleBetween(toFinish.bearing, legBearing[leg - 1]) > 90;
+        (toFinish.distance < FINISH_RADIUS_M &&
+          angleBetween(toFinish.bearing, legBearing[leg - 1]) > 90) ||
+        angleBetween(toFinish.bearing, legBearing[leg - 1]) >
+          180 - SECTOR_HALF_ANGLE;
     } else {
       const fromTP = toPoint(target, fix);
       reached =
         fromTP.distance < TP_BARREL_RADIUS_M ||
         (fromTP.distance < TP_SECTOR_RADIUS_M &&
-          angleBetween(fromTP.bearing, sectorBearing[leg]) <
-            TP_SECTOR_HALF_ANGLE);
+          angleBetween(fromTP.bearing, sectorBearing[leg]) < SECTOR_HALF_ANGLE);
     }
     if (reached) {
       turnIndices[leg] = i;
@@ -194,9 +212,23 @@ export function computeHeightLoss(data: IgcData): HeightLossResult | null {
     }
   }
 
+  // Landing on the finish airfield also finishes
+  if (
+    leg === last &&
+    toPoint(coords[last], track[landing]).distance < FINISH_AIRFIELD_RADIUS_M
+  ) {
+    turnIndices[last] = landing;
+    leg++;
+  }
   if (leg <= last) return null;
 
-  const startAltitude = altitude(track[turnIndices[0]]);
+  if (starts.length === 0) return null;
+  // The pilot may pick any valid start before the last one (ladder rule 5.1
+  // Note 1), so take the one that gives the least height loss.
+  const start = starts.reduce((a, b) =>
+    altitude(track[b]) < altitude(track[a]) ? b : a,
+  );
+  const startAltitude = altitude(track[start]);
   const finishAltitude = altitude(track[turnIndices[last]]);
 
   return {
