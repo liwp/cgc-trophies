@@ -7,6 +7,8 @@
  * under the FAI SC3 rules: a new record must beat the standing one by 1 km or
  * 1 km/h, triangles need FAI geometry, and speed flights must stay within the
  * 1000 m height-loss limit. Height records are never derived from ladder data.
+ * The ladder's reported height loss can understate the real one, so each speed
+ * candidate's is also computed from its IGC file and flagged if over the limit.
  * Prints each candidate (later ones supersede earlier ones in a category), for
  * a human to approve; it never edits records.config.ts.
  *
@@ -19,8 +21,10 @@ import CONFIG from "trophies-config";
 import records, { checkedThroughSeason } from "../records.config";
 import { parseCsv } from "../src/lib/csv";
 import { SPEC } from "../src/lib/flightCsvSpec";
-import { flightDetailsUrl } from "../src/lib/links";
-import { findCandidates } from "../src/lib/records";
+import { shouldWarnHeightLoss } from "../src/lib/heightLoss";
+import { computeHeightLoss, parseIgc } from "../src/lib/igc";
+import { flightDetailsUrl, igcFileUrl } from "../src/lib/links";
+import { findCandidates, MAX_HEIGHT_LOSS_M } from "../src/lib/records";
 import type { Flight } from "../src/types";
 
 const URL = "https://api.bgaladder.net/api/getlogfilescsv";
@@ -31,6 +35,18 @@ async function flightsFor(year: number): Promise<Flight[]> {
   const res = await fetch(`${URL}/${year}/${CONFIG.club.code}`);
   if (!res.ok) throw new Error(`Failed to fetch ${year}: ${res.status}`);
   return parseCsv(SPEC, await res.text());
+}
+
+/** The height loss computed from a flight's IGC file, as a line to print. */
+async function heightLossLine(flight: Flight): Promise<string> {
+  const res = await fetch(igcFileUrl(flight.id));
+  const result = res.ok ? computeHeightLoss(parseIgc(await res.text())) : null;
+  if (!result) return "  Height loss: could not compute from the IGC file";
+  const computed = Math.round(result.heightLoss);
+  const flag = shouldWarnHeightLoss(result.heightLoss, MAX_HEIGHT_LOSS_M)
+    ? ` — OVER THE ${MAX_HEIGHT_LOSS_M} m LIMIT, check in the IGC viewer`
+    : "";
+  return `  Height loss: ${computed} m computed (reported: ${flight.task.heightLoss} m)${flag}`;
 }
 
 async function main() {
@@ -44,14 +60,19 @@ async function main() {
     console.log("No candidate records.");
     return;
   }
-  const blocks = candidates.map(({ category, flight, value, beats }) => {
-    const beaten = beats === null ? "No claim" : beats.toFixed(1);
-    return [
-      `${category.label}: ${value.toFixed(1)} (beats: ${beaten})`,
-      `  ${flight.pilot}, ${flight.date.toISOString().slice(0, 10)}, ${flight.glider.type}, ${flight.task.scoringDistanceKm.toFixed(1)} km`,
-      `  ${flightDetailsUrl(flight.id)}`,
-    ].join("\n");
-  });
+  const blocks = await Promise.all(
+    candidates.map(async ({ category, flight, value, beats }) => {
+      const beaten = beats === null ? "No claim" : beats.toFixed(1);
+      return [
+        `${category.label}: ${value.toFixed(1)} (beats: ${beaten})`,
+        `  ${flight.pilot}, ${flight.date.toISOString().slice(0, 10)}, ${flight.glider.type}, ${flight.task.scoringDistanceKm.toFixed(1)} km`,
+        ...(category.rule.kind === "speed"
+          ? [await heightLossLine(flight)]
+          : []),
+        `  ${flightDetailsUrl(flight.id)}`,
+      ].join("\n");
+    }),
+  );
   console.log(blocks.join("\n\n"));
 }
 
