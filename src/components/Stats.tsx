@@ -33,11 +33,12 @@ const Stats = ({ flights, season }: { flights: Flight[]; season: number }) => {
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white px-6 py-5">
-      <div className="flex justify-around">
+      <div className="grid grid-cols-3 gap-y-4 sm:grid-cols-6">
         <FlightCategory label="All Flights" {...stats.open} />
         <FlightCategory label="300 km" {...stats["300km"]} />
         <FlightCategory label="400 km" {...stats["400km"]} />
         <FlightCategory label="500 km" {...stats["500km"]} />
+        <FlightCategory label="600 km" {...stats["600km"]} />
         <FlightCategory label="750 km" {...stats["750km"]} />
       </div>
     </div>
