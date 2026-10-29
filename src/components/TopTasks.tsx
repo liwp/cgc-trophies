@@ -1,14 +1,11 @@
-import { AlertTriangle } from "lucide-react";
 import { Fragment, useState } from "react";
-import { flightDetailsUrl } from "../lib/links";
 import type { TopTask } from "../lib/stats";
-import { formatPilotName } from "../lib/trophyCopyData";
 import TURNPOINTS from "../lib/turnpoints";
 import type { Flight } from "../types";
 import ExpandButton from "./ExpandButton";
+import FlightRow, { PenaltyWarning } from "./FlightRow";
 import Th from "./Th";
 import Tip from "./Tip";
-import Tooltip from "./Tooltip";
 
 const routeNames = (route: string[]) =>
   route.map((code) => TURNPOINTS[code]?.name ?? code).join(" – ");
@@ -18,54 +15,11 @@ const kph = (v: number | null) => (v === null ? "" : `${v.toFixed(1)} kph`);
 const completedOf = (completed: number, total: number) =>
   `${completed} / ${total}`;
 
-/** Shows a height loss penalty on hover, or focus for keyboard users. */
-const PenaltyWarning = ({ flight }: { flight: Flight }) => {
-  const { heightLoss, distancePenaltyKm } = flight.task;
-  if (distancePenaltyKm <= 0) return null;
-  return (
-    <Tooltip
-      text={`Height loss ${heightLoss.toLocaleString("en-GB")} m: ${distancePenaltyKm.toFixed(1)} km distance penalty`}
-      align="right"
-      asLabel
-    >
-      <button
-        type="button"
-        className="inline-flex cursor-default align-[-2px]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <AlertTriangle size={14} className="text-amber-500" aria-hidden />
-      </button>
-    </Tooltip>
-  );
-};
-
-const FlightRow = ({ flight }: { flight: Flight }) => {
+const TaskFlightRow = ({ flight }: { flight: Flight }) => {
   const { task } = flight;
   const completed = task.isCompleted && task.isDeclared;
   return (
-    <tr className="bg-gray-50 text-gray-500">
-      <td colSpan={3} className="py-1.5 pr-4 pl-10">
-        <div className="grid grid-cols-[6.5rem_minmax(9rem,1fr)_1fr] gap-x-4 whitespace-nowrap">
-          <span className="tabular-nums">
-            {flight.date.toLocaleDateString("en-GB", {
-              weekday: "short",
-              day: "numeric",
-              month: "short",
-              timeZone: "UTC",
-            })}
-          </span>
-          <a
-            href={flightDetailsUrl(flight.id)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-cambridge hover:text-cambridge-dark"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {formatPilotName(flight.pilot)}
-          </a>
-          <span className="text-gray-400">{flight.glider.type}</span>
-        </div>
-      </td>
+    <FlightRow flight={flight} span={3} detail={flight.glider.type}>
       <td className="px-4 py-1.5 text-right tabular-nums whitespace-nowrap">
         <span className="inline-flex items-center gap-1.5">
           <PenaltyWarning flight={flight} />
@@ -77,7 +31,7 @@ const FlightRow = ({ flight }: { flight: Flight }) => {
         </span>
       </td>
       <td />
-    </tr>
+    </FlightRow>
   );
 };
 
@@ -118,7 +72,9 @@ const TaskRow = ({ task }: { task: TopTask }) => {
         </td>
       </tr>
       {expanded &&
-        flights.map((flight) => <FlightRow key={flight.id} flight={flight} />)}
+        flights.map((flight) => (
+          <TaskFlightRow key={flight.id} flight={flight} />
+        ))}
     </>
   );
 };
