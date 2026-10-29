@@ -72,8 +72,8 @@ test("the stats fit a phone screen", async ({ page }) => {
   ).toBe(true);
 });
 
-const pilotRows = (page: Page) =>
-  page.getByRole("region", { name: "Pilots" }).locator("tbody tr");
+const pilots = (page: Page) => page.getByRole("region", { name: "Pilots" });
+const pilotRows = (page: Page) => pilots(page).locator("tbody tr");
 
 test("the pilot table lists pilots by points and sorts by any column", async ({
   page,
@@ -82,21 +82,27 @@ test("the pilot table lists pilots by points and sorts by any column", async ({
   await expect(pilotRows(page)).toHaveCount(10);
   await page.getByRole("switch", { name: "Top 10 only" }).click();
   await expect(pilotRows(page)).toHaveCount(43);
-  const pointsHeader = page.getByRole("columnheader", { name: "Points" });
+  const pointsHeader = pilots(page).getByRole("columnheader", {
+    name: "Points",
+  });
   await expect(pointsHeader).toHaveAttribute("aria-sort", "descending");
 
-  await page.getByRole("button", { name: "Pilot", exact: true }).click();
+  await pilots(page)
+    .getByRole("button", { name: "Pilot", exact: true })
+    .click();
   await expect(
-    page.getByRole("columnheader", { name: "Pilot" }),
+    pilots(page).getByRole("columnheader", { name: "Pilot" }),
   ).toHaveAttribute("aria-sort", "ascending");
   const names = await pilotRows(page)
     .locator("td:first-child")
     .allTextContents();
   expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
 
-  await page.getByRole("button", { name: "Pilot", exact: true }).click();
+  await pilots(page)
+    .getByRole("button", { name: "Pilot", exact: true })
+    .click();
   await expect(
-    page.getByRole("columnheader", { name: "Pilot" }),
+    pilots(page).getByRole("columnheader", { name: "Pilot" }),
   ).toHaveAttribute("aria-sort", "descending");
 });
 
@@ -257,4 +263,26 @@ test("a day award with several pilots expands to them", async ({ page }) => {
   await expect(
     first.getByRole("link", { name: "Alex Holswilder" }),
   ).toBeVisible();
+});
+
+test("the club glider table lists each club glider's season", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  const table = page
+    .getByRole("region", { name: "Club gliders" })
+    .getByRole("table");
+  const row = (name: string) =>
+    table.getByRole("row").filter({ hasText: name });
+
+  await expect(table.getByRole("row")).toHaveCount(9);
+  await expect(row("Discus DM").getByRole("cell")).toHaveText([
+    /Discus DM\s*G-CJXR/,
+    "7",
+    "821",
+    "5,110",
+    "3",
+  ]);
+  // Unflown club gliders are listed too
+  await expect(row("Puchacz JEC").getByRole("cell").nth(1)).toHaveText("0");
 });
