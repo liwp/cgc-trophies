@@ -153,3 +153,63 @@ test("best days ranks the season's days by total km", async ({ page }) => {
   await expand.click();
   await expect(rows.first().locator("li")).toHaveCount(1);
 });
+
+test("the tasks charts show completions by distance and shape", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  const distance = page.getByRole("figure", { name: /By distance/ });
+  await expect(distance.getByRole("img")).toHaveCount(6);
+  await expect(
+    distance.getByRole("img", {
+      name: "300\u00a0km: 118 / 145 completed (81%)",
+    }),
+  ).toBeVisible();
+  await expect(
+    distance.getByRole("img", { name: "600\u00a0km: 0 / 0 completed" }),
+  ).toBeAttached();
+  await expect(
+    page
+      .getByRole("figure", { name: /By shape/ })
+      .getByRole("img", { name: /^FAI triangle: \d+ \/ \d+ completed/ }),
+  ).toBeVisible();
+});
+
+test("top tasks counts a task and its reverse together", async ({ page }) => {
+  await page.goto("/stats?season=2024");
+  const rows = page
+    .getByRole("region", { name: "Top tasks" })
+    .locator("tbody tr");
+  await expect(rows).toHaveCount(10);
+  await expect(rows.first()).toContainText("GRL – CAL – EAW – SOH – GRL");
+  await expect(rows.first()).toContainText("27 / 31");
+  // Flown 6 times one way round and 5 the other
+  const rusRam = rows.filter({ hasText: /RUS – RAM|RAM – RUS/ });
+  await expect(rusRam).toHaveCount(1);
+  await expect(rusRam).toContainText("/ 11");
+});
+
+test("a top task expands to its flights", async ({ page }) => {
+  await page.goto("/stats?season=2024");
+  const rows = page
+    .getByRole("region", { name: "Top tasks" })
+    .locator("tbody tr");
+  await expect(rows).toHaveCount(10);
+  await rows.first().click();
+  await expect(rows).toHaveCount(10 + 31);
+  await expect(
+    rows.first().getByRole("button", { name: /Flights of/ }),
+  ).toHaveAttribute("aria-expanded", "true");
+  // Completed flights fastest first, the rest after
+  await expect(rows.nth(1)).toContainText("kph");
+  await expect(rows.nth(1)).toContainText(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) /);
+  await expect(
+    page.getByRole("button", { name: /distance penalty/ }),
+  ).not.toHaveCount(0);
+  await expect(rows.nth(31)).toContainText("Not completed");
+  await rows
+    .first()
+    .getByRole("button", { name: /Flights of/ })
+    .click();
+  await expect(rows).toHaveCount(10);
+});
