@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 import CONFIG from "trophies-config";
 import BestDays from "../components/BestDays";
+import CompletionChart from "../components/CompletionChart";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import MonthlyChart from "../components/MonthlyChart";
@@ -11,12 +12,16 @@ import PageNav from "../components/PageNav";
 import PilotStatsTable from "../components/PilotStatsTable";
 import Season from "../components/Season";
 import Toggle from "../components/Toggle";
+import TopTasks from "../components/TopTasks";
 import {
   bestDays,
   monthlyActivity,
   pilotStats,
   type SeasonSummary,
   seasonSummary,
+  type TaskCount,
+  taskBreakdown,
+  topTasks,
 } from "../lib/stats";
 import useFlights from "../lib/useFlights";
 
@@ -41,6 +46,21 @@ const TILES: {
     format: (v) => `${Math.round(v)}%`,
   },
 ];
+
+// Non-breaking spaces keep each label on one line
+const DISTANCE_BANDS = [
+  { key: "under300km", label: "<\u00a0300\u00a0km" },
+  { key: "300km", label: "300\u00a0km" },
+  { key: "400km", label: "400\u00a0km" },
+  { key: "500km", label: "500\u00a0km" },
+  { key: "600km", label: "600\u00a0km" },
+  { key: "750km", label: "750+\u00a0km" },
+];
+
+const bar = (label: string, count: TaskCount = { completed: 0, total: 0 }) => ({
+  label,
+  ...count,
+});
 
 const defaultFormat = (v: number) => v.toLocaleString("en-GB");
 
@@ -133,6 +153,8 @@ const StatsPage = () => {
     return {
       current: seasonSummary(flights, state.season, CONFIG.season),
       previous: seasonSummary(flights, state.season - 1, CONFIG.season),
+      tasks: taskBreakdown(flights, state.season, CONFIG.season),
+      topTasks: topTasks(flights, state.season, CONFIG.season),
       days: bestDays(flights, state.season, CONFIG.season),
       pilots: pilotStats(flights, state.season, CONFIG.season),
       months: monthlyActivity(flights, state.season, CONFIG.season),
@@ -188,6 +210,41 @@ const StatsPage = () => {
             />
           </div>
         </section>
+        <section aria-labelledby="tasks" className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+            <h2 id="tasks" className="text-lg font-semibold text-gray-900">
+              Tasks
+            </h2>
+            <p aria-hidden className="flex gap-3 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm bg-cambridge-dark" />
+                Completed
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm bg-gray-300" />
+                Not completed
+              </span>
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-[2fr_1fr]">
+            <CompletionChart
+              title="By distance"
+              bars={DISTANCE_BANDS.map(({ key, label }) =>
+                bar(label, summaries.tasks.bands[key]),
+              )}
+            />
+            <CompletionChart
+              title="By shape"
+              bars={[
+                bar("FAI triangle", summaries.tasks.shapes["fai-triangle"]),
+                bar("Triangle", summaries.tasks.shapes.triangle),
+                bar("Out & return", summaries.tasks.shapes["out-and-return"]),
+                bar("Other", summaries.tasks.shapes.other),
+              ]}
+            />
+          </div>
+        </section>
+        <TopTasks tasks={summaries.topTasks} />
         <BestDays days={summaries.days} />
         <PilotStatsTable stats={summaries.pilots} />
       </div>
