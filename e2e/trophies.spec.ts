@@ -151,3 +151,18 @@ test("the home page fits a phone screen", async ({ page }) => {
     ),
   ).toBe(true);
 });
+
+for (const id of ["1", "L1", "L5"]) {
+  test(`trophy ${id}'s results fit a phone screen`, async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await page.goto(`/trophy/${id}?season=2024`);
+    await expect(page.getByRole("listitem").first()).toBeVisible();
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <=
+          document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
+  });
+}
