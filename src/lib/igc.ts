@@ -95,9 +95,13 @@ function bisect(a: number, b: number): number {
 }
 
 // Observation zones, as the BGA's IGC viewer (igcviewer.bgaladder.net) uses
-// them by default. Its "Analyse task" height loss is what we aim to match.
+// them, but with the BGA Ladder's 5km finish radius (the ladder's per-flight
+// data records StartRadius and FinishRadius 5): it matches the ladder's own
+// over-limit height losses better than the viewer's 1km default. Turnpoints
+// accept the barrel or the sector whatever the flight's sector type, as the
+// ladder appears to (FAI-sector flights matched it only with the barrel).
 const START_RADIUS_M = 5000; // start line half-length
-const FINISH_RADIUS_M = 1000; // finish line half-length
+const FINISH_RADIUS_M = 5000; // finish line half-length
 const TP_BARREL_RADIUS_M = 500;
 const TP_SECTOR_RADIUS_M = 20000;
 const TP_SECTOR_HALF_ANGLE = 45;
