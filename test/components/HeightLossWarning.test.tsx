@@ -41,4 +41,16 @@ describe("HeightLossWarning", () => {
     expect(tooltip?.[0]).toContain('role="tooltip"');
     expect(tooltip?.[1]).toBe("Computed height loss: 1234m (reported: 1000m)");
   });
+
+  it("names a limit, not a reported figure, when compared with one", () => {
+    mockHeightLoss(1234);
+    const html = renderToStaticMarkup(
+      <HeightLossWarning
+        flightId="1"
+        reportedHeightLoss={1000}
+        comparedTo="limit"
+      />,
+    );
+    expect(html).toContain("Computed height loss: 1234m (limit: 1000m)");
+  });
 });
