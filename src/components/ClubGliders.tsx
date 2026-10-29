@@ -49,7 +49,10 @@ const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
           <span className="font-medium text-gray-900">{name}</span>{" "}
           <span className="text-xs text-gray-500">{glider.registration}</span>
         </td>
-        <td className={cell}>{flights.length}</td>
+        {/* Left-aligned, as the expanded flights' pilots and routes are */}
+        <td className="px-4 py-2 tabular-nums text-gray-700">
+          {flights.length}
+        </td>
         <td className={cell}>{kph(avgSpeedKph)}</td>
         <td className={cell}>{km(scoringKm)}</td>
         <td className="py-2 pr-4">
@@ -77,14 +80,20 @@ const ClubGliders = ({ stats }: { stats: ClubGliderStats[] }) => (
       Club gliders
     </h2>
     <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto">
-      <table className="w-full table-auto border-collapse text-sm">
+      {/* Fixed column widths, so expanding a glider's flights (which span the
+          first two columns) doesn't shift the columns */}
+      <table className="w-full min-w-[40rem] table-fixed border-collapse text-sm">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
-            <Th>Glider</Th>
-            <Th align="right">Flights</Th>
-            <Th align="right">Avg speed</Th>
-            <Th align="right">Distance</Th>
-            <Th />
+            <Th width="w-[35%]">Glider</Th>
+            <Th>Flights</Th>
+            <Th align="right" width="w-28">
+              Avg speed
+            </Th>
+            <Th align="right" width="w-28">
+              Distance
+            </Th>
+            <Th width="w-10" />
           </tr>
         </thead>
         <tbody>
