@@ -323,7 +323,7 @@ const config: TrophiesConfig = {
       name: "Complicity Cup",
       summary: "Syndicate ladder",
       description:
-        "Aggregate of best 6 cross-country point scores per glider registration. Requires at least 2 different pilots.",
+        "Aggregate of best 6 cross-country point scores per glider registration.\n\nRequires at least 2 different pilots.",
       ladderKey: "local2",
       groupBy: "registration",
       topN: 6,
@@ -411,7 +411,7 @@ const config: TrophiesConfig = {
       name: "Gransden Trophy",
       summary: "Fastest BUG–MEN (507 km)",
       description:
-        "For the fastest, handicapped speed around turning points at Burley Gate (BUG) and Mendlesham Mast (MEN) – 507km. The task can be done either way round.",
+        "For the fastest, handicapped speed around turning points at **Burley Gate (BUG) and Mendlesham Mast (MEN)**, 507km.\n\nThe task can be done either way round.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Gransden-Trophy-e1515083987492.jpg",
       ],
@@ -462,7 +462,7 @@ const config: TrophiesConfig = {
       name: "The Boomerang",
       summary: "Fastest SHP O/R (208.7 km), pre-500 km pilots",
       description:
-        "For the fastest, handicapped out-and-return flight to Shipston-on-Stour(SHP) – 208.7km, not necessarily declared. For pilots who have not completed a UK 500 km flight at the beginning of the season.",
+        "For the fastest, handicapped out-and-return flight to **Shipston-on-Stour (SHP)**, 208.7km, not necessarily declared.\n\nFor pilots who have not completed a UK 500 km flight at the beginning of the season.",
       expr: [
         ["filter", "task.launchSite", "=", "Gransden Lodge"],
         ["filter", "task.isCompleted"],
@@ -477,7 +477,7 @@ const config: TrophiesConfig = {
       name: "Double Century",
       summary: "Fastest BNW–HUS (205.2 km), pre-300 km pilots",
       description:
-        "Fastest handicapped flight: Bicester North West (BNW) – Husbands Bosworth (HUS) – 205.2km. For pilots who have not flown a 300km at the start of the ladder season. The task can be done either way round.",
+        "Fastest handicapped flight: **Bicester North West (BNW) – Husbands Bosworth (HUS)**, 205.2km. The task can be done either way round.\n\nFor pilots who have not flown a 300km at the start of the ladder season.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Double-Century.jpg",
       ],
@@ -495,7 +495,7 @@ const config: TrophiesConfig = {
           untilSeason: 2025,
           summary: "Fastest BIC–HUS (205.0 km), pre-300 km pilots",
           description:
-            "Fastest handicapped flight: Bicester Control Tower (BIC) – Husbands Bosworth (HUS) – 205.0km. For pilots who have not flown a 300km at the start of the ladder season. The task can be done either way round.",
+            "Fastest handicapped flight: **Bicester Control Tower (BIC) – Husbands Bosworth (HUS)**, 205.0km. The task can be done either way round.\n\nFor pilots who have not flown a 300km at the start of the ladder season.",
           expr: [
             ["filter", "task.launchSite", "=", "Gransden Lodge"],
             ["filter", "task.isDeclared"],
@@ -512,7 +512,7 @@ const config: TrophiesConfig = {
       name: "Slazenger Trophy",
       summary: "Fastest Slazenger triangle (110 km), novices",
       description:
-        "For the fastest, handicapped flight around the Slazenger triangle: Turning points at Newport Pagnell and Rushden (110Km). The Task can be done either way round. For novices only.",
+        "For the fastest, handicapped flight around the Slazenger triangle: turning points at **Newport Pagnell and Rushden** (110km). The task can be done either way round.\n\nFor novices only.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Slazenger-Trophy-1.jpg",
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Slazenger-Trophy-2.jpg",
