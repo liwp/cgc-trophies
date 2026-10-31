@@ -233,7 +233,7 @@ const TrophySection = ({
         </div>
         <span className="text-sm text-gray-500">{winnerLabel}</span>
       </div>
-      <p className="text-sm text-gray-400 mb-3">{trophy.description}</p>
+      <p className="text-sm text-gray-400 mb-3">{trophy.summary}</p>
 
       {results.length > 0 && (
         <>

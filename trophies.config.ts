@@ -276,8 +276,9 @@ const config: TrophiesConfig = {
       id: "L1",
       type: "ladder",
       name: "Pot Pewter Pringle",
+      summary: "Open ladder",
       description:
-        "Open ladder: aggregate of best 6 cross-country point scores on the BGA Open Ladder.",
+        "Aggregate of best 6 cross-country point scores on the BGA Open Ladder.",
       ladderKey: "open",
       groupBy: "pilot",
       topN: 6,
@@ -286,8 +287,9 @@ const config: TrophiesConfig = {
       id: "L2",
       type: "ladder",
       name: "Glass Jug",
+      summary: "Weekend ladder",
       description:
-        "Weekend ladder: aggregate of best 6 cross-country point scores on the BGA Weekend Ladder.",
+        "Aggregate of best 6 cross-country point scores on the BGA Weekend Ladder.",
       ladderKey: "weekend",
       groupBy: "pilot",
       topN: 6,
@@ -296,8 +298,9 @@ const config: TrophiesConfig = {
       id: "L3",
       type: "ladder",
       name: "Presidents Trophy",
+      summary: "Club Fleet ladder",
       description:
-        "Club Fleet ladder: aggregate of best 6 cross-country point scores flown in club fleet gliders.",
+        "Aggregate of best 6 cross-country point scores flown in club fleet gliders.",
       ladderKey: "local1",
       groupBy: "pilot",
       topN: 6,
@@ -306,8 +309,9 @@ const config: TrophiesConfig = {
       id: "L4",
       type: "ladder",
       name: "Ted Warner Trophy",
+      summary: "Fastrackers ladder",
       description:
-        "Fastrackers ladder: aggregate of best 6 cross-country point scores on the Fastrackers Ladder.",
+        "Aggregate of best 6 cross-country point scores on the Fastrackers Ladder.",
       ladderKey: "local5",
       groupBy: "pilot",
       topN: 6,
@@ -317,8 +321,9 @@ const config: TrophiesConfig = {
       id: "L5",
       type: "ladder",
       name: "Complicity Cup",
+      summary: "Syndicate ladder",
       description:
-        "Syndicate ladder: aggregate of best 6 cross-country point scores per glider registration. Requires at least 2 different pilots.",
+        "Aggregate of best 6 cross-country point scores per glider registration.\n\nRequires at least 2 different pilots.",
       ladderKey: "local2",
       groupBy: "registration",
       topN: 6,
@@ -327,8 +332,9 @@ const config: TrophiesConfig = {
       id: "L6",
       type: "ladder",
       name: "Bottle of Bolly Challenge",
+      summary: "Bolly/ASW19 ladder",
       description:
-        "Bolly/ASW19 ladder: aggregate of best 6 cross-country point scores on the Bolly Ladder.",
+        "Aggregate of best 6 cross-country point scores on the Bolly Ladder.",
       ladderKey: "local3",
       groupBy: "pilot",
       topN: 6,
@@ -338,8 +344,9 @@ const config: TrophiesConfig = {
       id: "L7",
       type: "ladder",
       name: "Shark Challenge",
+      summary: "Shark ladder",
       description:
-        "Shark ladder: aggregate of best 6 cross-country point scores on the Shark Ladder.",
+        "Aggregate of best 6 cross-country point scores on the Shark Ladder.",
       ladderKey: "local4",
       groupBy: "pilot",
       topN: 6,
@@ -348,6 +355,7 @@ const config: TrophiesConfig = {
     {
       id: "8",
       name: "Mug Metal Machin Trophy",
+      summary: "Longest declared, completed flight (up to 3 TPs)",
       description:
         "For the longest, handicapped, declared, completed flight around up to 3 turning points.",
       img: [
@@ -368,6 +376,7 @@ const config: TrophiesConfig = {
     {
       id: "6",
       name: "Jubilee Bowl",
+      summary: "Longest completed flight (up to 2 TPs)",
       description:
         "For the longest, handicapped, completed flight around up to 2 turning points, not necessarily declared.",
       img: [
@@ -384,6 +393,7 @@ const config: TrophiesConfig = {
     {
       id: "9",
       name: "Pons Pot",
+      summary: "Longest declared, uncompleted flight (up to 3 TPs)",
       description:
         "For the longest, handicapped, declared, uncompleted flight around up to 3 turning points.",
       expr: [
@@ -399,8 +409,9 @@ const config: TrophiesConfig = {
     {
       id: "5",
       name: "Gransden Trophy",
+      summary: "Fastest BUG–MEN (507 km)",
       description:
-        "For the fastest, handicapped speed around turning points at Burley Gate (BUG) and Mendlesham Mast (MEN) – 507km. The task can be done either way round.",
+        "For the fastest, handicapped speed around turning points at **Burley Gate (BUG) and Mendlesham Mast (MEN)**, 507km.\n\nThe task can be done either way round.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Gransden-Trophy-e1515083987492.jpg",
       ],
@@ -416,6 +427,7 @@ const config: TrophiesConfig = {
     {
       id: "2",
       name: "Boal Pot",
+      summary: "Fastest SOH–EAW–CAL triangle (305.5 km)",
       description:
         "For the fastest, handicapped flight round Soham(SOH), Eastwell(EAW), and Calvert(CAL) – 305.5km. The task can be done either way round.",
       expr: [
@@ -430,6 +442,7 @@ const config: TrophiesConfig = {
     {
       id: "10",
       name: "Sanville Enigma",
+      summary: "Fastest GRM O/R (305 km)",
       description:
         "For the fastest, handicapped out-and-return flight to Great Malvern(GRM) – 305km.",
       img: [
@@ -447,8 +460,9 @@ const config: TrophiesConfig = {
     {
       id: "3",
       name: "The Boomerang",
+      summary: "Fastest SHP O/R (208.7 km), pre-500 km pilots",
       description:
-        "For the fastest, handicapped out-and-return flight to Shipston-on-Stour(SHP) – 208.7km, not necessarily declared. For pilots who have not completed a UK 500 km flight at the beginning of the season.",
+        "For the fastest, handicapped out-and-return flight to **Shipston-on-Stour (SHP)**, 208.7km, not necessarily declared.\n\nFor pilots who have not completed a UK 500 km flight at the beginning of the season.",
       expr: [
         ["filter", "task.launchSite", "=", "Gransden Lodge"],
         ["filter", "task.isCompleted"],
@@ -461,8 +475,9 @@ const config: TrophiesConfig = {
     {
       id: "4",
       name: "Double Century",
+      summary: "Fastest BNW–HUS (205.2 km), pre-300 km pilots",
       description:
-        "Fastest handicapped flight: Bicester North West (BNW) – Husbands Bosworth (HUS) – 205.2km. For pilots who have not flown a 300km at the start of the ladder season. The task can be done either way round.",
+        "Fastest handicapped flight: **Bicester North West (BNW) – Husbands Bosworth (HUS)**, 205.2km. The task can be done either way round.\n\nFor pilots who have not flown a 300km at the start of the ladder season.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Double-Century.jpg",
       ],
@@ -478,8 +493,9 @@ const config: TrophiesConfig = {
       history: [
         {
           untilSeason: 2025,
+          summary: "Fastest BIC–HUS (205.0 km), pre-300 km pilots",
           description:
-            "Fastest handicapped flight: Bicester Control Tower (BIC) – Husbands Bosworth (HUS) – 205.0km. For pilots who have not flown a 300km at the start of the ladder season. The task can be done either way round.",
+            "Fastest handicapped flight: **Bicester Control Tower (BIC) – Husbands Bosworth (HUS)**, 205.0km. The task can be done either way round.\n\nFor pilots who have not flown a 300km at the start of the ladder season.",
           expr: [
             ["filter", "task.launchSite", "=", "Gransden Lodge"],
             ["filter", "task.isDeclared"],
@@ -494,8 +510,9 @@ const config: TrophiesConfig = {
     {
       id: "11",
       name: "Slazenger Trophy",
+      summary: "Fastest Slazenger triangle (110 km), novices",
       description:
-        "For the fastest, handicapped flight around the Slazenger triangle: Turning points at Newport Pagnell and Rushden (110Km). The Task can be done either way round. For novices only.",
+        "For the fastest, handicapped flight around the Slazenger triangle: turning points at **Newport Pagnell and Rushden** (110km). The task can be done either way round.\n\nFor novices only.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Slazenger-Trophy-1.jpg",
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Slazenger-Trophy-2.jpg",
@@ -513,6 +530,7 @@ const config: TrophiesConfig = {
     {
       id: "7",
       name: "The Kelman Clock",
+      summary: "Longest winter flight (up to 3 TPs)",
       description:
         "For the longest, handicapped, flight around up to three turning points, launched from GRL during the Winter Season.",
       img: [
@@ -551,6 +569,7 @@ const config: TrophiesConfig = {
     {
       id: "1",
       name: "The A.L.L. Alexander Trophy",
+      summary: "Best ladder flight, handicap 95 or less",
       description:
         "For the highest scoring flight on the BGA ladder flown in a glider with a handicap of 95 or less, launched from Gransden Lodge.",
       expr: [

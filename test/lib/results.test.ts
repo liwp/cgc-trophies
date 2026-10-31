@@ -18,6 +18,7 @@ import { makeFlight } from "../helpers/flight";
 const flightTrophy: FlightTrophy = {
   id: "F",
   name: "Speed",
+  summary: "Test",
   description: "Fastest flight",
   expr: [
     ["filter", "task.isCompleted"],
@@ -30,6 +31,7 @@ const ladderTrophy: LadderTrophy = {
   id: "L",
   type: "ladder",
   name: "Ladder",
+  summary: "Test",
   description: "Open ladder",
   ladderKey: "open",
   groupBy: "pilot",
@@ -143,11 +145,13 @@ describe("evaluateTrophy", () => {
   it("applies the trophy version in force for the season", () => {
     const trophy: FlightTrophy = {
       ...flightTrophy,
+      summary: "Test",
       description: "Current task",
       expr: [["filter", "task.turnpoints", "<=>", ["BNW", "HUS"]]],
       history: [
         {
           untilSeason: 2023,
+          summary: "Test",
           description: "Old task",
           expr: [["filter", "task.turnpoints", "<=>", ["BIC", "HUS"]]],
         },
