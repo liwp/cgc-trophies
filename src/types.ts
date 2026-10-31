@@ -110,7 +110,9 @@ export type TrophyExpr = FilterExpr | ScoreExpr | SortExpr;
 
 /** Fields a version leaves out are taken from the headline trophy. */
 export interface TrophyVersion
-  extends Partial<Pick<FlightTrophy, "description" | "expr" | "season">> {
+  extends Partial<
+    Pick<FlightTrophy, "summary" | "description" | "expr" | "season">
+  > {
   /** Inclusive: this version applied through this season (e.g. `untilSeason: 2025`
    *  means it was in force through the 2025 season and superseded from 2026). */
   untilSeason: number;
@@ -120,6 +122,9 @@ export interface FlightTrophy {
   id: string;
   type?: "flight";
   name: string;
+  /** One line, plain text: shown on the home and admin pages. */
+  summary: string;
+  /** Markdown: shown on the trophy page. */
   description: string;
   img?: string[];
   expr: TrophyExpr[];
@@ -134,6 +139,9 @@ export interface LadderTrophy {
   id: string;
   type: "ladder";
   name: string;
+  /** One line, plain text: shown on the home and admin pages. */
+  summary: string;
+  /** Markdown: shown on the trophy page. */
   description: string;
   img?: string[];
   ladderKey: string;
