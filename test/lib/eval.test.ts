@@ -19,6 +19,7 @@ describe("ladderEval", () => {
     id: "L1",
     type: "ladder",
     name: "Open Ladder",
+    summary: "Test",
     description: "Test open ladder",
     ladderKey: "open",
     groupBy: "pilot",
@@ -176,6 +177,7 @@ describe("ladderEval", () => {
       id: "L5",
       type: "ladder",
       name: "Complicity Cup",
+      summary: "Test",
       description: "Syndicate ladder",
       ladderKey: "local2",
       groupBy: "registration",
@@ -292,6 +294,7 @@ describe("ladderEval", () => {
       id: "L6",
       type: "ladder",
       name: "Bolly Challenge",
+      summary: "Test",
       description: "Test bolly",
       ladderKey: "open",
       groupBy: "pilot",
@@ -428,6 +431,7 @@ describe("trophyEval milestone exclusions", () => {
   const boomerangTrophy: FlightTrophy = {
     id: "3",
     name: "The Boomerang",
+    summary: "Test",
     description: "Test",
     expr: [
       ["filter", "task.launchSite", "=", "Gransden Lodge"],
@@ -521,6 +525,7 @@ describe("trophyEval DSL", () => {
   const speedTrophy = (expr: TrophyExpr[]): FlightTrophy => ({
     id: "T",
     name: "Test",
+    summary: "Test",
     description: "Test",
     expr,
   });
@@ -825,6 +830,7 @@ describe("season boundaries", () => {
   const trophy = (season?: SeasonConfig): FlightTrophy => ({
     id: "T",
     name: "Test",
+    summary: "Test",
     description: "Test",
     expr: [["filter", "task.isCompleted"]],
     season,
@@ -924,6 +930,7 @@ describe("season boundaries", () => {
         id: "L",
         type: "ladder",
         name: "Ladder",
+        summary: "Test",
         description: "Test",
         ladderKey: "open",
         groupBy: "pilot",

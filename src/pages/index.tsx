@@ -30,7 +30,7 @@ const TrophyName = ({
     >
       {trophy.name}
     </Link>
-    <div className="text-xs text-gray-400 mt-0.5">{trophy.description}</div>
+    <div className="text-xs text-gray-400 mt-0.5">{trophy.summary}</div>
   </>
 );
 

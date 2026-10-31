@@ -16,6 +16,7 @@ const fastrackers: LadderTrophy = {
   id: "L",
   type: "ladder",
   name: "Fastrackers",
+  summary: "Test",
   description: "Novice ladder",
   ladderKey: "local5",
   groupBy: "pilot",

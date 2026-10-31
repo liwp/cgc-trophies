@@ -16,6 +16,7 @@ const defaultSeason: SeasonConfig = {
 const doubleCentury: FlightTrophy = {
   id: "4",
   name: "Double Century",
+  summary: "Fastest BNW–HUS",
   description: "…Bicester North West (BNW)… 205.2km…",
   expr: [
     ["filter", "task.turnpoints", "<=>", ["BNW", "HUS"]],
@@ -25,6 +26,7 @@ const doubleCentury: FlightTrophy = {
   history: [
     {
       untilSeason: 2025,
+      summary: "Fastest BIC–HUS",
       description: "…Bicester Control Tower (BIC)… 205.0km…",
       expr: [
         ["filter", "task.turnpoints", "<=>", ["BIC", "HUS"]],
@@ -63,6 +65,7 @@ describe("resolveTrophy", () => {
   it("uses the headline version for the current season", () => {
     const resolved = resolveTrophy(doubleCentury, 2026);
     expect(resolved.description).toContain("205.2km");
+    expect(resolved.summary).toBe("Fastest BNW–HUS");
     expect(resolved.expr[0]).toEqual([
       "filter",
       "task.turnpoints",
@@ -74,6 +77,7 @@ describe("resolveTrophy", () => {
   it("uses the archived version for the season it applied to", () => {
     const resolved = resolveTrophy(doubleCentury, 2025);
     expect(resolved.description).toContain("205.0km");
+    expect(resolved.summary).toBe("Fastest BIC–HUS");
     expect(resolved.expr[0]).toEqual([
       "filter",
       "task.turnpoints",
@@ -91,6 +95,7 @@ describe("resolveTrophy", () => {
     const plain: FlightTrophy = {
       id: "9",
       name: "Plain",
+      summary: "Test",
       description: "no history",
       expr: [["filter", "task.isCompleted"]],
     };
@@ -102,6 +107,7 @@ describe("resolveTrophy", () => {
       id: "L1",
       type: "ladder",
       name: "Open Ladder",
+      summary: "Test",
       description: "ladder",
       ladderKey: "open",
       groupBy: "pilot",
@@ -114,6 +120,7 @@ describe("resolveTrophy", () => {
     const trophy: FlightTrophy = {
       id: "7",
       name: "Twice Revised",
+      summary: "Test",
       description: "current",
       expr: [["filter", "task.isCompleted"]],
       history: [
