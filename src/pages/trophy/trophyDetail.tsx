@@ -4,6 +4,7 @@ import ExcludedFlights from "../../components/ExcludedFlights";
 import FlightLoadFailure from "../../components/FlightLoadFailure";
 import LadderResultsList from "../../components/LadderResultsList";
 import Loading from "../../components/Loading";
+import Markdown from "../../components/Markdown";
 import PageLayout from "../../components/PageLayout";
 import ResultsList from "../../components/ResultsList";
 import Season from "../../components/Season";
@@ -36,7 +37,9 @@ const TrophyPage = () => {
           <Season season={season} />
         </div>
 
-        <p className="text-sm text-gray-500">{config.description}</p>
+        <Markdown className="text-sm text-gray-500">
+          {config.description}
+        </Markdown>
 
         <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
           {evaluated.type === "ladder" ? (
