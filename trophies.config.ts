@@ -385,7 +385,7 @@ const config: TrophiesConfig = {
       expr: [
         ["filter", "task.launchSite", "=", "Gransden Lodge"],
         ["filter", "task.isCompleted"],
-        ["filter", "task.turnpoints.length", "=", 2],
+        ["filter", "task.turnpoints.length", "<=", 2],
         ["score", "task.handicappedDistanceKm", "km"],
         ["sort", "score.value", "desc"],
       ],
