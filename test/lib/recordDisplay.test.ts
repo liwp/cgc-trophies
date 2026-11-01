@@ -115,7 +115,7 @@ describe("groupCategories", () => {
       "Speed: any course",
       "Height",
     ]);
-    expect(groups.map((g) => g.categories.length)).toEqual([2, 6, 6, 1, 2]);
+    expect(groups.map((g) => g.categories.length)).toEqual([2, 6, 5, 1, 2]);
     expect(groups[1].categories.map((c) => c.code)).toEqual([
       "600km △",
       "500km △",

@@ -28,13 +28,12 @@ const turnpointCases = records.flatMap(({ category, record }) =>
 );
 
 describe("records.config", () => {
-  it("has the spec's 17 ids in order", () => {
+  it("has the spec's 16 ids in order", () => {
     expect(categories.map((c) => c.id)).toEqual([
       "longest-distance",
       "largest-triangle",
       "fastest-750",
       "fastest-600-triangle",
-      "fastest-600-or",
       "fastest-500-triangle",
       "fastest-500-or",
       "fastest-400-triangle",
@@ -70,19 +69,12 @@ describe("records.config", () => {
     });
   });
 
-  it("has no claim for the 600 km O/R", () => {
-    expect(
-      categories.find((x) => x.id === "fastest-600-or")?.record,
-    ).toBeNull();
-  });
-
   it("gives every category a code and group", () => {
     expect(categories.map((c) => [c.id, c.code, c.group])).toEqual([
       ["longest-distance", "Up to 3 turnpoints", "distance"],
       ["largest-triangle", "FAI triangle", "distance"],
       ["fastest-750", "750km", "any-course"],
       ["fastest-600-triangle", "600km △", "triangle"],
-      ["fastest-600-or", "600km O/R", "out-and-return"],
       ["fastest-500-triangle", "500km △", "triangle"],
       ["fastest-500-or", "500km O/R", "out-and-return"],
       ["fastest-400-triangle", "400km △", "triangle"],

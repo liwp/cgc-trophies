@@ -38,13 +38,6 @@ test("the records page shows the five groups", async ({ page }) => {
   ]);
 });
 
-test("a category without a record shows No claim", async ({ page }) => {
-  await page.goto("/records");
-  const row = recordFor(page, "600km O/R");
-  await expect(row).toContainText("No claim");
-  await expect(row.getByRole("button", { name: /earlier/ })).toHaveCount(0);
-});
-
 test("a task code that is its full name has no tooltip", async ({ page }) => {
   await page.goto("/records");
   const row = recordFor(page, "Gain of height");
@@ -138,7 +131,10 @@ test("a record with history shows a pointer cursor", async ({ page }) => {
   await expect(
     row.getByRole("button", { name: "Show earlier records" }),
   ).toHaveCSS("cursor", "pointer");
-  await expect(recordFor(page, "600km O/R")).not.toHaveCSS("cursor", "pointer");
+  await expect(recordFor(page, "FAI triangle")).not.toHaveCSS(
+    "cursor",
+    "pointer",
+  );
 });
 
 test("history links only entries with a ladder flight", async ({ page }) => {

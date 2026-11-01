@@ -236,15 +236,6 @@ const categories: RecordCategory[] = [
     ],
   },
   {
-    id: "fastest-600-or",
-    label: "Fastest 600 km O/R",
-    code: "600km O/R",
-    group: "out-and-return",
-    rule: speed("out-and-return", 600),
-    record: null,
-    superseded: [],
-  },
-  {
     id: "fastest-500-triangle",
     label: "Fastest 500 km triangle",
     code: "500km △",
