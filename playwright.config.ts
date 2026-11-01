@@ -16,7 +16,12 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     trace: "on-first-retry",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    // Touch tests again in WebKit, as iOS Safari: it doesn't focus a tapped
+    // button and is pickier than Chromium about which taps become clicks.
+    { name: "iphone", use: { ...devices["iPhone 13"] }, grep: /@touch/ },
+  ],
   webServer: {
     command: `bun run build && bun run start --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,

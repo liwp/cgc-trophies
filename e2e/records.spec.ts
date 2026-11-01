@@ -153,7 +153,7 @@ test("history links only entries with a ladder flight", async ({ page }) => {
   ).toHaveCount(0);
 });
 
-test.describe("on a touch phone", () => {
+test.describe("on a touch phone @touch", () => {
   test.use(TOUCH_PHONE);
 
   test("tapping a card's body toggles its history", async ({ page }) => {
