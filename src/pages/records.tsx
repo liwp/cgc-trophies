@@ -45,11 +45,25 @@ const UkBadge = ({ category }: { category: RecordCategory }) => {
 };
 
 /** The task code with its UK badge, centred on the code's text. */
-const TaskCode = ({ category }: { category: RecordCategory }) => (
+/**
+ * A category's short code with its full name in a tooltip, or with `full`, the
+ * full name as plain text. The phone cards use `full`: iOS Safari moves a tap
+ * near a small button onto it, so a code button would catch taps meant for
+ * the card.
+ */
+const TaskCode = ({
+  category,
+  full = false,
+}: {
+  category: RecordCategory;
+  full?: boolean;
+}) => (
   <span className="inline-flex items-center gap-1.5">
     {/* A code that spells out its full name needs no tooltip */}
-    {category.code === category.label ? (
-      <span className="font-semibold text-gray-900">{category.code}</span>
+    {full || category.code === category.label ? (
+      <span className="font-semibold text-gray-900">
+        {full ? category.label : category.code}
+      </span>
     ) : (
       <Tip tip={category.label} className="font-semibold text-gray-900">
         {category.code}
@@ -217,7 +231,7 @@ const RecordCard = ({ category }: { category: RecordCategory }) => {
       className={`flex flex-col gap-0.5 border-t border-gray-100 px-3 py-2.5 first:border-t-0 ${click.className}`}
     >
       <div className="flex items-baseline justify-between gap-2">
-        <TaskCode category={category} />
+        <TaskCode category={category} full />
         <span className="font-semibold whitespace-nowrap">
           <RecordValue category={category} record={record} />
         </span>

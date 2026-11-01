@@ -161,41 +161,53 @@ test.describe("on a touch phone", () => {
     const history = page.getByRole("list", {
       name: "Earlier 200km O/R records",
     });
-    await recordFor(page, "200km O/R").getByText("Graham Drury").tap();
+    await recordFor(page, "Fastest 200 km O/R").getByText("Graham Drury").tap();
     await expect(history).toBeVisible();
   });
 
+  test("a card names its task in full, without a tooltip", async ({ page }) => {
+    await page.goto("/records");
+    const card = recordFor(page, "Fastest 600 km triangle");
+    await expect(card).toBeVisible();
+    await expect(card.getByRole("button", { name: "600km △" })).toHaveCount(0);
+  });
+
+  // The 500 km triangle's route, which the 400 km triangle shares.
+  const routeCard = (page: Page) => recordFor(page, "Fastest 500 km triangle");
+  const route = (page: Page) =>
+    routeCard(page).getByRole("button", { name: "BIC ’26 – SCU – GAB" });
+  const routeTip = (page: Page) =>
+    routeCard(page).getByRole("tooltip", {
+      name: "Bicester Control Tower (removed 2026) – Scunthorpe N – Garboldisham",
+    });
+
   test("a tap shows and hides a tooltip", async ({ page }) => {
     await page.goto("/records");
-    const code = page.getByRole("button", { name: "600km △" });
-    const tip = page.getByRole("tooltip", { name: "Fastest 600 km triangle" });
-    await code.tap();
-    await expect(tip).toBeVisible();
-    await code.tap();
-    await expect(tip).toBeHidden();
+    await route(page).tap();
+    await expect(routeTip(page)).toBeVisible();
+    await route(page).tap();
+    await expect(routeTip(page)).toBeHidden();
   });
 
   test("a tap elsewhere closes a tooltip", async ({ page }) => {
     await page.goto("/records");
-    const tip = page.getByRole("tooltip", { name: "Fastest 600 km triangle" });
-    await page.getByRole("button", { name: "600km △" }).tap();
-    await expect(tip).toBeVisible();
+    await route(page).tap();
+    await expect(routeTip(page)).toBeVisible();
     await page.getByRole("heading", { level: 1 }).tap();
-    await expect(tip).toBeHidden();
+    await expect(routeTip(page)).toBeHidden();
   });
 
   test("opening a tooltip closes the open one", async ({ page }) => {
     await page.goto("/records");
-    const first = page.getByRole("tooltip", {
-      name: "Fastest 600 km triangle",
+    const ukTip = page.getByRole("tooltip", {
+      name: "Current UK record: UK Standard, UK Feminine Open",
     });
-    const second = page.getByRole("tooltip", {
-      name: "Fastest 500 km triangle",
-    });
-    await page.getByRole("button", { name: "600km △" }).tap();
-    await page.getByRole("button", { name: "500km △" }).tap();
-    await expect(second).toBeVisible();
-    await expect(first).toBeHidden();
+    await route(page).tap();
+    await recordFor(page, "Fastest 500 km O/R")
+      .getByRole("button", { name: "UK" })
+      .tap();
+    await expect(ukTip).toBeVisible();
+    await expect(routeTip(page)).toBeHidden();
   });
 
   test("a tooltip near the right edge stays in the viewport", async ({
@@ -203,7 +215,9 @@ test.describe("on a touch phone", () => {
   }) => {
     await page.goto("/records");
     // The longest tooltip, which would otherwise pass the right edge.
-    const uk = recordFor(page, "500km O/R").getByRole("button", { name: "UK" });
+    const uk = recordFor(page, "Fastest 500 km O/R").getByRole("button", {
+      name: "UK",
+    });
     const tip = page.getByRole("tooltip", {
       name: "Current UK record: UK Standard, UK Feminine Open",
     });
