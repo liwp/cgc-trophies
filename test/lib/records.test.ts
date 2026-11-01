@@ -14,27 +14,20 @@ const orRule: RecordRule = {
   minDistanceKm: 300,
 };
 
-function category(
-  id: string,
-  rule: RecordRule,
-  value: number | null,
-): RecordCategory {
+function category(id: string, rule: RecordRule, value: number): RecordCategory {
   return {
     id,
     label: id,
     code: id,
     group: "distance",
     rule,
-    record:
-      value === null
-        ? null
-        : {
-            value,
-            pilot: "P",
-            turnpoints: [],
-            glider: "G",
-            date: "2000-01-01",
-          },
+    record: {
+      value,
+      pilot: "P",
+      turnpoints: [],
+      glider: "G",
+      date: "2000-01-01",
+    },
     superseded: [],
   };
 }
@@ -203,13 +196,6 @@ describe("findCandidates", () => {
     expect(result).toEqual([]);
   });
 
-  it("fills an empty category", () => {
-    const flight = makeFlight({ task: { ...orTask, scoringSpeedKph: 50 } });
-    const result = findCandidates([category("c", or100, null)], [flight]);
-    expect(result).toHaveLength(1);
-    expect(result[0].flight).toBe(flight);
-  });
-
   it("returns one flight for several categories", () => {
     const tri = (min: number): RecordRule => ({
       kind: "speed",
@@ -295,7 +281,7 @@ describe("findCandidates", () => {
 
   it("never yields height candidates", () => {
     expect(
-      findCandidates([category("h", { kind: "height" }, null)], [makeFlight()]),
+      findCandidates([category("h", { kind: "height" }, 0)], [makeFlight()]),
     ).toEqual([]);
   });
 });
@@ -332,8 +318,5 @@ describe("formatRecordValue", () => {
   });
   it("shows a height in feet with a thousands separator", () => {
     expect(formatRecordValue(rec({ kind: "height" }, 12992))).toBe("12,992 ft");
-  });
-  it("shows No claim without a record", () => {
-    expect(formatRecordValue(category("x", orRule, null))).toBe("No claim");
   });
 });

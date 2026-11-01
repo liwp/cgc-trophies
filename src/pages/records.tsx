@@ -81,9 +81,8 @@ const RecordValue = ({
   record,
 }: {
   category: RecordCategory;
-  record: ClubRecord | null;
+  record: ClubRecord;
 }) => {
-  if (!record) return <span className="text-gray-400 italic">No claim</span>;
   const value = formatClubRecordValue(category.rule, record);
   if (!record.flightId) return <span>{value}</span>;
   return (
@@ -177,23 +176,21 @@ const RecordRow = ({ category }: { category: RecordCategory }) => {
         </td>
         <td className="px-4 py-3">
           <TaskCode category={category} />
-          {record && record.turnpoints.length > 0 && (
+          {record.turnpoints.length > 0 && (
             <div className="text-xs text-gray-500 whitespace-nowrap">
               <Route record={record} />
             </div>
           )}
         </td>
         <td className="px-4 py-3">
-          <div className="font-medium text-gray-900">{record?.pilot}</div>
-          <div className="text-xs text-gray-500">{record?.glider}</div>
+          <div className="font-medium text-gray-900">{record.pilot}</div>
+          <div className="text-xs text-gray-500">{record.glider}</div>
         </td>
         <td className="px-4 py-3 whitespace-nowrap">
           <div className="font-semibold">
             <RecordValue category={category} record={record} />
           </div>
-          <div className="text-xs text-gray-500">
-            {record && formatDate(record.date)}
-          </div>
+          <div className="text-xs text-gray-500">{formatDate(record.date)}</div>
         </td>
       </tr>
       {open && (
@@ -225,29 +222,23 @@ const RecordCard = ({ category }: { category: RecordCategory }) => {
           <RecordValue category={category} record={record} />
         </span>
       </div>
-      {record && (
-        <>
-          <div className="flex items-baseline justify-between gap-2 text-sm">
-            <span className="text-gray-900">{record.pilot}</span>
-            <span className="text-xs text-gray-500">
-              {formatDate(record.date)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between gap-2 text-xs text-gray-500">
-            <span>
-              {record.turnpoints.length > 0 && (
-                <>
-                  <Route record={record} /> ·{" "}
-                </>
-              )}
-              {record.glider}
-            </span>
-            {hasHistory && (
-              <HistoryToggle open={open} onToggle={() => setOpen((o) => !o)} />
-            )}
-          </div>
-        </>
-      )}
+      <div className="flex items-baseline justify-between gap-2 text-sm">
+        <span className="text-gray-900">{record.pilot}</span>
+        <span className="text-xs text-gray-500">{formatDate(record.date)}</span>
+      </div>
+      <div className="flex items-center justify-between gap-2 text-xs text-gray-500">
+        <span>
+          {record.turnpoints.length > 0 && (
+            <>
+              <Route record={record} /> ·{" "}
+            </>
+          )}
+          {record.glider}
+        </span>
+        {hasHistory && (
+          <HistoryToggle open={open} onToggle={() => setOpen((o) => !o)} />
+        )}
+      </div>
       {open && (
         <div className="pt-1">
           <History category={category} />

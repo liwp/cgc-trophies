@@ -62,9 +62,8 @@ async function main() {
   }
   const blocks = await Promise.all(
     candidates.map(async ({ category, flight, value, beats }) => {
-      const beaten = beats === null ? "No claim" : beats.toFixed(1);
       return [
-        `${category.label}: ${value.toFixed(1)} (beats: ${beaten})`,
+        `${category.label}: ${value.toFixed(1)} (beats: ${beats.toFixed(1)})`,
         `  ${flight.pilot}, ${flight.date.toISOString().slice(0, 10)}, ${flight.glider.type}, ${flight.task.scoringDistanceKm.toFixed(1)} km`,
         ...(category.rule.kind === "speed"
           ? [await heightLossLine(flight)]

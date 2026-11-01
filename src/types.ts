@@ -268,8 +268,7 @@ export interface RecordCategory {
   code: string;
   group: RecordGroup;
   rule: RecordRule;
-  /** null = "No claim" */
-  record: ClubRecord | null;
+  record: ClubRecord;
   /** Oldest first */
   superseded: ClubRecord[];
   ukRecord?: { status: "current" | "former"; lists: string[] };
@@ -280,5 +279,5 @@ export interface CandidateRecord {
   flight: Flight;
   value: number;
   /** The record this candidate beats: the current record or an earlier candidate. */
-  beats: number | null;
+  beats: number;
 }

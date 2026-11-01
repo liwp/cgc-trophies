@@ -51,7 +51,7 @@ describe("records.config", () => {
 
   it("has consistent records", () => {
     for (const { rule, record, superseded } of categories) {
-      for (const r of [...(record ? [record] : []), ...superseded]) {
+      for (const r of [record, ...superseded]) {
         expect(r.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
         if (rule.kind === "speed" && r.distanceKm !== undefined) {
           expect(r.distanceKm).toBeGreaterThanOrEqual(rule.minDistanceKm);
@@ -62,7 +62,7 @@ describe("records.config", () => {
 
   it("records Kelman's 500 km O/R as a current UK record", () => {
     const c = categories.find((x) => x.id === "fastest-500-or");
-    expect(c?.record?.value).toBe(106.89);
+    expect(c?.record.value).toBe(106.89);
     expect(c?.ukRecord).toEqual({
       status: "current",
       lists: ["UK Standard", "UK Feminine Open"],

@@ -94,8 +94,8 @@ export function findCandidates(
     .sort((a, b) => a.date.getTime() - b.date.getTime());
   const candidates: CandidateRecord[] = [];
   for (const category of categories) {
-    const since = category.record?.date ?? "";
-    let current = category.record?.value ?? null;
+    const since = category.record.date;
+    let current = category.record.value;
     const bestByDay = new Map<string, { flight: Flight; value: number }>();
     for (const flight of eligible) {
       const day = isoDay(flight.date);
@@ -106,7 +106,7 @@ export function findCandidates(
       if (!best || value > best.value) bestByDay.set(day, { flight, value });
     }
     for (const { flight, value } of bestByDay.values()) {
-      if (current !== null && value <= current + RECORD_MARGIN) continue;
+      if (value <= current + RECORD_MARGIN) continue;
       candidates.push({ category, flight, value, beats: current });
       current = value;
     }
@@ -116,6 +116,5 @@ export function findCandidates(
 
 /** A category's current record as shown on the records page. */
 export function formatRecordValue(category: RecordCategory): string {
-  const { record, rule } = category;
-  return record ? formatClubRecordValue(rule, record) : "No claim";
+  return formatClubRecordValue(category.rule, category.record);
 }
