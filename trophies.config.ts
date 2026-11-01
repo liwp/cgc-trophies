@@ -311,7 +311,7 @@ const config: TrophiesConfig = {
       name: "Ted Warner Trophy",
       summary: "FASTrackers ladder",
       description:
-        "Aggregate of best 6 cross-country point scores on the FASTrackers Ladder.",
+        "Aggregate of best 6 cross-country point scores on the FASTrackers Ladder.\n\nFor pilots who have not flown a 300 km at the start of the ladder season.",
       ladderKey: "local5",
       groupBy: "pilot",
       topN: 6,
@@ -323,7 +323,7 @@ const config: TrophiesConfig = {
       name: "Complicity Cup",
       summary: "Syndicate ladder",
       description:
-        "Aggregate of best 6 cross-country point scores per glider registration.\n\nRequires at least 2 different pilots.",
+        "Aggregate of best 6 cross-country point scores per syndicate glider (by registration).\n\nRequires at least 2 different pilots.",
       ladderKey: "local2",
       groupBy: "registration",
       topN: 6,
@@ -357,7 +357,7 @@ const config: TrophiesConfig = {
       name: "Mug Metal Machin Trophy",
       summary: "Longest flight (up to 3 TPs)",
       description:
-        "For the longest, handicapped, declared, completed flight around up to 3 turning points.",
+        "For the longest handicapped, declared, completed flight round up to 3 turnpoints, launched from Gransden Lodge.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Mug-Metal-Machin-1.jpg",
       ],
@@ -378,7 +378,7 @@ const config: TrophiesConfig = {
       name: "Jubilee Bowl",
       summary: "Longest flight (up to 2 TPs), undeclared OK",
       description:
-        "For the longest, handicapped, completed flight around up to 2 turning points, not necessarily declared.",
+        "For the longest handicapped, completed flight round up to 2 turnpoints, not necessarily declared, launched from Gransden Lodge.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Jubilee-Bowl.jpg",
       ],
@@ -395,7 +395,7 @@ const config: TrophiesConfig = {
       name: "Pons Pot",
       summary: "Longest uncompleted flight (up to 3 TPs)",
       description:
-        "For the longest, handicapped, declared, uncompleted flight around up to 3 turning points.",
+        "For the longest handicapped, declared, uncompleted flight round up to 3 turnpoints, launched from Gransden Lodge.",
       expr: [
         ["filter", "task.launchSite", "=", "Gransden Lodge"],
         ["filter", "task.isDeclared"],
@@ -409,9 +409,9 @@ const config: TrophiesConfig = {
     {
       id: "5",
       name: "Gransden Trophy",
-      summary: "Fastest BUG–MEN (507 km)",
+      summary: "Fastest BUG–MEN (507.3 km)",
       description:
-        "For the fastest, handicapped speed around turning points at **Burley Gate (BUG) and Mendlesham Mast (MEN)**, 507km.\n\nThe task can be done either way round.",
+        "For the fastest handicapped, declared, completed flight round **Burley Gate (BUG) – Mendlesham Mast (MEN)**, 507.3 km, launched from Gransden Lodge.\n\nThe task can be done either way round.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Gransden-Trophy-e1515083987492.jpg",
       ],
@@ -429,7 +429,7 @@ const config: TrophiesConfig = {
       name: "Boal Pot",
       summary: "Fastest SOH–EAW–CAL triangle (305.5 km)",
       description:
-        "For the fastest, handicapped flight round Soham(SOH), Eastwell(EAW), and Calvert(CAL) – 305.5km. The task can be done either way round.",
+        "For the fastest handicapped, declared, completed flight round **Soham (SOH) – Eastwell (EAW) – Calvert (CAL)**, 305.5 km, launched from Gransden Lodge.\n\nThe task can be done either way round.",
       expr: [
         ["filter", "task.launchSite", "=", "Gransden Lodge"],
         ["filter", "task.isDeclared"],
@@ -444,7 +444,7 @@ const config: TrophiesConfig = {
       name: "Sanville Enigma",
       summary: "Fastest GRM O/R (305 km)",
       description:
-        "For the fastest, handicapped out-and-return flight to Great Malvern(GRM) – 305km.",
+        "For the fastest handicapped, declared, completed out-and-return flight to **Great Malvern (GRM)**, 305 km, launched from Gransden Lodge.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Sanville-Enigma-Trophy.jpg",
       ],
@@ -462,7 +462,7 @@ const config: TrophiesConfig = {
       name: "The Boomerang",
       summary: "Fastest SHP O/R (208.7 km), undeclared OK, pre-500 km pilots",
       description:
-        "For the fastest, handicapped out-and-return flight to **Shipston-on-Stour (SHP)**, 208.7km, not necessarily declared.\n\nFor pilots who have not completed a UK 500 km flight at the beginning of the season.",
+        "For the fastest handicapped, completed out-and-return flight to **Shipston-on-Stour (SHP)**, 208.7 km, not necessarily declared, launched from Gransden Lodge.\n\nFor pilots who have not flown a 500 km at the start of the ladder season.",
       expr: [
         ["filter", "task.launchSite", "=", "Gransden Lodge"],
         ["filter", "task.isCompleted"],
@@ -477,7 +477,7 @@ const config: TrophiesConfig = {
       name: "Double Century",
       summary: "Fastest BNW–HUS (205.2 km), pre-300 km pilots",
       description:
-        "Fastest handicapped flight: **Bicester North West (BNW) – Husbands Bosworth (HUS)**, 205.2km. The task can be done either way round.\n\nFor pilots who have not flown a 300km at the start of the ladder season.",
+        "For the fastest handicapped, declared, completed flight round **Bicester North West (BNW) – Husbands Bosworth (HUS)**, 205.2 km, launched from Gransden Lodge.\n\nThe task can be done either way round.\n\nFor pilots who have not flown a 300 km at the start of the ladder season.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Double-Century.jpg",
       ],
@@ -495,7 +495,7 @@ const config: TrophiesConfig = {
           untilSeason: 2025,
           summary: "Fastest BIC–HUS (205.0 km), pre-300 km pilots",
           description:
-            "Fastest handicapped flight: **Bicester Control Tower (BIC) – Husbands Bosworth (HUS)**, 205.0km. The task can be done either way round.\n\nFor pilots who have not flown a 300km at the start of the ladder season.",
+            "For the fastest handicapped, declared, completed flight round **Bicester Control Tower (BIC) – Husbands Bosworth (HUS)**, 205.0 km, launched from Gransden Lodge.\n\nThe task can be done either way round.\n\nFor pilots who have not flown a 300 km at the start of the ladder season.",
           expr: [
             ["filter", "task.launchSite", "=", "Gransden Lodge"],
             ["filter", "task.isDeclared"],
@@ -510,9 +510,9 @@ const config: TrophiesConfig = {
     {
       id: "11",
       name: "Slazenger Trophy",
-      summary: "Fastest NPT–RUS (110 km), pre-300 km pilots",
+      summary: "Fastest NPT–RUS (110.4 km), pre-300 km pilots",
       description:
-        "For the fastest, handicapped flight around the Slazenger triangle: turning points at **Newport Pagnell (NPT) and Rushden (RUS)** (110km). The task can be done either way round.\n\nFor novices only.",
+        "For the fastest handicapped, declared, completed flight round the Slazenger triangle, **Newport Pagnell (NPT) – Rushden (RUS)**, 110.4 km, launched from Gransden Lodge.\n\nThe task can be done either way round.\n\nFor pilots who have not flown a 300 km at the start of the ladder season.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Slazenger-Trophy-1.jpg",
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Slazenger-Trophy-2.jpg",
@@ -532,7 +532,7 @@ const config: TrophiesConfig = {
       name: "The Kelman Clock",
       summary: "Longest winter flight (up to 3 TPs)",
       description:
-        "For the longest, handicapped, flight around up to three turning points, launched from GRL during the Winter Season.",
+        "For the longest handicapped, completed flight round up to 3 turnpoints, launched from Gransden Lodge during the winter season.",
       img: [
         "https://www.camgliding.uk/wp-content/uploads/2018/01/Kelman-Clock.jpg",
       ],
@@ -571,7 +571,7 @@ const config: TrophiesConfig = {
       name: "The A.L.L. Alexander Trophy",
       summary: "Best ladder flight, handicap 95 or less",
       description:
-        "For the highest scoring flight on the BGA ladder flown in a glider with a handicap of 95 or less, launched from Gransden Lodge.",
+        "For the highest-scoring flight on the BGA ladder in a glider with a handicap of 95 or less, launched from Gransden Lodge.",
       expr: [
         ["filter", "task.launchSite", "=", "Gransden Lodge"],
         ["filter", "glider.handicap", "<=", 95],
