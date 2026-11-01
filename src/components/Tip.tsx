@@ -1,12 +1,17 @@
-import { type ReactNode, useId, useRef, useState } from "react";
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 
 /** Space kept between a tooltip and the viewport's right edge, in px. */
 const EDGE = 8;
 
+/** Closes the open tooltip, so that opening another closes it. */
+let closeOpenTip: (() => void) | null = null;
+
 /**
  * Inline text with a tooltip shown on hover (on devices that can hover), on
- * keyboard focus, and toggled by a click or tap. The visible text stays the
- * button's name; the tooltip is its description.
+ * keyboard focus, and toggled by a click or tap. A tap elsewhere or on another
+ * tooltip closes it: iOS Safari doesn't focus a tapped button, so blur alone
+ * can't. The visible text stays the button's name; the tooltip is its
+ * description.
  */
 const Tip = ({
   tip,
@@ -20,7 +25,23 @@ const Tip = ({
   const [open, setOpen] = useState(false);
   const [shift, setShift] = useState(0);
   const tipRef = useRef<HTMLSpanElement>(null);
+  const rootRef = useRef<HTMLSpanElement>(null);
   const id = useId();
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    closeOpenTip?.();
+    closeOpenTip = close;
+    const closeOutside = (e: PointerEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) close();
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    return () => {
+      document.removeEventListener("pointerdown", closeOutside);
+      if (closeOpenTip === close) closeOpenTip = null;
+    };
+  }, [open]);
 
   // Once the tooltip is showing, pull it left if it would pass the
   // viewport's right edge.
@@ -36,7 +57,7 @@ const Tip = ({
     });
 
   return (
-    <span className="group relative inline-flex">
+    <span ref={rootRef} className="group relative inline-flex">
       <button
         type="button"
         aria-describedby={id}

@@ -175,6 +175,29 @@ test.describe("on a touch phone", () => {
     await expect(tip).toBeHidden();
   });
 
+  test("a tap elsewhere closes a tooltip", async ({ page }) => {
+    await page.goto("/records");
+    const tip = page.getByRole("tooltip", { name: "Fastest 600 km triangle" });
+    await page.getByRole("button", { name: "600km △" }).tap();
+    await expect(tip).toBeVisible();
+    await page.getByRole("heading", { level: 1 }).tap();
+    await expect(tip).toBeHidden();
+  });
+
+  test("opening a tooltip closes the open one", async ({ page }) => {
+    await page.goto("/records");
+    const first = page.getByRole("tooltip", {
+      name: "Fastest 600 km triangle",
+    });
+    const second = page.getByRole("tooltip", {
+      name: "Fastest 500 km triangle",
+    });
+    await page.getByRole("button", { name: "600km △" }).tap();
+    await page.getByRole("button", { name: "500km △" }).tap();
+    await expect(second).toBeVisible();
+    await expect(first).toBeHidden();
+  });
+
   test("a tooltip near the right edge stays in the viewport", async ({
     page,
   }) => {
