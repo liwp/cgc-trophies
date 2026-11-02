@@ -17,10 +17,13 @@ const Tip = ({
   tip,
   children,
   className = "",
+  wide = false,
 }: {
-  tip: string;
+  tip: ReactNode;
   children: ReactNode;
   className?: string;
+  /** For long, multi-paragraph tips: wider, but never wider than the viewport. */
+  wide?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const [shift, setShift] = useState(0);
@@ -79,7 +82,9 @@ const Tip = ({
         style={{ left: -shift }}
         className={`${
           open ? "block" : "hidden"
-        } group-hover:block group-has-focus-visible:block absolute top-full z-10 mt-1 w-max max-w-64 whitespace-normal rounded font-sans bg-gray-900 px-2 py-1 text-xs font-normal text-white shadow`}
+        } group-hover:block group-has-focus-visible:block absolute top-full z-10 mt-1 w-max ${
+          wide ? "max-w-[min(24rem,calc(100vw-1rem))]" : "max-w-64"
+        } whitespace-normal rounded font-sans bg-gray-900 px-2 py-1 text-xs font-normal text-white shadow`}
       >
         {tip}
       </span>
