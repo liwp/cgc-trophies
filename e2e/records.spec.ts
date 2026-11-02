@@ -270,6 +270,16 @@ test("the home page links to the records page", async ({ page }) => {
   await expect(page).toHaveURL(/\/records$/);
 });
 
+test("the records page links to the other pages", async ({ page }) => {
+  await page.goto("/records");
+  for (const name of ["Trophies", "Season stats", "Admin view"]) {
+    await expect(page.getByRole("link", { name })).toBeVisible();
+  }
+  await expect(page.getByRole("link", { name: "Club records" })).toHaveCount(0);
+  await page.getByRole("link", { name: "Trophies" }).click();
+  await expect(page).toHaveURL(/\/\?season=\d{4}$/);
+});
+
 test("the records page loads with no console errors", async ({ page }) => {
   const errors: string[] = [];
   page.on("console", (msg) => {

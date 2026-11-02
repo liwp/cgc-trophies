@@ -1,16 +1,11 @@
-import {
-  ArrowLeft,
-  ChevronDown,
-  ChevronRight,
-  ExternalLink,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { Fragment, type MouseEvent, useState } from "react";
-import { Link } from "react-router-dom";
 
 import CONFIG from "trophies-config";
 import records from "../../records.config";
 import HeightLossWarning from "../components/HeightLossWarning";
 import PageLayout from "../components/PageLayout";
+import PageNav from "../components/PageNav";
 import Th from "../components/Th";
 import Tip from "../components/Tip";
 import { flightDetailsUrl } from "../lib/links";
@@ -24,6 +19,7 @@ import {
   ukRecordTooltip,
 } from "../lib/recordDisplay";
 import { MAX_HEIGHT_LOSS_M } from "../lib/records";
+import { currentSeason } from "../lib/season";
 import type { ClubRecord, RecordCategory } from "../types";
 
 /** ISO date (yyyy-mm-dd) as dd/mm/yyyy, without any timezone conversion. */
@@ -303,15 +299,14 @@ const RecordGroup = ({
 const RecordsPage = () => (
   <PageLayout>
     <div className="flex flex-col gap-6">
-      <Link
-        to="/"
-        className="inline-flex items-center gap-1 self-start text-cambridge hover:text-cambridge-dark transition-colors"
-      >
-        <ArrowLeft size={16} /> <span>All Trophies</span>
-      </Link>
-      <h1 className="text-2xl font-bold text-gray-900">
-        {CONFIG.club.shortName} Club Records
-      </h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold text-gray-900">
+          {CONFIG.club.shortName} Club Records
+        </h1>
+        <div className="flex items-center gap-4">
+          <PageNav current="records" season={currentSeason()} />
+        </div>
+      </div>
       {groupCategories(records).map(({ heading, categories }) => (
         <RecordGroup key={heading} heading={heading} categories={categories} />
       ))}
