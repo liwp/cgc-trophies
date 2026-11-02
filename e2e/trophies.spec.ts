@@ -167,6 +167,19 @@ for (const id of ["1", "L1", "L5"]) {
   });
 }
 
+test("the admin page links to the other pages", async ({ page }) => {
+  await page.goto("/admin?season=2024");
+  await expect(page.getByRole("link", { name: "Admin view" })).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Season stats" }),
+  ).toHaveAttribute("href", "/stats?season=2024");
+  await expect(page.getByRole("link", { name: "Club records" })).toBeVisible();
+  await page.getByRole("link", { name: "Trophies" }).click();
+  await expect(
+    page.getByRole("heading", { name: "CGC 2024 Trophies" }),
+  ).toBeVisible();
+});
+
 test("the admin page fits a phone screen", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 });
   await page.goto("/admin?season=2024");

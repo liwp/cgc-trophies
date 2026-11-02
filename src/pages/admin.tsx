@@ -1,6 +1,4 @@
-import { ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import CONFIG from "trophies-config";
 import CopyButton from "../components/CopyButton";
 import ExcludedFlights from "../components/ExcludedFlights";
@@ -12,6 +10,7 @@ import HeightLossWarning from "../components/HeightLossWarning";
 import Loading from "../components/Loading";
 import MissingLadderFlights from "../components/MissingLadderFlights";
 import PageLayout from "../components/PageLayout";
+import PageNav from "../components/PageNav";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Th from "../components/Th";
@@ -314,18 +313,13 @@ const AdminPage = () => {
     <PageLayout>
       <div className="flex flex-col gap-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Link
-              to={`/?season=${season}`}
-              className="inline-flex items-center gap-1 text-cambridge hover:text-cambridge-dark transition-colors"
-            >
-              <ArrowLeft size={16} /> Public view
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {CONFIG.club.shortName} {season} Trophies — Admin
-            </h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {CONFIG.club.shortName} {season} Trophies — Admin
+          </h1>
+          <div className="flex items-center gap-4">
+            <Season season={season} />
+            <PageNav current="admin" season={season} />
           </div>
-          <Season season={season} />
         </div>
 
         <Stats flights={flights} season={season} />
