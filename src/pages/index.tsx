@@ -9,6 +9,7 @@ import PageNav from "../components/PageNav";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Th from "../components/Th";
+import TrophySummary from "../components/TrophySummary";
 import { evaluateTrophy, winnerName, winnerScore } from "../lib/results";
 import { resolveTrophies } from "../lib/trophyHistory";
 import useFlights from "../lib/useFlights";
@@ -30,7 +31,12 @@ const TrophyName = ({
     >
       {trophy.name}
     </Link>
-    <div className="text-xs text-gray-400 mt-0.5">{trophy.summary}</div>
+    <div className="text-xs text-gray-400 mt-0.5">
+      <TrophySummary
+        summary={trophy.summary}
+        description={trophy.description}
+      />
+    </div>
   </>
 );
 

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { mockFlights } from "./helpers";
 
 test.beforeEach(async ({ page }) => {
@@ -193,4 +193,54 @@ test("the admin page fits a phone screen", async ({ page }) => {
         document.documentElement.clientWidth,
     ),
   ).toBe(true);
+});
+
+// Double Century's 2024 version, whose turnpoint later changed.
+const DOUBLE_CENTURY_2024 = "Fastest BIC–HUS (205.0 km), pre-300 km pilots";
+const doubleCenturyTip = (page: Page) =>
+  page.getByRole("tooltip").filter({ hasText: "Bicester Control Tower (BIC)" });
+
+test("hovering a trophy's summary shows its description", async ({ page }) => {
+  await page.goto("/?season=2024");
+  const tip = doubleCenturyTip(page);
+  await expect(tip).toBeHidden();
+  await page.getByRole("button", { name: DOUBLE_CENTURY_2024 }).hover();
+  await expect(tip).toBeVisible();
+  await expect(tip).toContainText("The task can be done either way round.");
+  // The season's own version, not the current one.
+  await expect(tip).not.toContainText("Bicester North West");
+});
+
+test("the admin page shows a trophy's description on its summary", async ({
+  page,
+}) => {
+  await page.goto("/admin?season=2024");
+  await page.getByRole("button", { name: DOUBLE_CENTURY_2024 }).hover();
+  await expect(doubleCenturyTip(page)).toBeVisible();
+});
+
+test.describe("on a touch phone @touch", () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    hasTouch: true,
+    isMobile: true,
+  });
+
+  test("a tap on a trophy's summary shows its description in the viewport", async ({
+    page,
+  }) => {
+    await page.goto("/?season=2024");
+    const summary = page.getByRole("button", { name: DOUBLE_CENTURY_2024 });
+    const tip = doubleCenturyTip(page);
+    await summary.tap();
+    await expect(tip).toBeVisible();
+    await expect
+      .poll(async () => {
+        const box = await tip.boundingBox();
+        return box !== null && box.x >= 0 && box.x + box.width <= 360 - 8;
+      })
+      .toBe(true);
+    await summary.tap();
+    await expect(tip).toBeHidden();
+  });
 });

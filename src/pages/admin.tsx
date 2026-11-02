@@ -14,6 +14,7 @@ import PageNav from "../components/PageNav";
 import Season from "../components/Season";
 import Stats from "../components/Stats";
 import Th from "../components/Th";
+import TrophySummary from "../components/TrophySummary";
 import { formatDate } from "../lib/formatDate";
 import { missingLadderFlights } from "../lib/missingLadderFlights";
 import {
@@ -232,7 +233,12 @@ const TrophySection = ({
         </div>
         <span className="text-sm text-gray-500">{winnerLabel}</span>
       </div>
-      <p className="text-sm text-gray-400 mb-3">{trophy.summary}</p>
+      <div className="text-sm text-gray-400 mb-3">
+        <TrophySummary
+          summary={trophy.summary}
+          description={trophy.description}
+        />
+      </div>
 
       {results.length > 0 && (
         <>
