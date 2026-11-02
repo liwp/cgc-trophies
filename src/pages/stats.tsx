@@ -222,6 +222,7 @@ const StatsPage = () => {
             />
           </div>
         </section>
+        <BestDays days={summaries.days} />
         <section aria-labelledby="tasks" className="flex flex-col gap-2">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4">
             <h2 id="tasks" className="text-lg font-semibold text-gray-900">
@@ -257,11 +258,10 @@ const StatsPage = () => {
           </div>
         </section>
         <TopTasks tasks={summaries.topTasks} />
-        <BestDays days={summaries.days} />
-        <PilotStatsTable stats={summaries.pilots} />
         {summaries.clubGliders.length > 0 && (
           <ClubGliders stats={summaries.clubGliders} />
         )}
+        <PilotStatsTable stats={summaries.pilots} />
       </div>
     </PageLayout>
   );

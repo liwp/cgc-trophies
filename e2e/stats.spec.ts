@@ -313,3 +313,17 @@ test("a club glider row expands to its flights", async ({ page }) => {
     section.getByRole("button", { name: "Flights in Puchacz JEC" }),
   ).toHaveCount(0);
 });
+
+test("the stats sections read from overview to detail", async ({ page }) => {
+  await page.goto("/stats?season=2024");
+  await expect(page.getByRole("heading", { name: "Pilots" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2 })).toHaveText([
+    "Season awards",
+    "By month",
+    "Best days",
+    "Tasks",
+    "Top tasks",
+    "Club gliders",
+    "Pilots",
+  ]);
+});
