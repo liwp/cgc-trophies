@@ -7,6 +7,12 @@ export function formatPilotName(name: string): string {
   return parts.length === 2 ? `${parts[1]} ${parts[0]}` : name;
 }
 
+/** A ladder name ("Surname, Forename") as an initial and surname, "F Surname". */
+export function shortPilotName(name: string): string {
+  const parts = name.split(", ");
+  return parts.length === 2 && parts[1] ? `${parts[1][0]} ${parts[0]}` : name;
+}
+
 export function flightCopyData(result: ScoredFlight): string[][] {
   const { id, date, pilot, glider, task } = result;
   const rows: string[][] = [

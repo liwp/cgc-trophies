@@ -1,4 +1,8 @@
-import { flightCopyData, ladderCopyData } from "../../src/lib/trophyCopyData";
+import {
+  flightCopyData,
+  ladderCopyData,
+  shortPilotName,
+} from "../../src/lib/trophyCopyData";
 import type { LadderResult, ScoredFlight } from "../../src/types";
 import { makeFlight as baseFlight } from "../helpers/flight";
 
@@ -108,5 +112,16 @@ describe("ladderCopyData", () => {
 
     expect(keys).not.toContain("Flight 1");
     expect(keys).not.toContain("Flight 2");
+  });
+});
+
+describe("shortPilotName", () => {
+  it("gives an initial and surname", () => {
+    expect(shortPilotName("Lawrence-Jones, Mark")).toBe("M Lawrence-Jones");
+  });
+
+  it("leaves a name not in ladder form alone", () => {
+    expect(shortPilotName("Mike Smith")).toBe("Mike Smith");
+    expect(shortPilotName("Smith, ")).toBe("Smith, ");
   });
 });

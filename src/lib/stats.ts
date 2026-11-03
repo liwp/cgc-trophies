@@ -323,7 +323,8 @@ function taskBreakdown(
   };
 }
 
-const routeOf = (f: Flight) => [
+/** A flight's task: its start, turnpoints and finish. */
+export const routeOf = (f: Flight) => [
   f.task.start,
   ...f.task.turnpoints,
   f.task.finish,

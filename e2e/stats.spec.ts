@@ -164,12 +164,96 @@ test("best days ranks the season's days by total km", async ({ page }) => {
   const expand = rows
     .first()
     .getByRole("button", { name: "All flights on Sun 28 Jul" });
-  await expect(rows.first().locator("li")).toHaveCount(1);
+  const pilots = rows.first().getByRole("link");
+  await expect(pilots).toHaveCount(1);
   await expand.click();
   await expect(expand).toHaveAttribute("aria-expanded", "true");
-  await expect(rows.first().locator("li")).toHaveCount(15);
+  await expect(pilots).toHaveCount(15);
+  // Each flight's distance sits in its own column, on the same line
+  const distances = rows.first().getByRole("cell").nth(3).getByRole("listitem");
+  await expect(distances).toHaveCount(15);
+  await expect(distances.first()).toHaveText(/^[\d,]+ km$/);
   await expand.click();
-  await expect(rows.first().locator("li")).toHaveCount(1);
+  await expect(pilots).toHaveCount(1);
+});
+
+for (const [device, viewport] of [
+  ["desktop", { width: 1280, height: 800 }],
+  ["laptop", { width: 1024, height: 768 }],
+  ["tablet", { width: 768, height: 1024 }],
+  ["phone", { width: 360, height: 740 }],
+] as const) {
+  test(`best days columns stay put when a day expands on a ${device}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    // 2022 has days whose expanded names widen the flights column.
+    await page.goto("/stats?season=2022");
+    const table = page
+      .getByRole("region", { name: "Best days" })
+      .getByRole("table");
+    const columns = () =>
+      table.locator("thead th").evaluateAll((ths) =>
+        ths.map((th) => {
+          const { x, width } = th.getBoundingClientRect();
+          const left = th.closest("table")?.getBoundingClientRect().x ?? 0;
+          return [Math.round(x - left), Math.round(width)];
+        }),
+      );
+    await expect(table.locator("tbody tr")).toHaveCount(10);
+    const before = await columns();
+    for (const button of await table
+      .getByRole("button", { name: /^All flights on / })
+      .all()) {
+      await button.click();
+      await expect(button).toHaveAttribute("aria-expanded", "true");
+      expect(await columns()).toEqual(before);
+    }
+  });
+}
+
+test("best days shows each flight's task where there's room", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/stats?season=2024");
+  const region = page.getByRole("region", { name: "Best days" });
+  const task = region
+    .locator("tbody tr")
+    .first()
+    .getByRole("button", { name: "GRL – DEV – CAS – BAN – GRL" });
+  await expect(task).toBeVisible();
+  await task.hover();
+  await expect(
+    region.getByRole("tooltip").filter({ hasText: /^Gransden Lodge – / }),
+  ).toBeVisible();
+
+  await page.setViewportSize({ width: 360, height: 740 });
+  await expect(region.getByRole("columnheader", { name: "Task" })).toBeHidden();
+  await expect(task).toBeHidden();
+});
+
+test("best days fits a phone without scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto("/stats?season=2024");
+  const card = page
+    .getByRole("region", { name: "Best days" })
+    .locator("div:has(> table)");
+  const row = card.locator("tbody tr").first();
+  // A phone shows the date without its weekday, and an initial and surname,
+  // with the pilot's full name kept for screen readers.
+  await expect(row.getByRole("cell").first()).toHaveText("28 Jul", {
+    useInnerText: true,
+  });
+  await expect(row.getByRole("link", { name: "Graham Drury" })).toHaveText(
+    "G Drury",
+    { useInnerText: true },
+  );
+  await expect(row).toContainText("15 flights");
+  await row.getByRole("button", { name: "All flights on Sun 28 Jul" }).click();
+  expect(await card.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
+    true,
+  );
 });
 
 test("the tasks charts show completions by distance and shape", async ({
