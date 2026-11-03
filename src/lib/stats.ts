@@ -85,10 +85,10 @@ function calculateStats(flights: Flight[]) {
 export interface SeasonSummary {
   flights: number;
   pilots: number;
-  gliders: number;
   scoringKm: number;
   points: number;
-  completed: number;
+  /** Percentage of flights that completed their task (0 when there are none). */
+  completedPct: number;
   /** Percentage of flights with a declared task (0 when there are none). */
   declaredPct: number;
 }
@@ -123,8 +123,8 @@ const avgSpeedKph = (flights: Flight[]) => {
 };
 
 /**
- * Club totals for one season's claimed ("C") flights. Completed counts
- * completed tasks, as in the distance categories above.
+ * Club totals for one season's claimed ("C") flights. Completed means a
+ * completed task, as in the distance categories above.
  */
 function seasonSummary(
   flights: Flight[],
@@ -132,17 +132,15 @@ function seasonSummary(
   seasonConfig: SeasonConfig,
 ): SeasonSummary {
   const claimed = claimedInSeason(flights, season, seasonConfig);
-  const count = (pred: (f: Flight) => boolean) => claimed.filter(pred).length;
+  const pct = (pred: (f: Flight) => boolean) =>
+    claimed.length ? (100 * claimed.filter(pred).length) / claimed.length : 0;
   return {
     flights: claimed.length,
     pilots: new Set(claimed.map((f) => f.pilot)).size,
-    gliders: new Set(claimed.map((f) => f.glider.registration)).size,
     scoringKm: sumBy(claimed, (f) => f.task.scoringDistanceKm),
     points: sumBy(claimed, (f) => f.task.crossCountryPoints),
-    completed: count(isCompletedTask),
-    declaredPct: claimed.length
-      ? (100 * count((f) => f.task.isDeclared)) / claimed.length
-      : 0,
+    completedPct: pct(isCompletedTask),
+    declaredPct: pct((f) => f.task.isDeclared),
   };
 }
 

@@ -9,7 +9,7 @@ const tile = (page: Page, label: string) =>
   page
     .getByRole("list", { name: "Season summary" })
     .getByRole("listitem")
-    .filter({ hasText: label });
+    .filter({ has: page.getByText(label, { exact: true }) });
 
 test("the home page links to the season's stats", async ({ page }) => {
   await page.goto("/?season=2024");
@@ -28,9 +28,21 @@ test("the tiles total all club flights with the change from last season", async 
 
   await expect(tile(page, "Flights")).toContainText("388");
   await expect(tile(page, "Flights")).toContainText("+103");
-  await expect(tile(page, "Gliders")).toContainText("−1");
-  await expect(tile(page, "Scoring km")).toContainText("99,445");
+  await expect(tile(page, "km")).toContainText("99,445");
   await expect(tile(page, "Declared")).toContainText("94%");
+  await expect(tile(page, "Completed")).toContainText("−6%");
+});
+
+test("the tiles go from how much was flown to how it was flown", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  await expect(
+    page
+      .getByRole("list", { name: "Season summary" })
+      .getByRole("listitem")
+      .locator("div:first-child"),
+  ).toHaveText(["Flights", "Pilots", "km", "Points", "Declared", "Completed"]);
 });
 
 test("the stats default to Gransden Lodge launches", async ({ page }) => {
@@ -39,7 +51,7 @@ test("the stats default to Gransden Lodge launches", async ({ page }) => {
 
   await expect(toggle).toHaveAttribute("aria-checked", "true");
   await expect(tile(page, "Flights")).toContainText("368");
-  await expect(tile(page, "Completed tasks")).toContainText("289");
+  await expect(tile(page, "Completed")).toContainText("79%");
 
   await toggle.click();
   await expect(page).toHaveURL(/site=all/);

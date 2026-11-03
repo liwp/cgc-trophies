@@ -188,11 +188,10 @@ describe("seasonSummary", () => {
     expect(summary).toEqual({
       flights: 3,
       pilots: 2,
-      gliders: 2,
       scoringKm: 450.5,
       points: 3600,
       // The undeclared flight still counts as completed.
-      completed: 2,
+      completedPct: (100 * 2) / 3,
       declaredPct: (100 * 2) / 3,
     });
   });
@@ -209,6 +208,7 @@ describe("seasonSummary", () => {
     );
     expect(summary.flights).toBe(0);
     expect(summary.declaredPct).toBe(0);
+    expect(summary.completedPct).toBe(0);
   });
 
   it("uses the configured season boundaries", () => {

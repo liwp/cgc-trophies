@@ -29,6 +29,8 @@ import {
 } from "../lib/stats";
 import useFlights from "../lib/useFlights";
 
+const percent = (v: number) => `${Math.round(v)}%`;
+
 const TILES: {
   key: keyof SeasonSummary;
   label: string;
@@ -36,19 +38,14 @@ const TILES: {
 }[] = [
   { key: "flights", label: "Flights" },
   { key: "pilots", label: "Pilots" },
-  { key: "gliders", label: "Gliders" },
   {
     key: "scoringKm",
-    label: "Scoring km",
+    label: "km",
     format: (v) => Math.round(v).toLocaleString("en-GB"),
   },
   { key: "points", label: "Points" },
-  { key: "completed", label: "Completed tasks" },
-  {
-    key: "declaredPct",
-    label: "Declared",
-    format: (v) => `${Math.round(v)}%`,
-  },
+  { key: "declaredPct", label: "Declared", format: percent },
+  { key: "completedPct", label: "Completed", format: percent },
 ];
 
 // Non-breaking spaces keep each label on one line
@@ -106,7 +103,7 @@ const SummaryTiles = ({
   <div className="flex flex-col gap-2">
     <ul
       aria-label="Season summary"
-      className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3"
+      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"
     >
       {TILES.map(({ key, label, format = defaultFormat }) => (
         <li
