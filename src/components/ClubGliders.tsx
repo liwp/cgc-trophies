@@ -1,32 +1,34 @@
 import { useState } from "react";
-import type { ClubGliderStats } from "../lib/stats";
+import { type ClubGliderStats, routeOf } from "../lib/stats";
 import type { Flight } from "../types";
+import { ExpandTh, pad, Th } from "./CompactTable";
 import ExpandButton from "./ExpandButton";
-import FlightRow, { FlightSpeed, kph } from "./FlightRow";
-import Th from "./Th";
+import { FlightSpeed, FlightSummary, flightCell, kph } from "./FlightRow";
+import Route from "./Route";
 
 const km = (v: number) => `${Math.round(v).toLocaleString("en-GB")} km`;
 
-const cell =
-  "px-4 py-2 text-right tabular-nums whitespace-nowrap text-gray-700";
-const flightCell = "px-4 py-1.5 text-right tabular-nums whitespace-nowrap";
-
-const route = ({ task }: Flight) =>
-  [task.start, ...task.turnpoints, task.finish].join("-");
+const sub = "text-xs text-gray-400";
+const cell = `${pad} text-right tabular-nums whitespace-nowrap text-gray-700`;
+/**
+ * One of a glider's flights, under its row: its date, pilot and route under
+ * the glider, then its speed and distance.
+ */
+const route = (flight: Flight) => routeOf(flight).filter(Boolean);
 
 const GliderFlightRow = ({ flight }: { flight: Flight }) => (
-  <FlightRow
-    flight={flight}
-    span={2}
-    // Long routes wrap, so they don't widen the table
-    detail={<span className="whitespace-normal">{route(flight)}</span>}
-  >
+  <tr className="bg-gray-50 text-gray-500">
+    <FlightSummary
+      flight={flight}
+      detail={<Route route={route(flight)} className="text-left" />}
+      phoneDetail={route(flight).join(" – ")}
+    />
     <td className={flightCell}>
       <FlightSpeed flight={flight} />
     </td>
     <td className={flightCell}>{km(flight.task.scoringDistanceKm)}</td>
     <td />
-  </FlightRow>
+  </tr>
 );
 
 const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
@@ -38,22 +40,23 @@ const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
   return (
     <>
       <tr
-        className={`border-b border-gray-100 ${
+        className={`border-b border-gray-100 align-top ${
           flown ? "cursor-pointer hover:bg-gray-50 transition-colors" : ""
         }`}
         onClick={flown ? toggle : undefined}
       >
-        <td className="px-4 py-2 whitespace-nowrap">
-          <span className="font-medium text-gray-900">{name}</span>{" "}
-          <span className="text-xs text-gray-500">{glider.registration}</span>
-        </td>
-        {/* Left-aligned, as the expanded flights' pilots and routes are */}
-        <td className="px-4 py-2 tabular-nums text-gray-700">
-          {flights.length}
+        <td className={pad}>
+          <div className="truncate font-medium text-gray-900">{name}</div>
+          <div className={`${sub} truncate`}>
+            {/* A phone has the comp number in the name, and no room for both. */}
+            <span className="hidden sm:inline">{glider.registration} · </span>
+            <span className="tabular-nums">{flights.length}</span>{" "}
+            {flights.length === 1 ? "flight" : "flights"}
+          </div>
         </td>
         <td className={cell}>{kph(avgSpeedKph)}</td>
         <td className={cell}>{km(scoringKm)}</td>
-        <td className="py-2 pr-4">
+        <td className="py-2 pr-1.5 sm:pr-4">
           {flown && (
             <ExpandButton
               expanded={expanded}
@@ -78,20 +81,21 @@ const ClubGliders = ({ stats }: { stats: ClubGliderStats[] }) => (
       Club gliders
     </h2>
     <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto">
-      {/* Fixed column widths, so expanding a glider's flights (which span the
-          first two columns) doesn't shift the columns */}
-      <table className="w-full min-w-[40rem] table-fixed border-collapse text-sm">
+      {/* Fixed widths, so expanding a glider can't move the columns; the
+          glider column takes the rest. It fits a phone; the card still
+          scrolls if a screen is too narrow even for that. */}
+      <table className="w-full min-w-72 table-fixed border-collapse text-sm">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
-            <Th width="w-[35%]">Glider</Th>
-            <Th>Flights</Th>
-            <Th align="right" width="w-28">
+            <Th width="">Glider</Th>
+            {/* Room for "Not completed" under a glider's flights. */}
+            <Th right width="w-24 sm:w-32">
               Avg speed
             </Th>
-            <Th align="right" width="w-28">
+            <Th right width="w-20 sm:w-24">
               Distance
             </Th>
-            <Th width="w-10" />
+            <ExpandTh width="w-7 sm:w-12" />
           </tr>
         </thead>
         <tbody>

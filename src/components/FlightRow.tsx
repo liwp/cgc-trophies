@@ -4,6 +4,7 @@ import { flightDetailsUrl } from "../lib/links";
 import { hasSpeed, isCompletedTask } from "../lib/stats";
 import { formatPilotName, shortPilotName } from "../lib/trophyCopyData";
 import type { Flight } from "../types";
+import { dateText, ShortDate } from "./CompactTable";
 import Tooltip from "./Tooltip";
 
 /** Shows a height loss penalty on hover, or focus for keyboard users. */
@@ -74,46 +75,46 @@ export const FlightSpeed = ({ flight }: { flight: Flight }) => {
 };
 
 /**
- * One flight under an expanded stats row: its date, pilot (linking to the
- * ladder) and `detail`, across the row's first `span` columns, followed by
- * the table's own cells.
+ * The first cell of a flight under an expanded stats row. Where there's room,
+ * the date, pilot and `detail` sit in a line. A phone has two lines: the
+ * pilot, then the date and `phoneDetail` (or `detail`) in small grey across
+ * the whole row, so nothing is hidden.
  */
-const FlightRow = ({
+export const FlightSummary = ({
   flight,
-  span,
   detail,
-  children,
+  phoneDetail = detail,
 }: {
   flight: Flight;
-  span: number;
   detail: ReactNode;
-  children: ReactNode;
+  phoneDetail?: ReactNode;
 }) => (
-  <tr className="bg-gray-50 text-gray-500">
-    <td colSpan={span} className="py-1.5 pr-4 pl-10">
-      <div className="grid grid-cols-[6.5rem_minmax(9rem,1fr)_1fr] gap-x-4 whitespace-nowrap">
-        <span className="tabular-nums">
-          {flight.date.toLocaleDateString("en-GB", {
-            weekday: "short",
-            day: "numeric",
-            month: "short",
-            timeZone: "UTC",
-          })}
-        </span>
-        <a
-          href={flightDetailsUrl(flight.id)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-cambridge hover:text-cambridge-dark"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {formatPilotName(flight.pilot)}
-        </a>
-        <span className="text-gray-400">{detail}</span>
+  <td className="py-1.5 pr-1.5 pl-4 sm:pr-4 sm:pl-10">
+    <div className="sm:hidden">
+      <div className="truncate">
+        <PilotLink flight={flight} />
       </div>
-    </td>
-    {children}
-  </tr>
+      {/* Wider than its cell, running on under the speed and distance, which
+          only take the first line: the card's width less its padding. */}
+      <div className="w-[calc(100vw-5rem)] text-xs text-gray-400">
+        <span className="tabular-nums">
+          {dateText(flight.date, { day: "numeric", month: "short" })}
+        </span>{" "}
+        · {phoneDetail}
+      </div>
+    </div>
+    <div className="hidden sm:grid sm:grid-cols-[5.5rem_9rem_minmax(0,1fr)] sm:gap-x-4">
+      <span className="tabular-nums">
+        <ShortDate date={flight.date} />
+      </span>
+      <span className="truncate">
+        <PilotLink flight={flight} />
+      </span>
+      <span className="text-gray-400">{detail}</span>
+    </div>
+  </td>
 );
 
-export default FlightRow;
+/** A flight's speed and distance cells line up with its pilot. */
+export const flightCell =
+  "px-1.5 py-1.5 text-right tabular-nums whitespace-nowrap align-top sm:px-4 sm:align-middle";

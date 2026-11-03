@@ -178,15 +178,29 @@ test("best days ranks the season's days by total km", async ({ page }) => {
 });
 
 // Expanding rows must not move a table's columns, at any width.
-for (const { section, season, expand, why } of [
+for (const { section, season, expand, why, rows } of [
   {
     section: "Best days",
     // 2022 has days whose expanded names widen the flights column.
     season: 2022,
     expand: /^All flights on /,
     why: "a day",
+    rows: 10,
   },
-  { section: "Top tasks", season: 2024, expand: /^Flights of /, why: "a task" },
+  {
+    section: "Top tasks",
+    season: 2024,
+    expand: /^Flights of /,
+    why: "a task",
+    rows: 10,
+  },
+  {
+    section: "Club gliders",
+    season: 2024,
+    expand: /^Flights in /,
+    why: "a glider",
+    rows: 8,
+  },
 ]) {
   for (const [device, viewport] of [
     ["desktop", { width: 1280, height: 800 }],
@@ -210,7 +224,7 @@ for (const { section, season, expand, why } of [
             return [Math.round(x - left), Math.round(width)];
           }),
         );
-      await expect(table.locator("tbody tr")).toHaveCount(10);
+      await expect(table.locator("tbody tr")).toHaveCount(rows);
       const before = await columns();
       for (const button of await table
         .getByRole("button", { name: expand })
@@ -340,7 +354,9 @@ test("a top task expands to its flights", async ({ page }) => {
   ).toHaveAttribute("aria-expanded", "true");
   // Completed flights fastest first, the rest after
   await expect(rows.nth(1)).toContainText("kph");
-  await expect(rows.nth(1)).toContainText(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) /);
+  await expect(rows.nth(1)).toContainText(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) /, {
+    useInnerText: true,
+  });
   await expect(
     page.getByRole("button", { name: /distance penalty/ }),
   ).not.toHaveCount(0);
@@ -411,14 +427,37 @@ test("the club glider table lists each club glider's season", async ({
 
   await expect(table.getByRole("row")).toHaveCount(9);
   await expect(row("Discus DM").getByRole("cell")).toHaveText([
-    /Discus DM\s*G-CJXR/,
-    "7",
+    /Discus DM\s*G-CJXR · 7 flights/,
     "67.4 kph",
     "821 km",
     "",
   ]);
   // Unflown club gliders are listed too
-  await expect(row("Puchacz JEC").getByRole("cell").nth(1)).toHaveText("0");
+  await expect(row("Puchacz JEC").getByRole("cell").first()).toContainText(
+    "0 flights",
+  );
+});
+
+test("club gliders fits a phone without scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto("/stats?season=2024");
+  const card = page
+    .getByRole("region", { name: "Club gliders" })
+    .locator("div:has(> table)");
+  await card.getByRole("button", { name: "Flights in Discus DM" }).click();
+  await expect(
+    card
+      .locator("tbody tr")
+      .filter({ has: page.getByRole("link") })
+      .first(),
+  ).toHaveText(
+    // The pilot, then the date and task under it
+    /^[A-Z] \S+\s+\d+ \w{3,4} · GRL – /,
+    { useInnerText: true },
+  );
+  expect(await card.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
+    true,
+  );
 });
 
 test("a club glider row expands to its flights", async ({ page }) => {
