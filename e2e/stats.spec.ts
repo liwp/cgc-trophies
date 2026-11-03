@@ -168,7 +168,7 @@ test("the monthly charts show each month's flights and km", async ({
     }),
   ).toBeVisible();
 
-  const km = page.getByRole("figure", { name: "Scoring km" });
+  const km = page.getByRole("figure", { name: "km", exact: true });
   await expect(km).toContainText("27,881 km");
   await km.getByRole("img", { name: /July 2024/ }).focus();
   await expect(km.getByText("July 2024: 27,881 km")).toBeVisible();

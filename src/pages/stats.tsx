@@ -210,7 +210,7 @@ const StatsPage = () => {
               format={(v) => `${v} ${v === 1 ? "flight" : "flights"}`}
             />
             <MonthlyChart
-              title="Scoring km"
+              title="km"
               season={season}
               months={summaries.months}
               previous={summaries.previousMonths}
