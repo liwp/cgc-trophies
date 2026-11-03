@@ -71,7 +71,7 @@ const TaskCode = ({
 
 /** A route's turnpoint codes, with their names in one tooltip. */
 const Route = ({ record }: { record: ClubRecord }) => (
-  <Tip tip={routeTooltip(record.turnpoints)} className="font-mono">
+  <Tip tip={routeTooltip(record.turnpoints)}>
     {record.turnpoints.map((tp, i) => {
       const label = turnpointLabel(tp);
       return (
