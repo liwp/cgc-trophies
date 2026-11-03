@@ -1,14 +1,10 @@
 import { Fragment, useState } from "react";
 import type { TopTask } from "../lib/stats";
-import TURNPOINTS from "../lib/turnpoints";
 import type { Flight } from "../types";
 import ExpandButton from "./ExpandButton";
 import FlightRow, { FlightSpeed, kph } from "./FlightRow";
+import Route from "./Route";
 import Th from "./Th";
-import Tip from "./Tip";
-
-const routeNames = (route: string[]) =>
-  route.map((code) => TURNPOINTS[code]?.name ?? code).join(" – ");
 
 const completedOf = (completed: number, total: number) =>
   `${completed} / ${total}`;
@@ -34,9 +30,7 @@ const TaskRow = ({ task }: { task: TopTask }) => {
         onClick={toggle}
       >
         <td className="px-4 py-2 whitespace-nowrap">
-          <Tip tip={routeNames(route)} className="font-mono text-gray-900">
-            {route.join(" – ")}
-          </Tip>
+          <Route route={route} className="text-gray-900" />
         </td>
         <td className="px-4 py-2 text-right tabular-nums whitespace-nowrap text-gray-700">
           {Math.round(taskDistanceKm)} km
