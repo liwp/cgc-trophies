@@ -19,9 +19,7 @@ const GliderFlightRow = ({ flight }: { flight: Flight }) => (
     flight={flight}
     span={2}
     // Long routes wrap, so they don't widen the table
-    detail={
-      <span className="font-mono whitespace-normal">{route(flight)}</span>
-    }
+    detail={<span className="whitespace-normal">{route(flight)}</span>}
   >
     <td className={flightCell}>
       <FlightSpeed flight={flight} />

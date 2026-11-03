@@ -12,7 +12,7 @@ const Route = ({
   route: string[];
   className?: string;
 }) => (
-  <Tip tip={routeNames(route)} className={`font-mono ${className}`}>
+  <Tip tip={routeNames(route)} className={className}>
     {route.join(" – ")}
   </Tip>
 );
