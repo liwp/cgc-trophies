@@ -1,6 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 import type { ReactNode } from "react";
 import { flightDetailsUrl } from "../lib/links";
+import { hasSpeed, isCompletedTask } from "../lib/stats";
 import { formatPilotName } from "../lib/trophyCopyData";
 import type { Flight } from "../types";
 import Tooltip from "./Tooltip";
@@ -29,14 +30,20 @@ export const PenaltyWarning = ({ flight }: { flight: Flight }) => {
 export const kph = (v: number | null) =>
   v === null ? "" : `${v.toFixed(1)} kph`;
 
-/** A flight's handicapped speed, if it completed its task, and any penalty. */
+/**
+ * A flight's handicapped speed, if it completed its task and the ladder timed
+ * it, and any penalty.
+ */
 export const FlightSpeed = ({ flight }: { flight: Flight }) => {
   const { task } = flight;
   return (
     <span className="inline-flex items-center gap-1.5">
       <PenaltyWarning flight={flight} />
-      {task.isCompleted && task.isDeclared ? (
+      {hasSpeed(flight) ? (
         kph(task.handicappedSpeedKph)
+      ) : isCompletedTask(flight) ? (
+        // The ladder sometimes gives a completed task no time, so no speed.
+        <span className="text-gray-400 italic">Completed</span>
       ) : (
         <span className="text-gray-400 italic">Not completed</span>
       )}

@@ -48,10 +48,9 @@ function updateCategory(
   stats: CategoryStat | undefined,
   flight: Flight,
 ): CategoryStat {
-  const { isCompleted = false, isDeclared = false } = flight.task || {};
   let { completed, total } = stats || { total: 0, completed: 0, percentage: 0 };
 
-  if (isCompleted && isDeclared) {
+  if (flight.task?.isCompleted) {
     completed += 1;
   }
   total += 1;
@@ -104,11 +103,28 @@ function claimedInSeason(
   return flights.filter((f) => f.task.claimType === "C" && inSeason(f));
 }
 
-const isCompletedTask = (f: Flight) => f.task.isCompleted && f.task.isDeclared;
+/**
+ * A completed task, as the BGA Ladder judges it. Declared or not: the stats
+ * report declarations separately, and the trophies filter on them themselves.
+ */
+export const isCompletedTask = (f: Flight) => f.task.isCompleted;
+
+/**
+ * Whether the ladder gave a completed task a speed. It sometimes doesn't (a
+ * task time of zero), and a 0 kph would drag an average down.
+ */
+export const hasSpeed = (f: Flight) =>
+  isCompletedTask(f) && f.task.handicappedSpeedKph > 0;
+
+/** Mean handicapped speed of the flights with one; null without any. */
+const avgSpeedKph = (flights: Flight[]) => {
+  const timed = flights.filter(hasSpeed);
+  return timed.length ? meanBy(timed, (f) => f.task.handicappedSpeedKph) : null;
+};
 
 /**
  * Club totals for one season's claimed ("C") flights. Completed counts
- * declared, completed tasks, as in the distance categories above.
+ * completed tasks, as in the distance categories above.
  */
 function seasonSummary(
   flights: Flight[],
@@ -137,9 +153,9 @@ export interface PilotStats {
   points: number;
   bestKm: number;
   bestPoints: number;
-  /** Declared, completed tasks. */
+  /** Completed tasks, declared or not. */
   completed: number;
-  /** Percentage of flights that were declared, completed tasks. */
+  /** Percentage of flights that were completed tasks. */
   completionPct: number;
   /** Mean handicapped speed of completed tasks; null without any. */
   avgSpeedKph: number | null;
@@ -175,9 +191,7 @@ function pilotStats(
       ),
       completed: completed.length,
       completionPct: (100 * completed.length) / pilotFlights.length,
-      avgSpeedKph: completed.length
-        ? meanBy(completed, (f) => f.task.handicappedSpeedKph)
-        : null,
+      avgSpeedKph: avgSpeedKph(completed),
       completed300: completedOver(300),
       completed500: completedOver(500),
       gliders: uniq(pilotFlights.map((f) => f.glider.registration)),
@@ -347,9 +361,7 @@ function topTasks(
       route: routeOf(usual[0]),
       taskDistanceKm: usual[0].task.taskDistanceKm,
       ...taskCount(taskFlights),
-      avgSpeedKph: completed.length
-        ? meanBy(completed, (f) => f.task.handicappedSpeedKph)
-        : null,
+      avgSpeedKph: avgSpeedKph(completed),
       flights: orderBy(
         taskFlights,
         [
@@ -526,9 +538,7 @@ function clubGliderStats(
     return {
       glider,
       flights: gliderFlights,
-      avgSpeedKph: completed.length
-        ? meanBy(completed, (f) => f.task.handicappedSpeedKph)
-        : null,
+      avgSpeedKph: avgSpeedKph(completed),
       scoringKm: sumBy(gliderFlights, (f) => f.task.scoringDistanceKm),
     };
   });
@@ -585,7 +595,7 @@ const pilotColumns: PilotColumn[] = [
     "Completed",
     (s) => s.completionPct,
     (v) => `${whole(v)}%`,
-    "Flights that were declared, completed tasks",
+    "Flights that were completed tasks",
   ),
   {
     key: "avgSpeedKph",

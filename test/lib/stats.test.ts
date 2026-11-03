@@ -91,10 +91,10 @@ describe("stats", () => {
       });
     });
 
-    it("requires both completed and declared to count as completed", () => {
+    it("counts an undeclared completed flight as completed", () => {
       expect(
         updateCategory(undefined, makeFlight({ isDeclared: false })),
-      ).toEqual({ completed: 0, total: 1, percentage: 0 });
+      ).toEqual({ completed: 1, total: 1, percentage: 100 });
     });
 
     it("defaults missing task flags to false", () => {
@@ -191,7 +191,8 @@ describe("seasonSummary", () => {
       gliders: 2,
       scoringKm: 450.5,
       points: 3600,
-      completed: 1,
+      // The undeclared flight still counts as completed.
+      completed: 2,
       declaredPct: (100 * 2) / 3,
     });
   });
@@ -764,6 +765,20 @@ describe("clubGliderStats", () => {
 
     expect(flown.avgSpeedKph).toBe(70);
     expect(unflown.avgSpeedKph).toBeNull();
+  });
+
+  it("leaves a completed task the ladder didn't time out of the average", () => {
+    const [flown] = clubGliderStats(
+      [
+        flight("HTV", "ASK 21", { task: { handicappedSpeedKph: 60 } }),
+        flight("HTV", "ASK 21", { task: { handicappedSpeedKph: 0 } }),
+      ],
+      2025,
+      calendar,
+      [k21],
+    );
+
+    expect(flown.avgSpeedKph).toBe(60);
   });
 
   it("lists a glider's flights by most points, then date", () => {

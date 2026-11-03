@@ -39,7 +39,7 @@ test("the stats default to Gransden Lodge launches", async ({ page }) => {
 
   await expect(toggle).toHaveAttribute("aria-checked", "true");
   await expect(tile(page, "Flights")).toContainText("368");
-  await expect(tile(page, "Completed tasks")).toContainText("273");
+  await expect(tile(page, "Completed tasks")).toContainText("289");
 
   await toggle.click();
   await expect(page).toHaveURL(/site=all/);
@@ -168,7 +168,7 @@ test("the tasks charts show completions by distance and shape", async ({
   await expect(distance.getByRole("img")).toHaveCount(6);
   await expect(
     distance.getByRole("img", {
-      name: "300\u00a0km: 118 / 145 completed (81%)",
+      name: "300\u00a0km: 120 / 145 completed (83%)",
     }),
   ).toBeVisible();
   await expect(
@@ -188,7 +188,7 @@ test("top tasks counts a task and its reverse together", async ({ page }) => {
     .locator("tbody tr");
   await expect(rows).toHaveCount(10);
   await expect(rows.first()).toContainText("GRL – CAL – EAW – SOH – GRL");
-  await expect(rows.first()).toContainText("27 / 31");
+  await expect(rows.first()).toContainText("28 / 31");
   // Flown 6 times one way round and 5 the other
   const rusRam = rows.filter({ hasText: /RUS – RAM|RAM – RUS/ });
   await expect(rusRam).toHaveCount(1);
@@ -213,6 +213,8 @@ test("a top task expands to its flights", async ({ page }) => {
     page.getByRole("button", { name: /distance penalty/ }),
   ).not.toHaveCount(0);
   await expect(rows.nth(31)).toContainText("Not completed");
+  // Knight's undeclared flight completed the task, so it has a speed.
+  await expect(rows.filter({ hasText: "Knight" })).toContainText("kph");
   await rows
     .first()
     .getByRole("button", { name: /Flights of/ })
