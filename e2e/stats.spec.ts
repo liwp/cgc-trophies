@@ -234,11 +234,11 @@ test("a top task expands to its flights", async ({ page }) => {
   await expect(rows).toHaveCount(10);
 });
 
-test("the season awards show each card's winner", async ({ page }) => {
+test("the season highlights show each card's winner", async ({ page }) => {
   await page.goto("/stats?season=2024");
-  const awards = page.getByRole("region", { name: "Season awards" });
+  const highlights = page.getByRole("region", { name: "Season highlights" });
   const card = (title: string) =>
-    awards.getByRole("listitem").filter({ hasText: title });
+    highlights.getByRole("listitem").filter({ hasText: title });
   await expect(card("Most flights")).toBeVisible();
   await expect(card("Most flights")).toContainText("28 flights");
   await expect(card("Most flights")).toContainText("Wendy Head");
@@ -248,10 +248,10 @@ test("the season awards show each card's winner", async ({ page }) => {
   ).toHaveAttribute("href", /bgaladder\.net\/flightdetails/);
   await expect(card("Top scoring flight")).toContainText("pts");
   await expect(card("Longest FAI triangle")).toContainText("km");
-  await expect(awards.locator("> ul > li")).toHaveCount(8);
+  await expect(highlights.locator("> ul > li")).toHaveCount(8);
 
   // A lone first flight shows its pilot directly
-  const first = awards
+  const first = highlights
     .locator("> ul > li")
     .filter({ hasText: "First flights" });
   await expect(first).toContainText("26 Mar");
@@ -264,7 +264,7 @@ test("the season awards show each card's winner", async ({ page }) => {
 test("a day award with several pilots expands to them", async ({ page }) => {
   await page.goto("/stats?season=2025");
   const first = page
-    .getByRole("region", { name: "Season awards" })
+    .getByRole("region", { name: "Season highlights" })
     .locator("> ul > li")
     .filter({ hasText: "First flights" });
   await expect(first).toContainText("15 Mar");
@@ -332,7 +332,7 @@ test("the stats sections read from overview to detail", async ({ page }) => {
   await page.goto("/stats?season=2024");
   await expect(page.getByRole("heading", { name: "Pilots" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 2 })).toHaveText([
-    "Season awards",
+    "Season highlights",
     "By month",
     "Best days",
     "Tasks",

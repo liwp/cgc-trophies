@@ -154,7 +154,7 @@ const StatsPage = () => {
     return {
       current: seasonSummary(flights, state.season, CONFIG.season),
       previous: seasonSummary(flights, state.season - 1, CONFIG.season),
-      awards: superlatives(flights, state.season, CONFIG.season),
+      highlights: superlatives(flights, state.season, CONFIG.season),
       tasks: taskBreakdown(flights, state.season, CONFIG.season),
       topTasks: topTasks(flights, state.season, CONFIG.season),
       days: bestDays(flights, state.season, CONFIG.season),
@@ -197,7 +197,7 @@ const StatsPage = () => {
           previous={summaries.previous}
           season={season}
         />
-        <Superlatives cards={summaries.awards} />
+        <Superlatives cards={summaries.highlights} />
         <section className="flex flex-col gap-2">
           <h2 className="text-lg font-semibold text-gray-900">By month</h2>
           <div className="flex flex-col gap-3 sm:flex-row">

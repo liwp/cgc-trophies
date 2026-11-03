@@ -112,9 +112,9 @@ const Card = ({ card }: { card: Superlative }) => (
 /** The season's award cards. */
 const Superlatives = ({ cards }: { cards: Superlative[] }) =>
   cards.length === 0 ? null : (
-    <section aria-labelledby="awards" className="flex flex-col gap-2">
-      <h2 id="awards" className="text-lg font-semibold text-gray-900">
-        Season awards
+    <section aria-labelledby="highlights" className="flex flex-col gap-2">
+      <h2 id="highlights" className="text-lg font-semibold text-gray-900">
+        Season highlights
       </h2>
       <ul className="grid auto-rows-fr grid-cols-2 gap-3 lg:grid-cols-4">
         {cards.map((card) => (
