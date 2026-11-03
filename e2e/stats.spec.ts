@@ -177,39 +177,50 @@ test("best days ranks the season's days by total km", async ({ page }) => {
   await expect(pilots).toHaveCount(1);
 });
 
-for (const [device, viewport] of [
-  ["desktop", { width: 1280, height: 800 }],
-  ["laptop", { width: 1024, height: 768 }],
-  ["tablet", { width: 768, height: 1024 }],
-  ["phone", { width: 360, height: 740 }],
-] as const) {
-  test(`best days columns stay put when a day expands on a ${device}`, async ({
-    page,
-  }) => {
-    await page.setViewportSize(viewport);
+// Expanding rows must not move a table's columns, at any width.
+for (const { section, season, expand, why } of [
+  {
+    section: "Best days",
     // 2022 has days whose expanded names widen the flights column.
-    await page.goto("/stats?season=2022");
-    const table = page
-      .getByRole("region", { name: "Best days" })
-      .getByRole("table");
-    const columns = () =>
-      table.locator("thead th").evaluateAll((ths) =>
-        ths.map((th) => {
-          const { x, width } = th.getBoundingClientRect();
-          const left = th.closest("table")?.getBoundingClientRect().x ?? 0;
-          return [Math.round(x - left), Math.round(width)];
-        }),
-      );
-    await expect(table.locator("tbody tr")).toHaveCount(10);
-    const before = await columns();
-    for (const button of await table
-      .getByRole("button", { name: /^All flights on / })
-      .all()) {
-      await button.click();
-      await expect(button).toHaveAttribute("aria-expanded", "true");
-      expect(await columns()).toEqual(before);
-    }
-  });
+    season: 2022,
+    expand: /^All flights on /,
+    why: "a day",
+  },
+  { section: "Top tasks", season: 2024, expand: /^Flights of /, why: "a task" },
+]) {
+  for (const [device, viewport] of [
+    ["desktop", { width: 1280, height: 800 }],
+    ["laptop", { width: 1024, height: 768 }],
+    ["tablet", { width: 768, height: 1024 }],
+    ["phone", { width: 360, height: 740 }],
+  ] as const) {
+    test(`${section.toLowerCase()} columns stay put when ${why} expands on a ${device}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await page.goto(`/stats?season=${season}`);
+      const table = page
+        .getByRole("region", { name: section })
+        .getByRole("table");
+      const columns = () =>
+        table.locator("thead th").evaluateAll((ths) =>
+          ths.map((th) => {
+            const { x, width } = th.getBoundingClientRect();
+            const left = th.closest("table")?.getBoundingClientRect().x ?? 0;
+            return [Math.round(x - left), Math.round(width)];
+          }),
+        );
+      await expect(table.locator("tbody tr")).toHaveCount(10);
+      const before = await columns();
+      for (const button of await table
+        .getByRole("button", { name: expand })
+        .all()) {
+        await button.click();
+        await expect(button).toHaveAttribute("aria-expanded", "true");
+        expect(await columns()).toEqual(before);
+      }
+    });
+  }
 }
 
 test("best days shows each flight's task where there's room", async ({
@@ -251,6 +262,31 @@ test("best days fits a phone without scrolling", async ({ page }) => {
   );
   await expect(row).toContainText("15 flights");
   await row.getByRole("button", { name: "All flights on Sun 28 Jul" }).click();
+  expect(await card.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
+    true,
+  );
+});
+
+test("top tasks fits a phone without scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto("/stats?season=2024");
+  const card = page
+    .getByRole("region", { name: "Top tasks" })
+    .locator("div:has(> table)");
+  const rows = card.locator("tbody tr");
+  // The task's distance sits under its route, the percentage under the count
+  await expect(rows.first().getByRole("cell").first()).toContainText("306 km");
+  await expect(rows.first().getByRole("cell").nth(1)).toHaveText(
+    /28 \/ 31\s*90%/,
+  );
+  await rows
+    .first()
+    .getByRole("button", { name: /^Flights of/ })
+    .click();
+  await expect(rows.nth(1).getByRole("link", { name: /\w+ \w+/ })).toHaveText(
+    /^[A-Z] \S+/,
+    { useInnerText: true },
+  );
   expect(await card.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
     true,
   );
