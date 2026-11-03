@@ -105,9 +105,7 @@ test("the pilot table lists pilots by points and sorts by any column", async ({
   await expect(
     pilots(page).getByRole("columnheader", { name: "Pilot" }),
   ).toHaveAttribute("aria-sort", "ascending");
-  const names = await pilotRows(page)
-    .locator("td:first-child")
-    .allTextContents();
+  const names = await pilotRows(page).locator("td:first-child").allInnerTexts();
   expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
 
   await pilots(page)
@@ -118,17 +116,44 @@ test("the pilot table lists pilots by points and sorts by any column", async ({
   ).toHaveAttribute("aria-sort", "descending");
 });
 
-test("the pilot table scrolls inside its card on a phone", async ({ page }) => {
+test("the pilot table fits a phone, a pilot expanding to the rest", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 360, height: 740 });
   await page.goto("/stats?season=2024");
-  await expect(pilotRows(page).first()).toBeVisible();
-  expect(
-    await page.evaluate(
-      () =>
-        document.documentElement.scrollWidth <=
-        document.documentElement.clientWidth,
-    ),
-  ).toBe(true);
+  const card = pilots(page).locator("div:has(> table)");
+  await expect(pilots(page).getByRole("columnheader")).toHaveText(
+    ["Pilot", "Flights", "Km", "Points", "Expand"],
+    { useInnerText: true },
+  );
+  const row = pilotRows(page).first();
+  await expect(row.getByRole("cell").first()).toHaveText("W Head", {
+    useInnerText: true,
+  });
+  const columns = () =>
+    pilots(page)
+      .locator("thead th:visible")
+      .evaluateAll((ths) =>
+        ths.map((th) => Math.round(th.getBoundingClientRect().width)),
+      );
+  const before = await columns();
+
+  await row.getByRole("button", { name: "More stats for Wendy Head" }).click();
+  const more = pilotRows(page).nth(1);
+  for (const label of [
+    "Best km",
+    "Best pts",
+    "Completed",
+    "Avg kph",
+    "300+",
+    "500+",
+  ])
+    await expect(more.getByText(label, { exact: true })).toBeVisible();
+  await expect(more).toContainText("86%");
+  expect(await columns()).toEqual(before);
+  expect(await card.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
+    true,
+  );
 });
 
 test("the monthly charts show each month's flights and km", async ({
