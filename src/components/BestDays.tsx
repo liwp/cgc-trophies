@@ -1,37 +1,12 @@
 import { type ReactNode, useState } from "react";
-import { flightDetailsUrl } from "../lib/links";
 import { type DayStats, routeOf } from "../lib/stats";
-import { formatPilotName, shortPilotName } from "../lib/trophyCopyData";
 import type { Flight } from "../types";
+import { dateText as date, ExpandTh, pad, ShortDate, Th } from "./CompactTable";
 import ExpandButton from "./ExpandButton";
+import { PilotLink } from "./FlightRow";
 import Route from "./Route";
 
 const km = (v: number) => `${Math.round(v).toLocaleString("en-GB")} km`;
-
-const linkClass = "text-cambridge hover:text-cambridge-dark";
-
-// Tighter padding on a phone, so the table fits without scrolling.
-const pad = "px-1.5 py-2 sm:px-4";
-
-const Th = ({
-  children,
-  width,
-  right = false,
-  className = "",
-}: {
-  children?: ReactNode;
-  width: string;
-  right?: boolean;
-  className?: string;
-}) => (
-  <th
-    className={`${pad} sm:py-3 ${width} ${className} ${
-      right ? "text-right" : "text-left"
-    } text-sm font-semibold text-gray-700`}
-  >
-    {children}
-  </th>
-);
 
 /** A list of a day's flights, one line each, in one column of its row. */
 const FlightList = ({
@@ -55,27 +30,6 @@ const FlightList = ({
   </ul>
 );
 
-/** A pilot's flight: an initial and surname on a phone, the full name wider. */
-const PilotLink = ({ flight }: { flight: Flight }) => {
-  const name = formatPilotName(flight.pilot);
-  return (
-    <a
-      href={flightDetailsUrl(flight.id)}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={name}
-      title={name}
-      className={linkClass}
-    >
-      <span className="sm:hidden">{shortPilotName(flight.pilot)}</span>
-      <span className="hidden sm:inline">{name}</span>
-    </a>
-  );
-};
-
-const date = (d: Date, options: Intl.DateTimeFormatOptions) =>
-  d.toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
-
 const DayRow = ({ day }: { day: DayStats }) => {
   const [expanded, setExpanded] = useState(false);
   const { flights, scoringKm } = day;
@@ -85,9 +39,7 @@ const DayRow = ({ day }: { day: DayStats }) => {
   return (
     <tr className="border-b border-gray-100 align-top">
       <td className={`${pad} whitespace-nowrap font-medium text-gray-900`}>
-        {/* The weekday only where there's room for it. */}
-        <span className="hidden sm:inline">{weekday} </span>
-        {dayMonth}
+        <ShortDate date={day.date} />
       </td>
       <td className={`${pad} text-right tabular-nums whitespace-nowrap`}>
         <div className="text-gray-700">{km(scoringKm)}</div>
@@ -157,9 +109,7 @@ const BestDays = ({ days }: { days: DayStats[] }) => (
               <Th width="lg:w-80" className="hidden lg:table-cell">
                 Task
               </Th>
-              <th className="relative w-7 sm:w-12">
-                <span className="sr-only">Expand</span>
-              </th>
+              <ExpandTh width="w-7 sm:w-12" />
             </tr>
           </thead>
           <tbody>

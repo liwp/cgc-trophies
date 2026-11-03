@@ -2,7 +2,7 @@ import { AlertTriangle } from "lucide-react";
 import type { ReactNode } from "react";
 import { flightDetailsUrl } from "../lib/links";
 import { hasSpeed, isCompletedTask } from "../lib/stats";
-import { formatPilotName } from "../lib/trophyCopyData";
+import { formatPilotName, shortPilotName } from "../lib/trophyCopyData";
 import type { Flight } from "../types";
 import Tooltip from "./Tooltip";
 
@@ -24,6 +24,28 @@ export const PenaltyWarning = ({ flight }: { flight: Flight }) => {
         <AlertTriangle size={14} className="text-amber-500" aria-hidden />
       </button>
     </Tooltip>
+  );
+};
+
+/**
+ * A link to a flight on the ladder, named by its pilot: an initial and surname
+ * on a phone, the full name wider. Screen readers always get the full name.
+ */
+export const PilotLink = ({ flight }: { flight: Flight }) => {
+  const name = formatPilotName(flight.pilot);
+  return (
+    <a
+      href={flightDetailsUrl(flight.id)}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={name}
+      title={name}
+      className="text-cambridge hover:text-cambridge-dark"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <span className="sm:hidden">{shortPilotName(flight.pilot)}</span>
+      <span className="hidden sm:inline">{name}</span>
+    </a>
   );
 };
 
