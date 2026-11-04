@@ -101,12 +101,13 @@ test("icon-only links are named by their tooltips", async ({ page }) => {
 test("ladder rows can be expanded from the keyboard", async ({ page }) => {
   await page.goto("/trophy/L1?season=2024");
   const rows = page.locator("tbody tr");
-  const collapsedRows = await rows.count();
-
   const toggle = page.getByRole("button", {
     name: "Flights for Alex Holswilder",
   });
+  // Count the rows only once the results have rendered: counting straight
+  // after the navigation can catch the page still loading.
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  const collapsedRows = await rows.count();
 
   await toggle.focus();
   await page.keyboard.press("Enter");
