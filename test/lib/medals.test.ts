@@ -1,4 +1,4 @@
-import { bestMedal, type Podium, podiumPlaces } from "../../src/lib/medals";
+import { podiumPlaces } from "../../src/lib/medals";
 import type { TrophyResults } from "../../src/lib/results";
 import type {
   Flight,
@@ -66,7 +66,7 @@ describe("podiumPlaces", () => {
       flightResults("F", [f("a"), f("b"), f("c"), f("d")]),
     ]);
     expect(places.get("a")).toEqual([
-      { place: 1, trophyId: "F", trophyName: "F name" },
+      { place: 1, trophyId: "F", trophyName: "F name", trophySummary: "Test" },
     ]);
     expect(places.get("b")?.[0].place).toBe(2);
     expect(places.get("c")?.[0].place).toBe(3);
@@ -100,27 +100,8 @@ describe("podiumPlaces", () => {
       ladderResults("L", [ladderResult("p1", [f("a")])]),
     ]);
     expect(places.get("a")).toEqual([
-      { place: 1, trophyId: "L", trophyName: "L name" },
-      { place: 3, trophyId: "F", trophyName: "F name" },
+      { place: 1, trophyId: "L", trophyName: "L name", trophySummary: "Test" },
+      { place: 3, trophyId: "F", trophyName: "F name", trophySummary: "Test" },
     ]);
-  });
-});
-
-describe("bestMedal", () => {
-  test("bestMedal names every trophy sharing the best place", () => {
-    const podiums: Podium[] = [
-      { place: 2, trophyId: "A", trophyName: "A name" },
-      { place: 2, trophyId: "B", trophyName: "B name" },
-      { place: 3, trophyId: "C", trophyName: "C name" },
-    ];
-    expect(bestMedal(podiums)).toEqual({
-      place: 2,
-      trophyNames: ["A name", "B name"],
-    });
-  });
-
-  test("bestMedal of undefined or [] is undefined", () => {
-    expect(bestMedal(undefined)).toBeUndefined();
-    expect(bestMedal([])).toBeUndefined();
   });
 });

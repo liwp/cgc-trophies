@@ -8,6 +8,8 @@ export interface Podium {
   place: Place;
   trophyId: string;
   trophyName: string;
+  /** The trophy's one-line summary, for the season. */
+  trophySummary: string;
 }
 
 export const placeName: Record<Place, "Gold" | "Silver" | "Bronze"> = {
@@ -40,6 +42,7 @@ export function podiumPlaces(
         place: (i + 1) as Place,
         trophyId: e.trophy.id,
         trophyName: e.trophy.name,
+        trophySummary: e.trophy.summary,
       };
       for (const flight of flights) add(flight.id, podium);
     });
@@ -48,18 +51,4 @@ export function podiumPlaces(
   for (const podiums of places.values())
     podiums.sort((a, b) => a.place - b.place);
   return places;
-}
-
-/** A flight's best place and every trophy it has that place on. */
-export function bestMedal(
-  podiums: Podium[] | undefined,
-): { place: Place; trophyNames: string[] } | undefined {
-  if (!podiums?.length) return undefined;
-  const place = Math.min(...podiums.map((p) => p.place)) as Place;
-  return {
-    place,
-    trophyNames: podiums
-      .filter((p) => p.place === place)
-      .map((p) => p.trophyName),
-  };
 }

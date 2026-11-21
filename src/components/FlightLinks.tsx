@@ -9,12 +9,16 @@ export const LadderLink = ({
   flightId,
   iconSize = 16,
   inline = false,
+  side,
+  align,
 }: {
   flightId: string;
   iconSize?: number;
   inline?: boolean;
+  side?: "top" | "bottom";
+  align?: "center" | "left" | "right";
 }) => (
-  <Tooltip text="BGA Ladder" asLabel>
+  <Tooltip text="BGA Ladder" asLabel side={side} align={align}>
     <a
       href={flightDetailsUrl(flightId)}
       target="_blank"

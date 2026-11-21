@@ -5,6 +5,12 @@ test.beforeEach(async ({ page }) => {
   await mockFlights(page);
 });
 
+/** Wait for a sliding sheet to come to rest. */
+const settled = (page: Page) =>
+  page
+    .getByRole("dialog")
+    .evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
+
 const region = (page: Page, name: string) => page.getByRole("region", { name });
 
 /** Top tasks with its first (most flown) task expanded. */
@@ -143,6 +149,7 @@ test.describe("on a touch phone @touch", () => {
       .click();
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
+    await settled(page);
     const box = await dialog.boundingBox();
     expect(
       Math.abs((box?.y ?? 0) + (box?.height ?? 0) - 740),
@@ -167,7 +174,8 @@ async function expandAll(page: Page) {
 }
 
 // Alex Holswilder's 17 Jul 2024 flight: first on three trophies, third on one.
-const GOLDS = "Gold: Pot Pewter Pringle, Complicity Cup, Jubilee Bowl";
+const GOLDS =
+  "Trophies: Gold · Pot Pewter Pringle, Gold · Complicity Cup, Gold · Jubilee Bowl, Bronze · Mug Metal Machin Trophy";
 
 test("a podium flight shows its best medal next to the pilot, with a tooltip naming the trophies", async ({
   page,
@@ -179,8 +187,14 @@ test("a podium flight shows its best medal next to the pilot, with a tooltip nam
   await medal.hover();
   const tooltip = page.getByRole("tooltip").filter({ hasText: "Jubilee Bowl" });
   await expect(tooltip.first()).toBeVisible();
-  await expect(tooltip.first()).toContainText("Pot Pewter Pringle");
-  await expect(tooltip.first()).toContainText("Complicity Cup");
+  // Every podium place, not just the best, each with its own medal.
+  await expect(tooltip.first().locator("> span")).toHaveText([
+    "Gold · Pot Pewter Pringle",
+    "Gold · Complicity Cup",
+    "Gold · Jubilee Bowl",
+    "Bronze · Mug Metal Machin Trophy",
+  ]);
+  await expect(tooltip.first().locator("svg")).toHaveCount(4);
 });
 
 test("the pop-up lists every podium place, best first", async ({ page }) => {
@@ -196,12 +210,15 @@ test("the pop-up lists every podium place, best first", async ({ page }) => {
     .getByRole("dialog")
     .getByRole("list", { name: "Trophies" })
     .getByRole("listitem");
-  await expect(trophies).toHaveText([
-    "Gold · Pot Pewter Pringle",
-    "Gold · Complicity Cup",
-    "Gold · Jubilee Bowl",
-    "Bronze · Mug Metal Machin Trophy",
-  ]);
+  await expect(trophies).toHaveText(
+    [
+      "Gold · Pot Pewter Pringle",
+      "Gold · Complicity Cup",
+      "Gold · Jubilee Bowl",
+      "Bronze · Mug Metal Machin Trophy",
+    ],
+    { useInnerText: true },
+  );
 });
 
 test("a flight on no podium has no medal and no trophies section", async ({
@@ -211,7 +228,7 @@ test("a flight on no podium has no medal and no trophies section", async ({
   const plain = rows
     .filter({ has: page.getByRole("button", { name: /^Flight details/ }) })
     .filter({
-      hasNot: page.getByRole("button", { name: /^(Gold|Silver|Bronze): / }),
+      hasNot: page.getByRole("button", { name: /^Trophies: / }),
     })
     .first();
   await plain.getByRole("button", { name: /^Flight details/ }).click();
@@ -226,7 +243,7 @@ test("medals follow the selected season", async ({ page }) => {
     await page.goto(`/stats?season=${season}`);
     await expandAll(page);
     return page
-      .getByRole("button", { name: /^(Gold|Silver|Bronze): / })
+      .getByRole("button", { name: /^Trophies: / })
       .evaluateAll((els) => els.map((el) => el.textContent ?? ""));
   };
   const in2024 = await medals(2024);
@@ -234,7 +251,7 @@ test("medals follow the selected season", async ({ page }) => {
   expect(await medals(2023)).not.toContain(GOLDS);
 });
 
-test.describe("on a touch phone @touch", () => {
+test.describe("medals on a touch phone @touch", () => {
   test.use({
     viewport: { width: 360, height: 740 },
     hasTouch: true,
@@ -324,4 +341,159 @@ test("the height-loss tooltip in the pop-up stays on a phone's screen", async ({
   expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(360);
   expect(box?.y).toBeGreaterThanOrEqual(0);
   expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(740);
+});
+
+/** Whether the middle of `box` shows the element itself, not something over it or a clipped edge. */
+const showsAt = (
+  page: Page,
+  box: { x: number; y: number; width: number; height: number } | null,
+  selector: string,
+) =>
+  page.evaluate(
+    ([cx, cy, sel]) =>
+      document
+        .elementFromPoint(cx as number, cy as number)
+        ?.closest(sel as string) !== null,
+    [
+      (box?.x ?? 0) + (box?.width ?? 0) / 2,
+      (box?.y ?? 0) + (box?.height ?? 0) / 2,
+      selector,
+    ],
+  );
+
+test("a row medal's tooltip shows in full, outside the table's card", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  await expandAll(page);
+  const medal = page.getByRole("button", { name: GOLDS }).first();
+  await medal.hover();
+  const tooltip = page
+    .getByRole("tooltip")
+    .filter({ hasText: "Jubilee Bowl" })
+    .first();
+  await expect(tooltip).toBeVisible();
+  // Nothing clips it: the card's scrolling box would hide it.
+  expect(
+    await showsAt(page, await tooltip.boundingBox(), "[role=tooltip]"),
+  ).toBe(true);
+});
+
+test("a row medal has the row's pointer, not a help cursor", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  await expandAll(page);
+  const medal = page.getByRole("button", { name: GOLDS }).first();
+  await expect(medal).not.toHaveCSS("cursor", "help");
+});
+
+/** Open the 17 Jul 2024 Holswilder flight's pop-up. */
+async function openGolds(page: Page) {
+  await page.goto("/stats?season=2024");
+  await expandAll(page);
+  await page
+    .getByRole("listitem")
+    .or(page.getByRole("row"))
+    .filter({ has: page.getByRole("button", { name: GOLDS }) })
+    .last()
+    .getByRole("button", { name: /^Flight details for / })
+    .click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await settled(page);
+  return page.getByRole("dialog");
+}
+
+test("opening the pop-up shows no tooltip until asked", async ({ page }) => {
+  const dialog = await openGolds(page);
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Close" })).toBeFocused();
+  await expect(dialog.getByRole("tooltip", { name: "BGA Ladder" })).toHaveCSS(
+    "opacity",
+    "0",
+  );
+});
+
+test("the ladder link's tooltip in the pop-up isn't cut off", async ({
+  page,
+}) => {
+  const dialog = await openGolds(page);
+  await dialog.getByRole("link", { name: "BGA Ladder" }).hover();
+  const tooltip = dialog.getByRole("tooltip", { name: "BGA Ladder" });
+  await expect(tooltip).toHaveCSS("opacity", "1");
+  const box = await tooltip.boundingBox();
+  const frame = await dialog.boundingBox();
+  expect(box?.y).toBeGreaterThanOrEqual(frame?.y ?? 0);
+  expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
+    (frame?.x ?? 0) + (frame?.width ?? 0),
+  );
+});
+
+test("a trophy in the pop-up has a tooltip with its summary", async ({
+  page,
+}) => {
+  const dialog = await openGolds(page);
+  await dialog
+    .getByRole("button", { name: "Gold · Pot Pewter Pringle" })
+    .hover();
+  const tooltip = page.getByRole("tooltip").filter({ hasText: "Open ladder" });
+  await expect(tooltip).toBeVisible();
+  expect(
+    await showsAt(page, await tooltip.boundingBox(), "[role=tooltip]"),
+  ).toBe(true);
+});
+
+test.describe("the pop-up sheet on a phone @touch", () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    hasTouch: true,
+    isMobile: true,
+  });
+
+  test("a trophy's tooltip near the bottom of the screen opens above it", async ({
+    page,
+  }) => {
+    const dialog = await openGolds(page);
+    const last = dialog.getByRole("button", {
+      name: "Bronze · Mug Metal Machin Trophy",
+    });
+    await last.tap();
+    const tooltip = page
+      .getByRole("tooltip")
+      .filter({ hasText: "Longest flight (up to 3 TPs)" });
+    await expect(tooltip).toBeVisible();
+    const box = await tooltip.boundingBox();
+    expect(box?.y).toBeGreaterThanOrEqual(0);
+    expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(740);
+  });
+
+  test("the sheet slides up as it opens and down as it closes", async ({
+    page,
+  }) => {
+    const dialog = await openGolds(page);
+    await expect(dialog).toBeVisible();
+    expect(
+      await dialog.evaluate((el) => getComputedStyle(el).transitionProperty),
+    ).toContain("translate");
+    // It ends up resting on the bottom edge.
+    await expect
+      .poll(async () => {
+        const box = await dialog.boundingBox();
+        return Math.round((box?.y ?? 0) + (box?.height ?? 0));
+      })
+      .toBe(740);
+    // Closing keeps its content while it slides away.
+    await dialog.getByRole("button", { name: "Close" }).tap();
+    await expect(dialog).toBeHidden();
+    await expect(page.locator("dialog h2")).toHaveCount(1);
+  });
+
+  test("with reduced motion the sheet doesn't slide", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const dialog = await openGolds(page);
+    await expect(dialog).toBeVisible();
+    expect(
+      await dialog.evaluate((el) => getComputedStyle(el).transitionProperty),
+    ).not.toContain("translate");
+  });
 });

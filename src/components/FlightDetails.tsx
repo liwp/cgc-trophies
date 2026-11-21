@@ -9,14 +9,15 @@ import {
   useState,
 } from "react";
 import { formatDate } from "../lib/formatDate";
-import { type Podium, placeName } from "../lib/medals";
+import type { Podium } from "../lib/medals";
 import { formatScore } from "../lib/results";
 import { hasSpeed, isCompletedTask } from "../lib/stats";
 import { formatPilotName } from "../lib/trophyCopyData";
 import type { Flight } from "../types";
 import { LadderLink } from "./FlightLinks";
 import { kph, PenaltyWarning } from "./FlightRow";
-import { MedalIcon } from "./Medal";
+import { MedalIcon, podiumText } from "./Medal";
+import Tip from "./Tip";
 
 type FlightDetailsContext = {
   /** Show a flight's details in the pop-up. */
@@ -77,10 +78,17 @@ const Details = ({
         </h2>
         <div className="flex shrink-0 items-center gap-3">
           <PenaltyWarning flight={flight} side="bottom" />
-          <LadderLink flightId={flight.id} iconSize={18} />
+          {/* Below and leftwards: above, the pop-up's edge would cut it off. */}
+          <LadderLink
+            flightId={flight.id}
+            iconSize={18}
+            side="bottom"
+            align="right"
+          />
           <button
             type="button"
             aria-label="Close"
+            data-autofocus
             className="text-gray-400 hover:text-gray-700"
             onClick={onClose}
           >
@@ -112,14 +120,14 @@ const Details = ({
             aria-labelledby={`${headingId}-trophies`}
             className="flex flex-col gap-1 text-sm text-gray-700"
           >
-            {podiums.map(({ place, trophyId, trophyName }) => (
+            {podiums.map(({ place, trophyId, trophyName, trophySummary }) => (
               <li key={trophyId} className="flex items-start gap-1.5">
                 <span className="mt-0.5">
                   <MedalIcon place={place} />
                 </span>
-                <span className="min-w-0">
-                  {placeName[place]} · {trophyName}
-                </span>
+                <Tip tip={trophySummary} className="min-w-0 text-left">
+                  {podiumText({ place, trophyId, trophyName, trophySummary })}
+                </Tip>
               </li>
             ))}
           </ul>
@@ -142,21 +150,30 @@ export const FlightDetailsProvider = ({
   podiums: Map<string, Podium[]>;
   children: ReactNode;
 }) => {
-  const [flight, setFlight] = useState<Flight | null>(null);
+  // The flight shown, kept after closing so the sheet slides away with its
+  // content; `opened` counts openings, so reopening the same flight works.
+  const [{ flight, opened }, setShown] = useState<{
+    flight: Flight | null;
+    opened: number;
+  }>({ flight: null, opened: 0 });
   const dialogRef = useRef<HTMLDialogElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const headingId = useId();
 
   const open = (f: Flight) => {
     openerRef.current = document.activeElement as HTMLElement | null;
-    setFlight(f);
+    setShown(({ opened }) => ({ flight: f, opened: opened + 1 }));
   };
   const close = () => dialogRef.current?.close();
 
   useEffect(() => {
     const dialog = dialogRef.current;
-    if (flight && dialog && !dialog.open) dialog.showModal();
-  }, [flight]);
+    if (!opened || !dialog || dialog.open) return;
+    dialog.showModal();
+    // Opening focuses the first control, and on the icons that would show
+    // their tooltips straight away: start on Close instead.
+    dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+  }, [opened]);
 
   return (
     <Context.Provider value={{ open, podiums }}>
@@ -165,16 +182,18 @@ export const FlightDetailsProvider = ({
       <dialog
         ref={dialogRef}
         aria-labelledby={headingId}
-        onClose={() => {
-          setFlight(null);
-          openerRef.current?.focus();
-        }}
+        onClose={() => openerRef.current?.focus()}
         // A click on the backdrop lands on the dialog itself; one on its
         // content lands on the content.
         onClick={(e) => {
           if (e.target === e.currentTarget) close();
         }}
-        className="m-auto max-h-[calc(100dvh-1rem)] w-full max-w-md overflow-y-auto rounded-xl bg-white p-0 shadow-xl backdrop:bg-gray-900/40 max-sm:mb-0 max-sm:max-w-none max-sm:rounded-b-none"
+        // On a phone the sheet slides up from the bottom edge and back down,
+        // the backdrop fading with it; allow-discrete keeps it on screen
+        // until it has slid away. At rest it has no translate at all: any
+        // would make it the frame its fixed tooltips are placed in. Not for
+        // those who'd rather less motion.
+        className="m-auto max-h-[calc(100dvh-1rem)] w-full max-w-md overflow-y-auto rounded-xl bg-white p-0 shadow-xl backdrop:bg-gray-900/40 max-sm:mb-0 max-sm:max-w-none max-sm:rounded-b-none max-sm:translate-y-full max-sm:open:translate-none max-sm:starting:open:translate-y-full max-sm:transition-[translate,overlay,display] max-sm:transition-discrete max-sm:duration-300 max-sm:ease-out max-sm:backdrop:opacity-0 max-sm:open:backdrop:opacity-100 max-sm:starting:open:backdrop:opacity-0 max-sm:backdrop:transition-[opacity,overlay,display] max-sm:backdrop:transition-discrete max-sm:backdrop:duration-300 max-sm:motion-reduce:transition-none max-sm:motion-reduce:backdrop:transition-none"
       >
         {flight && (
           <Details flight={flight} headingId={headingId} onClose={close} />
