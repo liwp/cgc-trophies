@@ -477,8 +477,8 @@ test("club gliders fits a phone without scrolling", async ({ page }) => {
       .filter({ has: page.getByRole("button", { name: /^Flight details/ }) })
       .first(),
   ).toHaveText(
-    // The pilot, then the date and task under it
-    /^[A-Z] \S+\s+\d+ \w{3,4} · GRL – /,
+    // The pilot (and any medal), then the date and task under it
+    /^[A-Z] \S+(\s+(Gold|Silver|Bronze): .+)?\s+\d+ \w{3,4} · GRL – /,
     { useInnerText: true },
   );
   expect(await card.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(

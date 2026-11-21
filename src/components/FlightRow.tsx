@@ -5,6 +5,7 @@ import { formatPilotName, shortPilotName } from "../lib/trophyCopyData";
 import type { Flight } from "../types";
 import { dateText, ShortDate } from "./CompactTable";
 import { useFlightDetails } from "./FlightDetails";
+import { RowMedal } from "./Medal";
 import Tooltip from "./Tooltip";
 
 /** Shows a height loss penalty on hover, or focus for keyboard users. */
@@ -60,6 +61,14 @@ export const PilotButton = ({ flight }: { flight: Flight }) => {
   );
 };
 
+/** A flight's pilot button, followed by its best trophy medal if it has one. */
+export const PilotWithMedal = ({ flight }: { flight: Flight }) => (
+  <span className="flex min-w-0 items-center gap-1">
+    <PilotButton flight={flight} />
+    <RowMedal flight={flight} />
+  </span>
+);
+
 export const kph = (v: number | null) =>
   v === null ? "" : `${v.toFixed(1)} kph`;
 
@@ -101,9 +110,7 @@ export const FlightSummary = ({
 }) => (
   <td className="py-1.5 pr-1.5 pl-4 sm:pr-4 sm:pl-10">
     <div className="sm:hidden">
-      <div className="truncate">
-        <PilotButton flight={flight} />
-      </div>
+      <PilotWithMedal flight={flight} />
       {/* Wider than its cell, running on under the speed and distance, which
           only take the first line: the card's width less its padding. */}
       <div className="w-[calc(100vw-5rem)] text-xs text-gray-400">
@@ -117,9 +124,7 @@ export const FlightSummary = ({
       <span className="tabular-nums">
         <ShortDate date={flight.date} />
       </span>
-      <span className="truncate">
-        <PilotButton flight={flight} />
-      </span>
+      <PilotWithMedal flight={flight} />
       <span className="text-gray-400">{detail}</span>
     </div>
   </td>

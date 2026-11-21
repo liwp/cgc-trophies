@@ -4,7 +4,7 @@ import type { Flight } from "../types";
 import { dateText as date, pad, ShortDate, Th } from "./CompactTable";
 import ExpandButton, { ExpandSpacer } from "./ExpandButton";
 import { useFlightDetails } from "./FlightDetails";
-import { PilotButton } from "./FlightRow";
+import { PilotWithMedal } from "./FlightRow";
 import Route from "./Route";
 
 const km = (v: number) => `${Math.round(v).toLocaleString("en-GB")} km`;
@@ -86,7 +86,7 @@ const DayRow = ({ day }: { day: DayStats }) => {
         <FlightList
           flights={shown}
           hover={hover}
-          item={(flight) => <PilotButton flight={flight} />}
+          item={(flight) => <PilotWithMedal flight={flight} />}
         />
       </td>
       <td className={pad}>

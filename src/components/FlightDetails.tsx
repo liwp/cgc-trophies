@@ -9,13 +9,14 @@ import {
   useState,
 } from "react";
 import { formatDate } from "../lib/formatDate";
-import type { Podium } from "../lib/medals";
+import { type Podium, placeName } from "../lib/medals";
 import { formatScore } from "../lib/results";
 import { hasSpeed, isCompletedTask } from "../lib/stats";
 import { formatPilotName } from "../lib/trophyCopyData";
 import type { Flight } from "../types";
 import { LadderLink } from "./FlightLinks";
 import { kph, PenaltyWarning } from "./FlightRow";
+import { MedalIcon } from "./Medal";
 
 type FlightDetailsContext = {
   /** Show a flight's details in the pop-up. */
@@ -64,6 +65,7 @@ const Details = ({
   onClose: () => void;
 }) => {
   const { glider, task } = flight;
+  const podiums = useContext(Context).podiums.get(flight.id) ?? [];
   return (
     <div className="flex flex-col gap-4 p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
@@ -98,6 +100,31 @@ const Details = ({
           {formatScore({ value: task.crossCountryPoints, unit: "pts" })}
         </Detail>
       </dl>
+      {podiums.length > 0 && (
+        <section aria-labelledby={`${headingId}-trophies`}>
+          <h3
+            id={`${headingId}-trophies`}
+            className="mb-1.5 text-sm font-semibold text-gray-900"
+          >
+            Trophies
+          </h3>
+          <ul
+            aria-labelledby={`${headingId}-trophies`}
+            className="flex flex-col gap-1 text-sm text-gray-700"
+          >
+            {podiums.map(({ place, trophyId, trophyName }) => (
+              <li key={trophyId} className="flex items-start gap-1.5">
+                <span className="mt-0.5">
+                  <MedalIcon place={place} />
+                </span>
+                <span className="min-w-0">
+                  {placeName[place]} · {trophyName}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 };

@@ -16,6 +16,8 @@ import Season from "../components/Season";
 import Superlatives from "../components/Superlatives";
 import Toggle from "../components/Toggle";
 import TopTasks from "../components/TopTasks";
+import { type Podium, podiumPlaces } from "../lib/medals";
+import { evaluateTrophy } from "../lib/results";
 import {
   bestDays,
   clubGliderStats,
@@ -28,6 +30,7 @@ import {
   taskBreakdown,
   topTasks,
 } from "../lib/stats";
+import { resolveTrophies } from "../lib/trophyHistory";
 import useFlights from "../lib/useFlights";
 
 const percent = (v: number) => `${Math.round(v)}%`;
@@ -132,9 +135,6 @@ const SummaryTiles = ({
   </div>
 );
 
-// Filled in by the trophy medals.
-const NO_PODIUMS = new Map();
-
 const StatsPage = () => {
   const state = useFlights();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -174,13 +174,30 @@ const StatsPage = () => {
     };
   }, [state, homeOnly]);
 
+  // Trophy podiums are scored as the trophy pages score them, whichever
+  // launches the tables show, so the two always agree.
+  const podiums = useMemo(
+    () =>
+      state.status === "ready"
+        ? podiumPlaces(
+            resolveTrophies(state.season).map((trophy) =>
+              evaluateTrophy(trophy, state.season, {
+                flights: state.flights,
+                allFlights: state.allFlights,
+              }),
+            ),
+          )
+        : new Map<string, Podium[]>(),
+    [state],
+  );
+
   if (state.status === "error") return <FlightLoadFailure />;
   if (!summaries) return <Loading />;
   const { season } = state;
 
   return (
     <PageLayout>
-      <FlightDetailsProvider podiums={NO_PODIUMS}>
+      <FlightDetailsProvider podiums={podiums}>
         <div className="flex flex-col gap-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h1 className="text-2xl font-bold text-gray-900">

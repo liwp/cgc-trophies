@@ -156,3 +156,126 @@ test.describe("on a touch phone @touch", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 });
+
+/** Expand every row of the three flight tables. */
+async function expandAll(page: Page) {
+  for (const name of ["Best days", "Top tasks", "Club gliders"]) {
+    const table = region(page, name).getByRole("table");
+    const expand = table.getByRole("button", { expanded: false });
+    while ((await expand.count()) > 0) await expand.first().click();
+  }
+}
+
+// Alex Holswilder's 17 Jul 2024 flight: first on three trophies, third on one.
+const GOLDS = "Gold: Pot Pewter Pringle, Complicity Cup, Jubilee Bowl";
+
+test("a podium flight shows its best medal next to the pilot, with a tooltip naming the trophies", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  await expandAll(page);
+  const medal = page.getByRole("button", { name: GOLDS }).first();
+  await expect(medal).toBeVisible();
+  await medal.hover();
+  const tooltip = page.getByRole("tooltip").filter({ hasText: "Jubilee Bowl" });
+  await expect(tooltip.first()).toBeVisible();
+  await expect(tooltip.first()).toContainText("Pot Pewter Pringle");
+  await expect(tooltip.first()).toContainText("Complicity Cup");
+});
+
+test("the pop-up lists every podium place, best first", async ({ page }) => {
+  await page.goto("/stats?season=2024");
+  await expandAll(page);
+  const row = page
+    .getByRole("listitem")
+    .or(page.getByRole("row"))
+    .filter({ has: page.getByRole("button", { name: GOLDS }) })
+    .last();
+  await row.getByRole("button", { name: /^Flight details for / }).click();
+  const trophies = page
+    .getByRole("dialog")
+    .getByRole("list", { name: "Trophies" })
+    .getByRole("listitem");
+  await expect(trophies).toHaveText([
+    "Gold · Pot Pewter Pringle",
+    "Gold · Complicity Cup",
+    "Gold · Jubilee Bowl",
+    "Bronze · Mug Metal Machin Trophy",
+  ]);
+});
+
+test("a flight on no podium has no medal and no trophies section", async ({
+  page,
+}) => {
+  const rows = await topTaskFlights(page);
+  const plain = rows
+    .filter({ has: page.getByRole("button", { name: /^Flight details/ }) })
+    .filter({
+      hasNot: page.getByRole("button", { name: /^(Gold|Silver|Bronze): / }),
+    })
+    .first();
+  await plain.getByRole("button", { name: /^Flight details/ }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(
+    page.getByRole("dialog").getByRole("list", { name: "Trophies" }),
+  ).toHaveCount(0);
+});
+
+test("medals follow the selected season", async ({ page }) => {
+  const medals = async (season: number) => {
+    await page.goto(`/stats?season=${season}`);
+    await expandAll(page);
+    return page
+      .getByRole("button", { name: /^(Gold|Silver|Bronze): / })
+      .evaluateAll((els) => els.map((el) => el.textContent ?? ""));
+  };
+  const in2024 = await medals(2024);
+  expect(in2024).toContain(GOLDS);
+  expect(await medals(2023)).not.toContain(GOLDS);
+});
+
+test.describe("on a touch phone @touch", () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    hasTouch: true,
+    isMobile: true,
+  });
+
+  test("tapping a medal shows its tooltip without opening the pop-up", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await page.goto("/stats?season=2024");
+    await expandAll(page);
+    const medal = page.getByRole("button", { name: GOLDS }).first();
+    await medal.tap();
+    await expect(
+      page.getByRole("tooltip").filter({ hasText: "Jubilee Bowl" }).first(),
+    ).toBeVisible();
+    await expect(page.getByRole("dialog")).toBeHidden();
+  });
+
+  test("the pop-up with long trophy names fits the screen", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await page.goto("/stats?season=2024");
+    await expandAll(page);
+    const row = page
+      .getByRole("listitem")
+      .or(page.getByRole("row"))
+      .filter({ has: page.getByRole("button", { name: GOLDS }) })
+      .last();
+    await row.getByRole("button", { name: /^Flight details for / }).tap();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("list", { name: "Trophies" })).toBeVisible();
+    const box = await dialog.boundingBox();
+    expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(360);
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+});
