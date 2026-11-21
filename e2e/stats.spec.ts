@@ -182,11 +182,8 @@ test("best days ranks the season's days by total km", async ({ page }) => {
   await expect(rows).toHaveCount(10);
   await expect(rows.first()).toContainText("Sun 28 Jul");
   await expect(rows.first()).toContainText("6,647 km");
-  await expect(
-    rows
-      .first()
-      .getByRole("button", { name: "Flight details for Graham Drury" }),
-  ).toBeVisible();
+  // Collapsed, the top flight's pilot is text: a click on the row expands it.
+  await expect(rows.first()).toContainText("Graham Drury");
 
   const expand = rows
     .first()
@@ -194,7 +191,7 @@ test("best days ranks the season's days by total km", async ({ page }) => {
   const pilots = rows
     .first()
     .getByRole("button", { name: /^Flight details for / });
-  await expect(pilots).toHaveCount(1);
+  await expect(pilots).toHaveCount(0);
   await expand.click();
   await expect(expand).toHaveAttribute("aria-expanded", "true");
   await expect(pilots).toHaveCount(15);
@@ -203,7 +200,7 @@ test("best days ranks the season's days by total km", async ({ page }) => {
   await expect(distances).toHaveCount(15);
   await expect(distances.first()).toHaveText(/^[\d,]+ km$/);
   await expand.click();
-  await expect(pilots).toHaveCount(1);
+  await expect(pilots).toHaveCount(0);
 });
 
 // Expanding rows must not move a table's columns, at any width.
@@ -299,11 +296,12 @@ test("best days fits a phone without scrolling", async ({ page }) => {
   await expect(row.getByRole("cell").first()).toHaveText("28 Jul", {
     useInnerText: true,
   });
+  await expect(row.getByRole("cell").nth(2).getByText("G Drury")).toBeVisible();
+  await expect(row).toContainText("15 flights");
+  await row.getByRole("button", { name: "All flights on Sun 28 Jul" }).click();
   await expect(
     row.getByRole("button", { name: "Flight details for Graham Drury" }),
   ).toHaveText("G Drury", { useInnerText: true });
-  await expect(row).toContainText("15 flights");
-  await row.getByRole("button", { name: "All flights on Sun 28 Jul" }).click();
   expect(await card.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
     true,
   );

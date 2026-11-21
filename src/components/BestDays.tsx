@@ -15,7 +15,8 @@ type Hover = { id: string | null; set: (id: string | null) => void };
 
 /**
  * A list of a day's flights, one line each, in one column of its row. A
- * flight's line, across all the columns, opens its details.
+ * flight's line, across all the columns, opens its details, unless the row
+ * is collapsed: then a click anywhere on it expands it instead.
  */
 const FlightList = ({
   flights,
@@ -23,6 +24,7 @@ const FlightList = ({
   hover,
   className = "",
   truncate = true,
+  interactive,
 }: {
   flights: Flight[];
   item: (flight: Flight) => ReactNode;
@@ -30,6 +32,8 @@ const FlightList = ({
   className?: string;
   /** Cut off a line that's too long; off where a line has a tooltip to show. */
   truncate?: boolean;
+  /** Whether a line opens its flight; off while the row expands instead. */
+  interactive: boolean;
 }) => {
   const { open } = useFlightDetails();
   return (
@@ -38,10 +42,10 @@ const FlightList = ({
         // biome-ignore lint/a11y/useKeyWithClickEvents: the pilot's button is the keyboard way in
         <li
           key={flight.id}
-          className={`-mx-1 cursor-pointer rounded px-1 ${truncate ? "truncate" : ""} ${
-            hover.id === flight.id ? "bg-gray-100" : ""
-          }`}
-          onClick={() => open(flight)}
+          className={`-mx-1 rounded px-1 ${truncate ? "truncate" : ""} ${
+            interactive ? "cursor-pointer" : ""
+          } ${interactive && hover.id === flight.id ? "bg-gray-100" : ""}`}
+          onClick={interactive ? () => open(flight) : undefined}
           onMouseEnter={() => hover.set(flight.id)}
           onMouseLeave={() => hover.set(null)}
         >
@@ -60,11 +64,22 @@ const DayRow = ({ day }: { day: DayStats }) => {
   const shown = expanded ? flights : flights.slice(0, 1);
   const [hovered, setHovered] = useState<string | null>(null);
   const hover = { id: hovered, set: setHovered };
+  // Collapsed, a click anywhere on the row expands it, the top flight's
+  // line included: its pop-up is a click away once the day is open.
+  const expandable = flights.length > 1;
+  const expandsOnClick = expandable && !expanded;
   return (
-    <tr className="border-b border-gray-100 align-top">
+    <tr
+      className={`border-b border-gray-100 align-top ${
+        expandsOnClick
+          ? "cursor-pointer hover:bg-gray-50 transition-colors"
+          : ""
+      }`}
+      onClick={expandsOnClick ? toggle : undefined}
+    >
       <td className={`${pad} whitespace-nowrap font-medium text-gray-900`}>
         <div className="flex items-start gap-1.5">
-          {flights.length > 1 ? (
+          {expandable ? (
             <ExpandButton
               expanded={expanded}
               onToggle={toggle}
@@ -87,13 +102,17 @@ const DayRow = ({ day }: { day: DayStats }) => {
         <FlightList
           flights={shown}
           hover={hover}
-          item={(flight) => <PilotWithMedal flight={flight} />}
+          interactive={!expandsOnClick}
+          item={(flight) => (
+            <PilotWithMedal flight={flight} asText={expandsOnClick} />
+          )}
         />
       </td>
       <td className={pad}>
         <FlightList
           flights={shown}
           hover={hover}
+          interactive={!expandsOnClick}
           className="text-right tabular-nums whitespace-nowrap text-gray-500"
           item={(flight) => km(flight.task.scoringDistanceKm)}
         />
@@ -104,6 +123,7 @@ const DayRow = ({ day }: { day: DayStats }) => {
           flights={shown}
           hover={hover}
           truncate={false}
+          interactive={!expandsOnClick}
           className="whitespace-nowrap text-gray-700"
           item={(flight) => <Route route={routeOf(flight).filter(Boolean)} />}
         />

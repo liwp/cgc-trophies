@@ -635,6 +635,23 @@ test.describe("the open pop-up is in the URL", () => {
   });
 });
 
+test("a collapsed best day expands from anywhere on its row", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  const day = region(page, "Best days").locator("tbody tr").first();
+  const expand = day.getByRole("button", { name: "All flights on Sun 28 Jul" });
+  // The top flight's distance: on a collapsed day, it expands the day
+  // rather than opening that flight.
+  await day.getByRole("cell").nth(3).getByRole("listitem").first().click();
+  await expect(expand).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("dialog")).toBeHidden();
+  // Expanded, the same line opens its flight.
+  await day.getByRole("cell").nth(3).getByRole("listitem").first().click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(expand).toHaveAttribute("aria-expanded", "true");
+});
+
 test.describe("expanded rows survive Back", () => {
   test("from a trophy linked in the pop-up", async ({ page }) => {
     await page.goto("/stats?season=2024");

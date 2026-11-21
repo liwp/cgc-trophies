@@ -41,9 +41,26 @@ export const PenaltyWarning = ({
  * and surname on a phone, the full name wider. Screen readers hear "Flight
  * details for" and the full name.
  */
-export const PilotButton = ({ flight }: { flight: Flight }) => {
+export const PilotButton = ({
+  flight,
+  asText = false,
+}: {
+  flight: Flight;
+  /** Just the name, where a click on its row does something else. */
+  asText?: boolean;
+}) => {
   const { open } = useFlightDetails();
   const name = formatPilotName(flight.pilot);
+  if (asText)
+    return (
+      // A phone shows the short name; screen readers hear the full one.
+      <span className="max-w-full truncate text-gray-900">
+        <span aria-hidden className="sm:hidden">
+          {shortPilotName(flight.pilot)}
+        </span>
+        <span className="max-sm:sr-only">{name}</span>
+      </span>
+    );
   return (
     <button
       type="button"
@@ -61,10 +78,17 @@ export const PilotButton = ({ flight }: { flight: Flight }) => {
   );
 };
 
-/** A flight's pilot button, followed by its best trophy medal if it has one. */
-export const PilotWithMedal = ({ flight }: { flight: Flight }) => (
+/** A flight's pilot button (or name), followed by its best trophy medal if it has one. */
+export const PilotWithMedal = ({
+  flight,
+  asText = false,
+}: {
+  flight: Flight;
+  /** The pilot as plain text, not a button: see PilotButton. */
+  asText?: boolean;
+}) => (
   <span className="flex min-w-0 items-center gap-1">
-    <PilotButton flight={flight} />
+    <PilotButton flight={flight} asText={asText} />
     <RowMedal flight={flight} />
   </span>
 );
