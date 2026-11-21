@@ -292,3 +292,42 @@ test.describe("hover tooltips", () => {
     await expect(visibleTips(page)).not.toHaveText(first ?? "");
   });
 });
+
+test.describe("a trophy's row on the home page", () => {
+  const row = (page: Page) =>
+    page.locator("tr", { hasText: "Pot Pewter Pringle" });
+
+  test("opens the trophy page from anywhere in it", async ({ page }) => {
+    await page.goto("/?season=2024");
+    // Forced: the link's overlay covers the score, which is the point; the
+    // click still lands at the score's position and hits the overlay.
+    await row(page).getByText("18682").click({ force: true });
+    await expect(
+      page.getByRole("heading", { name: "Pot Pewter Pringle" }),
+    ).toBeVisible();
+  });
+
+  test("still shows the summary's tooltip, not the trophy page", async ({
+    page,
+  }) => {
+    await page.goto("/?season=2024");
+    await page.getByRole("button", { name: DOUBLE_CENTURY_2024 }).click();
+    await expect(doubleCenturyTip(page)).toBeVisible();
+    await expect(page).toHaveURL(/\/\?season=2024$/);
+  });
+});
+
+test.describe("a trophy's row on a phone @touch", () => {
+  test.use({ viewport: { width: 360, height: 740 }, hasTouch: true });
+
+  test("opens the trophy page from its winner", async ({ page }) => {
+    await page.goto("/?season=2024");
+    await page
+      .locator("li", { hasText: "Pot Pewter Pringle" })
+      .getByText("Alex Holswilder")
+      .tap({ force: true });
+    await expect(
+      page.getByRole("heading", { name: "Pot Pewter Pringle" }),
+    ).toBeVisible();
+  });
+});

@@ -27,11 +27,14 @@ const TrophyName = ({
   <>
     <Link
       to={`/trophy/${trophy.id}?season=${season}`}
-      className="font-medium text-cambridge hover:text-cambridge-dark transition-colors"
+      // Stretched over its row (the nearest positioned ancestor), so the
+      // whole row opens the trophy.
+      className="font-medium text-cambridge hover:text-cambridge-dark transition-colors after:absolute after:inset-0"
     >
       {trophy.name}
     </Link>
-    <div className="text-xs text-gray-400 mt-0.5">
+    {/* Above the row's link, so the summary still shows its tooltip. */}
+    <div className="relative z-10 w-fit text-xs text-gray-400 mt-0.5">
       <TrophySummary
         summary={trophy.summary}
         description={trophy.description}
@@ -76,7 +79,7 @@ const TrophyList = ({
           {trophies.map((evaluated) => (
             <tr
               key={evaluated.trophy.id}
-              className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              className="relative border-b border-gray-100 hover:bg-gray-50 transition-colors"
             >
               <td className="px-4 py-3">
                 <TrophyName evaluated={evaluated} season={season} />
@@ -95,7 +98,7 @@ const TrophyList = ({
         {trophies.map((evaluated) => (
           <li
             key={evaluated.trophy.id}
-            className="flex flex-col gap-0.5 border-t border-gray-100 px-3 py-2.5 first:border-t-0"
+            className="relative flex flex-col gap-0.5 border-t border-gray-100 px-3 py-2.5 first:border-t-0"
           >
             <TrophyName evaluated={evaluated} season={season} />
             <div className="flex items-baseline justify-between gap-2 text-sm">
