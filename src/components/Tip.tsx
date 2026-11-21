@@ -64,7 +64,9 @@ const Tip = ({
       <button
         type="button"
         aria-describedby={id}
-        onClick={() => {
+        onClick={(e) => {
+          // A tap shows the tip; it mustn't also open the row it sits in.
+          e.stopPropagation();
           setOpen((o) => !o);
           place();
         }}

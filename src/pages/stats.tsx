@@ -5,6 +5,7 @@ import CONFIG from "trophies-config";
 import BestDays from "../components/BestDays";
 import ClubGliders from "../components/ClubGliders";
 import CompletionChart from "../components/CompletionChart";
+import { FlightDetailsProvider } from "../components/FlightDetails";
 import FlightLoadFailure from "../components/FlightLoadFailure";
 import Loading from "../components/Loading";
 import MonthlyChart from "../components/MonthlyChart";
@@ -131,6 +132,9 @@ const SummaryTiles = ({
   </div>
 );
 
+// Filled in by the trophy medals.
+const NO_PODIUMS = new Map();
+
 const StatsPage = () => {
   const state = useFlights();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -176,90 +180,92 @@ const StatsPage = () => {
 
   return (
     <PageLayout>
-      <div className="flex flex-col gap-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {CONFIG.club.shortName} {season} Stats
-          </h1>
-          <div className="flex items-center gap-4">
-            <Season season={season} />
-            <PageNav current="stats" season={season} />
+      <FlightDetailsProvider podiums={NO_PODIUMS}>
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {CONFIG.club.shortName} {season} Stats
+            </h1>
+            <div className="flex items-center gap-4">
+              <Season season={season} />
+              <PageNav current="stats" season={season} />
+            </div>
           </div>
+          <Toggle
+            id="home-only"
+            label={`${CONFIG.club.launchSite} launches only`}
+            checked={homeOnly}
+            onChange={toggleHomeOnly}
+          />
+          <SummaryTiles
+            current={summaries.current}
+            previous={summaries.previous}
+            season={season}
+          />
+          <Superlatives cards={summaries.highlights} />
+          <section className="flex flex-col gap-2">
+            <h2 className="text-lg font-semibold text-gray-900">By month</h2>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <MonthlyChart
+                title="Flights"
+                season={season}
+                months={summaries.months}
+                previous={summaries.previousMonths}
+                value={(m) => m.flights}
+                format={(v) => `${v} ${v === 1 ? "flight" : "flights"}`}
+              />
+              <MonthlyChart
+                title="km"
+                season={season}
+                months={summaries.months}
+                previous={summaries.previousMonths}
+                value={(m) => m.scoringKm}
+                format={(v) => `${Math.round(v).toLocaleString("en-GB")} km`}
+              />
+            </div>
+          </section>
+          <BestDays days={summaries.days} />
+          <section aria-labelledby="tasks" className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+              <h2 id="tasks" className="text-lg font-semibold text-gray-900">
+                Tasks
+              </h2>
+              <p aria-hidden className="flex gap-3 text-xs text-gray-500">
+                <span className="flex items-center gap-1">
+                  <span className="h-2.5 w-2.5 rounded-sm bg-cambridge-dark" />
+                  Completed
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="h-2.5 w-2.5 rounded-sm bg-gray-300" />
+                  Not completed
+                </span>
+              </p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-[2fr_1fr]">
+              <CompletionChart
+                title="By distance"
+                bars={DISTANCE_BANDS.map(({ key, label }) =>
+                  bar(label, summaries.tasks.bands[key]),
+                )}
+              />
+              <CompletionChart
+                title="By shape"
+                bars={[
+                  bar("FAI triangle", summaries.tasks.shapes["fai-triangle"]),
+                  bar("Triangle", summaries.tasks.shapes.triangle),
+                  bar("Out & return", summaries.tasks.shapes["out-and-return"]),
+                  bar("Other", summaries.tasks.shapes.other),
+                ]}
+              />
+            </div>
+          </section>
+          <TopTasks tasks={summaries.topTasks} />
+          {summaries.clubGliders.length > 0 && (
+            <ClubGliders stats={summaries.clubGliders} />
+          )}
+          <PilotStatsTable stats={summaries.pilots} />
         </div>
-        <Toggle
-          id="home-only"
-          label={`${CONFIG.club.launchSite} launches only`}
-          checked={homeOnly}
-          onChange={toggleHomeOnly}
-        />
-        <SummaryTiles
-          current={summaries.current}
-          previous={summaries.previous}
-          season={season}
-        />
-        <Superlatives cards={summaries.highlights} />
-        <section className="flex flex-col gap-2">
-          <h2 className="text-lg font-semibold text-gray-900">By month</h2>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <MonthlyChart
-              title="Flights"
-              season={season}
-              months={summaries.months}
-              previous={summaries.previousMonths}
-              value={(m) => m.flights}
-              format={(v) => `${v} ${v === 1 ? "flight" : "flights"}`}
-            />
-            <MonthlyChart
-              title="km"
-              season={season}
-              months={summaries.months}
-              previous={summaries.previousMonths}
-              value={(m) => m.scoringKm}
-              format={(v) => `${Math.round(v).toLocaleString("en-GB")} km`}
-            />
-          </div>
-        </section>
-        <BestDays days={summaries.days} />
-        <section aria-labelledby="tasks" className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-            <h2 id="tasks" className="text-lg font-semibold text-gray-900">
-              Tasks
-            </h2>
-            <p aria-hidden className="flex gap-3 text-xs text-gray-500">
-              <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded-sm bg-cambridge-dark" />
-                Completed
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded-sm bg-gray-300" />
-                Not completed
-              </span>
-            </p>
-          </div>
-          <div className="grid gap-3 md:grid-cols-[2fr_1fr]">
-            <CompletionChart
-              title="By distance"
-              bars={DISTANCE_BANDS.map(({ key, label }) =>
-                bar(label, summaries.tasks.bands[key]),
-              )}
-            />
-            <CompletionChart
-              title="By shape"
-              bars={[
-                bar("FAI triangle", summaries.tasks.shapes["fai-triangle"]),
-                bar("Triangle", summaries.tasks.shapes.triangle),
-                bar("Out & return", summaries.tasks.shapes["out-and-return"]),
-                bar("Other", summaries.tasks.shapes.other),
-              ]}
-            />
-          </div>
-        </section>
-        <TopTasks tasks={summaries.topTasks} />
-        {summaries.clubGliders.length > 0 && (
-          <ClubGliders stats={summaries.clubGliders} />
-        )}
-        <PilotStatsTable stats={summaries.pilots} />
-      </div>
+      </FlightDetailsProvider>
     </PageLayout>
   );
 };

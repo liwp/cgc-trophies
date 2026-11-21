@@ -3,6 +3,7 @@ import { type ClubGliderStats, routeOf } from "../lib/stats";
 import type { Flight } from "../types";
 import { pad, Th } from "./CompactTable";
 import ExpandButton, { ExpandSpacer } from "./ExpandButton";
+import { useFlightDetails } from "./FlightDetails";
 import { FlightSpeed, FlightSummary, flightCell, kph } from "./FlightRow";
 import Route from "./Route";
 
@@ -16,19 +17,25 @@ const cell = `${pad} text-right tabular-nums whitespace-nowrap text-gray-700`;
  */
 const route = (flight: Flight) => routeOf(flight).filter(Boolean);
 
-const GliderFlightRow = ({ flight }: { flight: Flight }) => (
-  <tr className="bg-gray-50 text-gray-500">
-    <FlightSummary
-      flight={flight}
-      detail={<Route route={route(flight)} className="text-left" />}
-      phoneDetail={route(flight).join(" – ")}
-    />
-    <td className={flightCell}>
-      <FlightSpeed flight={flight} />
-    </td>
-    <td className={flightCell}>{km(flight.task.scoringDistanceKm)}</td>
-  </tr>
-);
+const GliderFlightRow = ({ flight }: { flight: Flight }) => {
+  const { open } = useFlightDetails();
+  return (
+    <tr
+      className="cursor-pointer bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors"
+      onClick={() => open(flight)}
+    >
+      <FlightSummary
+        flight={flight}
+        detail={<Route route={route(flight)} className="text-left" />}
+        phoneDetail={route(flight).join(" – ")}
+      />
+      <td className={flightCell}>
+        <FlightSpeed flight={flight} />
+      </td>
+      <td className={flightCell}>{km(flight.task.scoringDistanceKm)}</td>
+    </tr>
+  );
+};
 
 const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
   const [expanded, setExpanded] = useState(false);

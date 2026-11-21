@@ -4,6 +4,28 @@ import Tooltip from "./Tooltip";
 
 const linkClass = "text-gray-400 hover:text-cambridge transition-colors";
 
+/** An icon link to a flight's BGA Ladder page, named by its tooltip. */
+export const LadderLink = ({
+  flightId,
+  iconSize = 16,
+  inline = false,
+}: {
+  flightId: string;
+  iconSize?: number;
+  inline?: boolean;
+}) => (
+  <Tooltip text="BGA Ladder" asLabel>
+    <a
+      href={flightDetailsUrl(flightId)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={linkClass}
+    >
+      <BarChart3 size={iconSize} className={inline ? "inline" : undefined} />
+    </a>
+  </Tooltip>
+);
+
 /** Icon links to a flight's BGA Ladder page and its trace in the IGC viewer. */
 const FlightLinks = ({
   flightId,
@@ -18,16 +40,7 @@ const FlightLinks = ({
   const iconClass = inline ? "inline" : undefined;
   return (
     <>
-      <Tooltip text="BGA Ladder" asLabel>
-        <a
-          href={flightDetailsUrl(flightId)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={linkClass}
-        >
-          <BarChart3 size={iconSize} className={iconClass} />
-        </a>
-      </Tooltip>
+      <LadderLink flightId={flightId} iconSize={iconSize} inline={inline} />
       <Tooltip text="IGC Viewer" asLabel>
         <a
           href={igcViewerUrl(flightId)}

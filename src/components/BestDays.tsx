@@ -3,32 +3,53 @@ import { type DayStats, routeOf } from "../lib/stats";
 import type { Flight } from "../types";
 import { dateText as date, pad, ShortDate, Th } from "./CompactTable";
 import ExpandButton, { ExpandSpacer } from "./ExpandButton";
-import { PilotLink } from "./FlightRow";
+import { useFlightDetails } from "./FlightDetails";
+import { PilotButton } from "./FlightRow";
 import Route from "./Route";
 
 const km = (v: number) => `${Math.round(v).toLocaleString("en-GB")} km`;
 
-/** A list of a day's flights, one line each, in one column of its row. */
+/** Which of a day's flights the pointer is on, to light up its whole line. */
+type Hover = { id: string | null; set: (id: string | null) => void };
+
+/**
+ * A list of a day's flights, one line each, in one column of its row. A
+ * flight's line, across all the columns, opens its details.
+ */
 const FlightList = ({
   flights,
   item,
+  hover,
   className = "",
   truncate = true,
 }: {
   flights: Flight[];
   item: (flight: Flight) => ReactNode;
+  hover: Hover;
   className?: string;
   /** Cut off a line that's too long; off where a line has a tooltip to show. */
   truncate?: boolean;
-}) => (
-  <ul className={`flex flex-col gap-1.5 ${className}`}>
-    {flights.map((flight) => (
-      <li key={flight.id} className={truncate ? "truncate" : ""}>
-        {item(flight)}
-      </li>
-    ))}
-  </ul>
-);
+}) => {
+  const { open } = useFlightDetails();
+  return (
+    <ul className={`flex flex-col gap-1.5 ${className}`}>
+      {flights.map((flight) => (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: the pilot's button is the keyboard way in
+        <li
+          key={flight.id}
+          className={`-mx-1 cursor-pointer rounded px-1 ${truncate ? "truncate" : ""} ${
+            hover.id === flight.id ? "bg-gray-100" : ""
+          }`}
+          onClick={() => open(flight)}
+          onMouseEnter={() => hover.set(flight.id)}
+          onMouseLeave={() => hover.set(null)}
+        >
+          {item(flight)}
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 const DayRow = ({ day }: { day: DayStats }) => {
   const [expanded, setExpanded] = useState(false);
@@ -36,6 +57,8 @@ const DayRow = ({ day }: { day: DayStats }) => {
   const weekday = date(day.date, { weekday: "short" });
   const dayMonth = date(day.date, { day: "numeric", month: "short" });
   const shown = expanded ? flights : flights.slice(0, 1);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const hover = { id: hovered, set: setHovered };
   return (
     <tr className="border-b border-gray-100 align-top">
       <td className={`${pad} whitespace-nowrap font-medium text-gray-900`}>
@@ -62,12 +85,14 @@ const DayRow = ({ day }: { day: DayStats }) => {
       <td className={pad}>
         <FlightList
           flights={shown}
-          item={(flight) => <PilotLink flight={flight} />}
+          hover={hover}
+          item={(flight) => <PilotButton flight={flight} />}
         />
       </td>
       <td className={pad}>
         <FlightList
           flights={shown}
+          hover={hover}
           className="text-right tabular-nums whitespace-nowrap text-gray-500"
           item={(flight) => km(flight.task.scoringDistanceKm)}
         />
@@ -76,6 +101,7 @@ const DayRow = ({ day }: { day: DayStats }) => {
       <td className={`${pad} hidden lg:table-cell`}>
         <FlightList
           flights={shown}
+          hover={hover}
           truncate={false}
           className="whitespace-nowrap text-gray-700"
           item={(flight) => <Route route={routeOf(flight).filter(Boolean)} />}

@@ -3,24 +3,31 @@ import type { TopTask } from "../lib/stats";
 import type { Flight } from "../types";
 import { pad, Th } from "./CompactTable";
 import ExpandButton from "./ExpandButton";
+import { useFlightDetails } from "./FlightDetails";
 import { FlightSpeed, FlightSummary, flightCell, kph } from "./FlightRow";
 import Route from "./Route";
 
 const sub = "text-xs text-gray-400";
 
 /**
- * One of a task's flights, under its row: its date, pilot and glider under
- * the task, and the speed across the
+ * One of a task's flights, under its row, opening its details: its date,
+ * pilot and glider under the task, and the speed across the
  * completion and speed columns, which leaves room for "Not completed".
  */
-const TaskFlightRow = ({ flight }: { flight: Flight }) => (
-  <tr className="bg-gray-50 text-gray-500">
-    <FlightSummary flight={flight} detail={flight.glider.type} />
-    <td colSpan={2} className={flightCell}>
-      <FlightSpeed flight={flight} />
-    </td>
-  </tr>
-);
+const TaskFlightRow = ({ flight }: { flight: Flight }) => {
+  const { open } = useFlightDetails();
+  return (
+    <tr
+      className="cursor-pointer bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors"
+      onClick={() => open(flight)}
+    >
+      <FlightSummary flight={flight} detail={flight.glider.type} />
+      <td colSpan={2} className={flightCell}>
+        <FlightSpeed flight={flight} />
+      </td>
+    </tr>
+  );
+};
 
 const TaskRow = ({ task }: { task: TopTask }) => {
   const [expanded, setExpanded] = useState(false);

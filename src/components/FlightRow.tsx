@@ -1,20 +1,27 @@
 import { AlertTriangle } from "lucide-react";
 import type { ReactNode } from "react";
-import { flightDetailsUrl } from "../lib/links";
 import { hasSpeed, isCompletedTask } from "../lib/stats";
 import { formatPilotName, shortPilotName } from "../lib/trophyCopyData";
 import type { Flight } from "../types";
 import { dateText, ShortDate } from "./CompactTable";
+import { useFlightDetails } from "./FlightDetails";
 import Tooltip from "./Tooltip";
 
 /** Shows a height loss penalty on hover, or focus for keyboard users. */
-export const PenaltyWarning = ({ flight }: { flight: Flight }) => {
+export const PenaltyWarning = ({
+  flight,
+  side,
+}: {
+  flight: Flight;
+  side?: "top" | "bottom";
+}) => {
   const { heightLoss, distancePenaltyKm } = flight.task;
   if (distancePenaltyKm <= 0) return null;
   return (
     <Tooltip
       text={`Height loss ${heightLoss.toLocaleString("en-GB")} m: ${distancePenaltyKm.toFixed(1)} km distance penalty`}
       align="right"
+      side={side}
       asLabel
     >
       <button
@@ -29,24 +36,27 @@ export const PenaltyWarning = ({ flight }: { flight: Flight }) => {
 };
 
 /**
- * A link to a flight on the ladder, named by its pilot: an initial and surname
- * on a phone, the full name wider. Screen readers always get the full name.
+ * A flight's pilot, as a button that opens the flight's details: an initial
+ * and surname on a phone, the full name wider. Screen readers hear "Flight
+ * details for" and the full name.
  */
-export const PilotLink = ({ flight }: { flight: Flight }) => {
+export const PilotButton = ({ flight }: { flight: Flight }) => {
+  const { open } = useFlightDetails();
   const name = formatPilotName(flight.pilot);
   return (
-    <a
-      href={flightDetailsUrl(flight.id)}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={name}
-      title={name}
-      className="text-cambridge hover:text-cambridge-dark"
-      onClick={(e) => e.stopPropagation()}
+    <button
+      type="button"
+      aria-label={`Flight details for ${name}`}
+      className="max-w-full truncate text-left text-cambridge hover:text-cambridge-dark"
+      onClick={(e) => {
+        // The row would open it too; once is enough.
+        e.stopPropagation();
+        open(flight);
+      }}
     >
       <span className="sm:hidden">{shortPilotName(flight.pilot)}</span>
       <span className="hidden sm:inline">{name}</span>
-    </a>
+    </button>
   );
 };
 
@@ -92,7 +102,7 @@ export const FlightSummary = ({
   <td className="py-1.5 pr-1.5 pl-4 sm:pr-4 sm:pl-10">
     <div className="sm:hidden">
       <div className="truncate">
-        <PilotLink flight={flight} />
+        <PilotButton flight={flight} />
       </div>
       {/* Wider than its cell, running on under the speed and distance, which
           only take the first line: the card's width less its padding. */}
@@ -108,7 +118,7 @@ export const FlightSummary = ({
         <ShortDate date={flight.date} />
       </span>
       <span className="truncate">
-        <PilotLink flight={flight} />
+        <PilotButton flight={flight} />
       </span>
       <span className="text-gray-400">{detail}</span>
     </div>

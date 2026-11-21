@@ -183,13 +183,17 @@ test("best days ranks the season's days by total km", async ({ page }) => {
   await expect(rows.first()).toContainText("Sun 28 Jul");
   await expect(rows.first()).toContainText("6,647 km");
   await expect(
-    rows.first().getByRole("link", { name: "Graham Drury" }),
-  ).toHaveAttribute("href", /bgaladder\.net\/flightdetails/);
+    rows
+      .first()
+      .getByRole("button", { name: "Flight details for Graham Drury" }),
+  ).toBeVisible();
 
   const expand = rows
     .first()
     .getByRole("button", { name: "All flights on Sun 28 Jul" });
-  const pilots = rows.first().getByRole("link");
+  const pilots = rows
+    .first()
+    .getByRole("button", { name: /^Flight details for / });
   await expect(pilots).toHaveCount(1);
   await expand.click();
   await expect(expand).toHaveAttribute("aria-expanded", "true");
@@ -295,10 +299,9 @@ test("best days fits a phone without scrolling", async ({ page }) => {
   await expect(row.getByRole("cell").first()).toHaveText("28 Jul", {
     useInnerText: true,
   });
-  await expect(row.getByRole("link", { name: "Graham Drury" })).toHaveText(
-    "G Drury",
-    { useInnerText: true },
-  );
+  await expect(
+    row.getByRole("button", { name: "Flight details for Graham Drury" }),
+  ).toHaveText("G Drury", { useInnerText: true });
   await expect(row).toContainText("15 flights");
   await row.getByRole("button", { name: "All flights on Sun 28 Jul" }).click();
   expect(await card.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
@@ -322,10 +325,9 @@ test("top tasks fits a phone without scrolling", async ({ page }) => {
     .first()
     .getByRole("button", { name: /^Flights of/ })
     .click();
-  await expect(rows.nth(1).getByRole("link", { name: /\w+ \w+/ })).toHaveText(
-    /^[A-Z] \S+/,
-    { useInnerText: true },
-  );
+  await expect(
+    rows.nth(1).getByRole("button", { name: /^Flight details for / }),
+  ).toHaveText(/^[A-Z] \S+/, { useInnerText: true });
   expect(await card.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
     true,
   );
@@ -472,7 +474,7 @@ test("club gliders fits a phone without scrolling", async ({ page }) => {
   await expect(
     card
       .locator("tbody tr")
-      .filter({ has: page.getByRole("link") })
+      .filter({ has: page.getByRole("button", { name: /^Flight details/ }) })
       .first(),
   ).toHaveText(
     // The pilot, then the date and task under it
@@ -495,13 +497,12 @@ test("a club glider row expands to its flights", async ({ page }) => {
   await expect(expand).toHaveAttribute("aria-expanded", "true");
   await expect(rows).toHaveCount(9 + 7);
   // Each flight shows its speed, or that it didn't complete its task
-  const flightRows = rows.filter({ has: page.getByRole("link") });
+  const flightRows = rows.filter({
+    has: page.getByRole("button", { name: /^Flight details/ }),
+  });
   await expect(
     flightRows.filter({ hasText: /\d kph|Not completed/ }),
   ).toHaveCount(7);
-  await expect(
-    section.getByRole("link", { name: /\w/ }).first(),
-  ).toHaveAttribute("href", /bgaladder\.net\/flightdetails\//);
 
   await expand.click();
   await expect(rows).toHaveCount(9);
