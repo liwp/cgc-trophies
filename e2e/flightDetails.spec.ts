@@ -538,3 +538,19 @@ test.describe("the pop-up sheet on a phone @touch", () => {
     ).not.toContain("translate");
   });
 });
+
+test("a trophy followed from far down the stats page opens at its top", async ({
+  page,
+}) => {
+  // Its flight is the last row of the expanded tables, far down the page.
+  const dialog = await openGolds(page);
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  await dialog
+    .getByRole("list", { name: "Trophies" })
+    .getByRole("link", { name: "Pot Pewter Pringle" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Pot Pewter Pringle" }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+});
