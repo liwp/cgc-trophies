@@ -6,12 +6,26 @@ const EDGE = 8;
 /** How long a hovered tip stays after the pointer leaves, in ms. */
 const LINGER = 300;
 
+/**
+ * How long the pointer must rest on a label before its tip opens, in ms, so
+ * passing over labels doesn't open them.
+ */
+const HOVER_DELAY = 350;
+
 /** Closes the open tooltip, so that opening another closes it. */
 let closeOpenTip: (() => void) | null = null;
 
 /**
- * Inline text with a tooltip shown on hover (lingering a moment after the
- * pointer leaves, and while it's on the tooltip), on
+ * Hides the tip shown (or lingering) by hover. While one is, a neighbouring
+ * tip opens at once and this one closes straight away: one hover tip at a
+ * time.
+ */
+let hideHoverTip: (() => void) | null = null;
+
+/**
+ * Inline text with a tooltip shown on hover once the pointer rests on it
+ * (lingering a moment after the pointer leaves, and while it's on the
+ * tooltip; only one hover tooltip shows at a time), on
  * keyboard focus, and toggled by a click or tap. A tap elsewhere or on another
  * tooltip closes it: iOS Safari doesn't focus a tapped button, so blur alone
  * can't. The visible text stays the button's name; the tooltip is its
@@ -37,7 +51,21 @@ const Tip = ({
   // pointer can cross the gap onto the tip itself and stay to read it.
   const [hovered, setHovered] = useState(false);
   const linger = useRef<ReturnType<typeof setTimeout>>(undefined);
-  useEffect(() => () => clearTimeout(linger.current), []);
+  const delay = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // This tip's own hide, so the shared slot can tell whose it is.
+  const hide = useRef(() => {
+    clearTimeout(linger.current);
+    setHovered(false);
+    if (hideHoverTip === hide.current) hideHoverTip = null;
+  });
+  useEffect(
+    () => () => {
+      clearTimeout(linger.current);
+      clearTimeout(delay.current);
+      if (hideHoverTip === hide.current) hideHoverTip = null;
+    },
+    [],
+  );
   // Where the tip goes on screen. Fixed, so no scrolling card or dialog
   // around it can clip it.
   const [pos, setPos] = useState({ top: 0, left: 0 });
@@ -94,12 +122,22 @@ const Tip = ({
       onPointerEnter={(e) => {
         if (e.pointerType !== "mouse") return;
         clearTimeout(linger.current);
-        if (!hovered) place();
-        setHovered(true);
+        // Back on its own label or tip while it lingers.
+        if (hideHoverTip === hide.current) return;
+        const show = () => {
+          hideHoverTip?.();
+          hideHoverTip = hide.current;
+          place();
+          setHovered(true);
+        };
+        if (hideHoverTip) show();
+        else delay.current = setTimeout(show, HOVER_DELAY);
       }}
       onPointerLeave={(e) => {
         if (e.pointerType !== "mouse") return;
-        linger.current = setTimeout(() => setHovered(false), LINGER);
+        clearTimeout(delay.current);
+        if (hideHoverTip === hide.current)
+          linger.current = setTimeout(hide.current, LINGER);
       }}
     >
       <button

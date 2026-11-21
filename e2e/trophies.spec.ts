@@ -245,3 +245,50 @@ test.describe("on a touch phone @touch", () => {
     await expect(tip).toBeHidden();
   });
 });
+
+test.describe("hover tooltips", () => {
+  // Trophy summaries, top to bottom: each has its description in a tooltip.
+  const summaries = (page: Page) =>
+    page.locator("button[aria-describedby].text-left");
+  // Tip's tooltips (fixed), not the icons' always-rendered, faded ones.
+  const visibleTips = (page: Page) =>
+    page.locator('[role="tooltip"].fixed').filter({ visible: true });
+  const centre = async (page: Page, i: number) => {
+    const box = await summaries(page).nth(i).boundingBox();
+    if (!box) throw new Error(`summary ${i} has no box`);
+    return { x: box.x + 10, y: box.y + box.height / 2 };
+  };
+
+  test("sweeping the pointer over summaries opens none of them", async ({
+    page,
+  }) => {
+    await page.goto("/?season=2024");
+    await expect(summaries(page).nth(3)).toBeVisible();
+    const from = await centre(page, 0);
+    const to = await centre(page, 3);
+    await page.mouse.move(from.x, from.y);
+    await page.mouse.move(to.x, to.y, { steps: 10 });
+    // Checked at once: a tip opened in passing would still be lingering.
+    expect(await visibleTips(page).count()).toBe(0);
+  });
+
+  test("resting on a summary opens its tooltip", async ({ page }) => {
+    await page.goto("/?season=2024");
+    await page.getByRole("button", { name: DOUBLE_CENTURY_2024 }).hover();
+    await expect(doubleCenturyTip(page)).toBeVisible();
+    await expect(visibleTips(page)).toHaveCount(1);
+  });
+
+  test("moving to the next summary shows only its tooltip", async ({
+    page,
+  }) => {
+    await page.goto("/?season=2024");
+    await summaries(page).nth(0).hover();
+    await expect(visibleTips(page)).toHaveCount(1);
+    const first = await visibleTips(page).textContent();
+    await summaries(page).nth(1).hover();
+    // At once, without the open delay, and the previous one closes.
+    await expect(visibleTips(page)).toHaveCount(1, { timeout: 200 });
+    await expect(visibleTips(page)).not.toHaveText(first ?? "");
+  });
+});
