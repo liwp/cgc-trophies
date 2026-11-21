@@ -554,3 +554,79 @@ test("a trophy followed from far down the stats page opens at its top", async ({
   ).toBeVisible();
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
 });
+
+test.describe("the open pop-up is in the URL", () => {
+  const FLIGHT = /[?&]flight=[^&]+/;
+
+  test("opening a flight adds it to the URL, closing takes it out", async ({
+    page,
+  }) => {
+    const dialog = await openGolds(page);
+    await expect(page).toHaveURL(FLIGHT);
+    await expect(page).toHaveURL(/season=2024/);
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).toBeHidden();
+    await expect(page).not.toHaveURL(FLIGHT);
+  });
+
+  test("Back from a trophy page reopens the pop-up", async ({ page }) => {
+    const dialog = await openGolds(page);
+    const name = await dialog.getByRole("heading", { level: 2 }).textContent();
+    await dialog
+      .getByRole("list", { name: "Trophies" })
+      .getByRole("link", { name: "Pot Pewter Pringle" })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Pot Pewter Pringle" }),
+    ).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(
+      page.getByRole("dialog").getByRole("heading", { level: 2 }),
+    ).toHaveText(name ?? "");
+  });
+
+  test("Back while it's open closes it, and Forward reopens it", async ({
+    page,
+  }) => {
+    const dialog = await openGolds(page);
+    await page.goBack();
+    await expect(dialog).toBeHidden();
+    await expect(page).toHaveURL(/\/stats\?season=2024$/);
+    await page.goForward();
+    await expect(dialog).toBeVisible();
+  });
+
+  test("closing it goes back, not forward to a new entry", async ({ page }) => {
+    const dialog = await openGolds(page);
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    // Back now leaves the stats page rather than reopening the pop-up.
+    await page.goForward();
+    await expect(dialog).toBeVisible();
+  });
+
+  test("a shared link opens the pop-up, and closing it stays on the page", async ({
+    page,
+  }) => {
+    const opened = await openGolds(page);
+    const url = page.url();
+    const name = await opened.getByRole("heading", { level: 2 }).textContent();
+    const fresh = await page.context().newPage();
+    await fresh.goto(url);
+    const dialog = fresh.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole("heading", { level: 2 })).toHaveText(
+      name ?? "",
+    );
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).toBeHidden();
+    await expect(fresh).toHaveURL(/\/stats\?season=2024$/);
+  });
+
+  test("an unknown flight in the URL opens nothing", async ({ page }) => {
+    await page.goto("/stats?season=2024&flight=nope");
+    await expect(page.getByRole("heading", { name: /Stats/ })).toBeVisible();
+    await expect(page.getByRole("dialog")).toBeHidden();
+  });
+});

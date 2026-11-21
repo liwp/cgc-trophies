@@ -192,12 +192,16 @@ const StatsPage = () => {
   );
 
   if (state.status === "error") return <FlightLoadFailure />;
-  if (!summaries) return <Loading />;
+  if (state.status !== "ready" || !summaries) return <Loading />;
   const { season } = state;
 
   return (
     <PageLayout>
-      <FlightDetailsProvider podiums={podiums} season={season}>
+      <FlightDetailsProvider
+        flights={state.allFlights}
+        podiums={podiums}
+        season={season}
+      >
         <div className="flex flex-col gap-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h1 className="text-2xl font-bold text-gray-900">

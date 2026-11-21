@@ -5,10 +5,10 @@ import {
   useContext,
   useEffect,
   useId,
+  useMemo,
   useRef,
-  useState,
 } from "react";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 import { formatDate } from "../lib/formatDate";
 import { type Podium, placeName } from "../lib/medals";
 import { formatScore } from "../lib/results";
@@ -151,45 +151,83 @@ const Details = ({
   );
 };
 
+/** The query parameter naming the flight whose pop-up is open. */
+export const FLIGHT_PARAM = "flight";
+
 /**
  * Gives the stats tables a way to open a flight's details, and shows them in
  * one pop-up: a sheet along the bottom of a phone, a dialog in the middle of
  * wider screens. A native modal dialog, so Esc closes it, focus stays inside,
  * and it sits above everything else.
+ *
+ * The open pop-up is in the URL (`?flight=<id>`), pushed as a history entry:
+ * Back from a page linked in it reopens it, Back while it's open closes it,
+ * and the link can be shared.
  */
 export const FlightDetailsProvider = ({
+  flights,
   podiums,
   season,
   children,
 }: {
+  /** Every flight the pop-up could show, to find the URL's one by id. */
+  flights: Flight[];
   podiums: Map<string, Podium[]>;
   season: number;
   children: ReactNode;
 }) => {
-  // The flight shown, kept after closing so the sheet slides away with its
-  // content; `opened` counts openings, so reopening the same flight works.
-  const [{ flight, opened }, setShown] = useState<{
-    flight: Flight | null;
-    opened: number;
-  }>({ flight: null, opened: 0 });
+  const [params] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const byId = useMemo(() => new Map(flights.map((f) => [f.id, f])), [flights]);
+  const shown = byId.get(params.get(FLIGHT_PARAM) ?? "");
+  // The flight last shown, kept after closing so the sheet slides away with
+  // its content.
+  const lastRef = useRef<Flight | undefined>(undefined);
+  if (shown) lastRef.current = shown;
+  const flight = shown ?? lastRef.current;
   const dialogRef = useRef<HTMLDialogElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const headingId = useId();
 
+  /** This page's URL with the pop-up's flight set, or removed. */
+  const withFlight = (id: string | null) => {
+    const next = new URLSearchParams(params);
+    if (id) next.set(FLIGHT_PARAM, id);
+    else next.delete(FLIGHT_PARAM);
+    const search = next.toString();
+    return { pathname: location.pathname, search: search && `?${search}` };
+  };
+
   const open = (f: Flight) => {
     openerRef.current = document.activeElement as HTMLElement | null;
-    setShown(({ opened }) => ({ flight: f, opened: opened + 1 }));
+    navigate(withFlight(f.id), { state: { pushedFlight: true } });
   };
   const close = () => dialogRef.current?.close();
 
+  // The dialog follows the URL: open while it names a flight, closed when
+  // it doesn't (Back, or a link that left it out).
   useEffect(() => {
     const dialog = dialogRef.current;
-    if (!opened || !dialog || dialog.open) return;
-    dialog.showModal();
-    // Opening focuses the first control, and on the icons that would show
-    // their tooltips straight away: start on Close instead.
-    dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
-  }, [opened]);
+    if (!dialog) return;
+    if (shown && !dialog.open) {
+      dialog.showModal();
+      // Opening focuses the first control, and on the icons that would show
+      // their tooltips straight away: start on Close instead.
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    } else if (!shown && dialog.open) dialog.close();
+  }, [shown]);
+
+  // Closed from within (Close, the backdrop, Esc): take the flight out of the
+  // URL. Back undoes the push that opened it, so Forward can reopen it; a
+  // visit that started on the pop-up's link has nothing to go back to here.
+  const onClose = () => {
+    if (shown) {
+      if (location.state?.pushedFlight) navigate(-1);
+      else navigate(withFlight(null), { replace: true });
+    }
+    openerRef.current?.focus();
+  };
 
   return (
     <Context.Provider value={{ open, podiums, season }}>
@@ -198,7 +236,7 @@ export const FlightDetailsProvider = ({
       <dialog
         ref={dialogRef}
         aria-labelledby={headingId}
-        onClose={() => openerRef.current?.focus()}
+        onClose={onClose}
         // A click on the backdrop lands on the dialog itself; one on its
         // content lands on the content.
         onClick={(e) => {
