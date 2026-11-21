@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import ScrollToTop from "./components/ScrollToTop";
+import ScrollPosition from "./components/ScrollPosition";
 import Admin from "./pages/admin";
 import Components from "./pages/components";
 import Home from "./pages/index";
@@ -10,7 +10,7 @@ import TrophyDetail from "./pages/trophy/trophyDetail";
 export default function App() {
   return (
     <>
-      <ScrollToTop />
+      <ScrollPosition />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<Admin />} />

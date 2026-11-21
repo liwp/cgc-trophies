@@ -523,3 +523,22 @@ test("the stats sections read from overview to detail", async ({ page }) => {
     "Pilots",
   ]);
 });
+
+test("Back to the stats page returns to where the reader was", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  await page
+    .getByRole("region", { name: "Best days" })
+    .getByRole("button", { name: "All flights on Sun 28 Jul" })
+    .click();
+  await page.evaluate(() => window.scrollTo(0, 2500));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(2500);
+  // Dispatched: a click would first scroll the link, at the top, into view.
+  await page.getByRole("link", { name: "Club records" }).dispatchEvent("click");
+  await expect(page).toHaveURL(/\/records/);
+  // A new page opens at the top.
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  await page.goBack();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(2500);
+});

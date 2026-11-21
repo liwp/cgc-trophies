@@ -652,7 +652,7 @@ test("a collapsed best day expands from anywhere on its row", async ({
   await expect(expand).toHaveAttribute("aria-expanded", "true");
 });
 
-test.describe("expanded rows survive Back", () => {
+test.describe("expanded rows and the scroll survive Back", () => {
   test("from a trophy linked in the pop-up", async ({ page }) => {
     await page.goto("/stats?season=2024");
     const task = region(page, "Top tasks").getByRole("button", {
@@ -664,6 +664,8 @@ test.describe("expanded rows survive Back", () => {
     });
     await glider.first().click();
     const dialog = await openGolds(page);
+    const scrolled = await page.evaluate(() => window.scrollY);
+    expect(scrolled).toBeGreaterThan(0);
     await dialog
       .getByRole("list", { name: "Trophies" })
       .getByRole("link", { name: "Pot Pewter Pringle" })
@@ -673,6 +675,8 @@ test.describe("expanded rows survive Back", () => {
     ).toBeVisible();
     await page.goBack();
     await expect(page.getByRole("dialog")).toBeVisible();
+    // Where the reader was, under the pop-up.
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrolled);
     await page.keyboard.press("Escape");
     await expect(task.first()).toHaveAttribute("aria-expanded", "true");
     await expect(glider.first()).toHaveAttribute("aria-expanded", "true");
