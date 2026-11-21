@@ -174,7 +174,7 @@ export const FlightDetailsProvider = ({
         onClick={(e) => {
           if (e.target === e.currentTarget) close();
         }}
-        className="m-auto w-full max-w-md overflow-visible rounded-xl bg-white p-0 shadow-xl backdrop:bg-gray-900/40 max-sm:mb-0 max-sm:max-w-none max-sm:rounded-b-none"
+        className="m-auto max-h-[calc(100dvh-1rem)] w-full max-w-md overflow-y-auto rounded-xl bg-white p-0 shadow-xl backdrop:bg-gray-900/40 max-sm:mb-0 max-sm:max-w-none max-sm:rounded-b-none"
       >
         {flight && (
           <Details flight={flight} headingId={headingId} onClose={close} />

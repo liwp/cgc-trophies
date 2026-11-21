@@ -279,3 +279,49 @@ test.describe("on a touch phone @touch", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 });
+
+test("a pop-up taller than the screen scrolls to its last trophy", async ({
+  page,
+}) => {
+  // A phone on its side: wider than a phone, so the centred dialog, but short.
+  await page.setViewportSize({ width: 740, height: 360 });
+  await page.goto("/stats?season=2024");
+  await expandAll(page);
+  await page
+    .getByRole("listitem")
+    .or(page.getByRole("row"))
+    .filter({ has: page.getByRole("button", { name: GOLDS }) })
+    .last()
+    .getByRole("button", { name: /^Flight details for / })
+    .click();
+  const last = page
+    .getByRole("dialog")
+    .getByRole("list", { name: "Trophies" })
+    .getByRole("listitem")
+    .last();
+  await last.scrollIntoViewIfNeeded();
+  const box = await last.boundingBox();
+  expect(box?.y).toBeGreaterThanOrEqual(0);
+  expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(360);
+});
+
+test("the height-loss tooltip in the pop-up stays on a phone's screen", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  const rows = await topTaskFlights(page);
+  await rows
+    .filter({ has: page.getByRole("button", { name: /distance penalty/ }) })
+    .first()
+    .getByRole("button", { name: /^Flight details/ })
+    .click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("button", { name: /distance penalty/ }).hover();
+  const tooltip = dialog.getByRole("tooltip", { name: /distance penalty/ });
+  await expect(tooltip).toBeVisible();
+  const box = await tooltip.boundingBox();
+  expect(box?.x).toBeGreaterThanOrEqual(0);
+  expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(360);
+  expect(box?.y).toBeGreaterThanOrEqual(0);
+  expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(740);
+});
