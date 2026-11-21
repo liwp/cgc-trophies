@@ -14,6 +14,7 @@ import { type Podium, placeName } from "../lib/medals";
 import { formatScore } from "../lib/results";
 import { hasSpeed, isCompletedTask } from "../lib/stats";
 import { formatPilotName } from "../lib/trophyCopyData";
+import { entryState } from "../lib/useExpanded";
 import type { Flight } from "../types";
 import { LadderLink } from "./FlightLinks";
 import { kph, PenaltyWarning } from "./FlightRow";
@@ -201,7 +202,10 @@ export const FlightDetailsProvider = ({
 
   const open = (f: Flight) => {
     openerRef.current = document.activeElement as HTMLElement | null;
-    navigate(withFlight(f.id), { state: { pushedFlight: true } });
+    // Carries the rows the reader has expanded into the new entry.
+    navigate(withFlight(f.id), {
+      state: { ...(entryState() ?? {}), pushedFlight: true },
+    });
   };
   const close = () => dialogRef.current?.close();
 

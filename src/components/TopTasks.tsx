@@ -1,5 +1,5 @@
-import { useState } from "react";
 import type { TopTask } from "../lib/stats";
+import { useExpanded } from "../lib/useExpanded";
 import type { Flight } from "../types";
 import { pad, Th } from "./CompactTable";
 import ExpandButton from "./ExpandButton";
@@ -30,10 +30,9 @@ const TaskFlightRow = ({ flight }: { flight: Flight }) => {
 };
 
 const TaskRow = ({ task }: { task: TopTask }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, toggle] = useExpanded(`task:${task.route.join("-")}`);
   const { route, taskDistanceKm, completed, total, avgSpeedKph, flights } =
     task;
-  const toggle = () => setExpanded(!expanded);
   return (
     <>
       <tr

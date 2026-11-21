@@ -7,6 +7,7 @@ import {
   pilotStatsCopyData,
 } from "../lib/stats";
 import { shortPilotName } from "../lib/trophyCopyData";
+import { useExpanded } from "../lib/useExpanded";
 import CopyButton from "./CopyButton";
 import ExpandButton from "./ExpandButton";
 import Toggle from "./Toggle";
@@ -92,8 +93,7 @@ const cell = (key: string) =>
  * labelled values, in a row of their own; wider screens show every column.
  */
 const PilotRow = ({ stats }: { stats: PilotStats }) => {
-  const [expanded, setExpanded] = useState(false);
-  const toggle = () => setExpanded(!expanded);
+  const [expanded, toggle] = useExpanded(`pilot:${stats.pilot}`);
   return (
     <>
       <tr

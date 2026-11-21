@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from "react";
 import { type DayStats, routeOf } from "../lib/stats";
+import { useExpanded } from "../lib/useExpanded";
 import type { Flight } from "../types";
 import { dateText as date, pad, ShortDate, Th } from "./CompactTable";
 import ExpandButton, { ExpandSpacer } from "./ExpandButton";
@@ -52,7 +53,7 @@ const FlightList = ({
 };
 
 const DayRow = ({ day }: { day: DayStats }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, toggle] = useExpanded(`day:${day.date.getTime()}`);
   const { flights, scoringKm } = day;
   const weekday = date(day.date, { weekday: "short" });
   const dayMonth = date(day.date, { day: "numeric", month: "short" });
@@ -66,7 +67,7 @@ const DayRow = ({ day }: { day: DayStats }) => {
           {flights.length > 1 ? (
             <ExpandButton
               expanded={expanded}
-              onToggle={() => setExpanded(!expanded)}
+              onToggle={toggle}
               label={`All flights on ${weekday} ${dayMonth}`}
               className="mt-0.5"
             />

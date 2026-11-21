@@ -31,6 +31,7 @@ import {
   topTasks,
 } from "../lib/stats";
 import { resolveTrophies } from "../lib/trophyHistory";
+import { entryState } from "../lib/useExpanded";
 import useFlights from "../lib/useFlights";
 
 const percent = (v: number) => `${Math.round(v)}%`;
@@ -149,7 +150,8 @@ const StatsPage = () => {
         else next.delete("site");
         return next;
       },
-      { replace: true },
+      // Keeps the expanded rows: the same rows, just more or fewer flights.
+      { replace: true, state: entryState() },
     );
 
   const summaries = useMemo(() => {

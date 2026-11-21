@@ -87,6 +87,8 @@ test("stats tables no longer link straight to the ladder", async ({ page }) => {
   await page.goto("/stats?season=2024");
   for (const name of ["Best days", "Top tasks", "Club gliders"]) {
     const table = region(page, name).getByRole("table");
+    // Before counting what's left to expand: until the flights load, nothing.
+    await expect(table.locator("tbody tr").first()).toBeVisible();
     const expand = table.getByRole("button", { expanded: false });
     while ((await expand.count()) > 0) await expand.first().click();
     await expect(table.getByRole("link")).toHaveCount(0);
@@ -168,6 +170,8 @@ test.describe("on a touch phone @touch", () => {
 async function expandAll(page: Page) {
   for (const name of ["Best days", "Top tasks", "Club gliders"]) {
     const table = region(page, name).getByRole("table");
+    // Before counting what's left to expand: until the flights load, nothing.
+    await expect(table.locator("tbody tr").first()).toBeVisible();
     const expand = table.getByRole("button", { expanded: false });
     while ((await expand.count()) > 0) await expand.first().click();
   }
@@ -628,5 +632,65 @@ test.describe("the open pop-up is in the URL", () => {
     await page.goto("/stats?season=2024&flight=nope");
     await expect(page.getByRole("heading", { name: /Stats/ })).toBeVisible();
     await expect(page.getByRole("dialog")).toBeHidden();
+  });
+});
+
+test.describe("expanded rows survive Back", () => {
+  test("from a trophy linked in the pop-up", async ({ page }) => {
+    await page.goto("/stats?season=2024");
+    const task = region(page, "Top tasks").getByRole("button", {
+      name: /^Flights of /,
+    });
+    await task.first().click();
+    const glider = region(page, "Club gliders").getByRole("button", {
+      name: /^Flights in /,
+    });
+    await glider.first().click();
+    const dialog = await openGolds(page);
+    await dialog
+      .getByRole("list", { name: "Trophies" })
+      .getByRole("link", { name: "Pot Pewter Pringle" })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Pot Pewter Pringle" }),
+    ).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(task.first()).toHaveAttribute("aria-expanded", "true");
+    await expect(glider.first()).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("from another page, and a fresh visit starts collapsed", async ({
+    page,
+  }) => {
+    await page.goto("/stats?season=2024");
+    const day = region(page, "Best days").getByRole("button", {
+      name: "All flights on Sun 28 Jul",
+    });
+    await day.click();
+    await page.getByRole("link", { name: "Club records" }).click();
+    await expect(page).toHaveURL(/\/records/);
+    await page.goBack();
+    await expect(day).toHaveAttribute("aria-expanded", "true");
+    // A reload keeps them; a new visit doesn't.
+    const fresh = await page.context().newPage();
+    await fresh.goto(page.url());
+    await expect(
+      region(fresh, "Best days").getByRole("button", {
+        name: "All flights on Sun 28 Jul",
+      }),
+    ).toHaveAttribute("aria-expanded", "false");
+  });
+
+  test("switching to all launch sites keeps them", async ({ page }) => {
+    await page.goto("/stats?season=2024");
+    const day = region(page, "Best days").getByRole("button", {
+      name: "All flights on Sun 28 Jul",
+    });
+    await day.click();
+    await page.getByLabel(/launches only/).click();
+    await expect(page).toHaveURL(/site=all/);
+    await expect(day).toHaveAttribute("aria-expanded", "true");
   });
 });

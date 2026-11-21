@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { type ClubGliderStats, routeOf } from "../lib/stats";
+import { useExpanded } from "../lib/useExpanded";
 import type { Flight } from "../types";
 import { pad, Th } from "./CompactTable";
 import ExpandButton, { ExpandSpacer } from "./ExpandButton";
@@ -38,11 +38,10 @@ const GliderFlightRow = ({ flight }: { flight: Flight }) => {
 };
 
 const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, toggle] = useExpanded(`glider:${stats.glider.registration}`);
   const { glider, flights, avgSpeedKph, scoringKm } = stats;
   const name = `${glider.name} ${glider.compNo}`;
   const flown = flights.length > 0;
-  const toggle = () => setExpanded(!expanded);
   return (
     <>
       <tr
