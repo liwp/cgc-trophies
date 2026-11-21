@@ -18,15 +18,20 @@ const Tip = ({
   children,
   className = "",
   wide = false,
+  help = true,
 }: {
   tip: ReactNode;
   children: ReactNode;
   className?: string;
   /** For long, multi-paragraph tips: wider, but never wider than the viewport. */
   wide?: boolean;
+  /** Show the help cursor; off where the text isn't text to read, e.g. an icon. */
+  help?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
-  const [shift, setShift] = useState(0);
+  // Where the tip goes on screen. Fixed, so no scrolling card or dialog
+  // around it can clip it.
+  const [pos, setPos] = useState({ top: 0, left: 0 });
   const tipRef = useRef<HTMLSpanElement>(null);
   const rootRef = useRef<HTMLSpanElement>(null);
   const id = useId();
@@ -46,18 +51,31 @@ const Tip = ({
     };
   }, [open]);
 
-  // Once the tooltip is showing, pull it left if it would pass the
-  // viewport's right edge.
+  // Once the tooltip is showing, put it under its text, or over it if it
+  // would pass the viewport's bottom edge, pulled left if it would pass the
+  // right edge.
   const place = () =>
     requestAnimationFrame(() => {
       const el = tipRef.current;
-      if (!el) return;
-      // The rect already includes the current shift; undo it to get the natural edge.
-      const right = el.getBoundingClientRect().right + shift;
-      setShift(
-        Math.max(0, right - (document.documentElement.clientWidth - EDGE)),
-      );
+      const anchor = rootRef.current;
+      if (!el || !anchor) return;
+      const { left, top, bottom } = anchor.getBoundingClientRect();
+      const { width, height } = el.getBoundingClientRect();
+      const max = document.documentElement.clientWidth - EDGE - width;
+      const below = bottom + 4 + height <= window.innerHeight - EDGE;
+      setPos({
+        top: below ? bottom + 4 : Math.max(EDGE, top - 4 - height),
+        left: Math.max(EDGE, Math.min(left, max)),
+      });
     });
+
+  // A tip that stays open follows its text as the page scrolls.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: place only reads refs
+  useEffect(() => {
+    if (!open) return;
+    window.addEventListener("scroll", place, true);
+    return () => window.removeEventListener("scroll", place, true);
+  }, [open]);
 
   return (
     <span ref={rootRef} className="group relative inline-flex">
@@ -73,7 +91,7 @@ const Tip = ({
         onFocus={place}
         onMouseEnter={place}
         onBlur={() => setOpen(false)}
-        className={`cursor-help ${className}`}
+        className={`${help ? "cursor-help" : ""} ${className}`}
       >
         {children}
       </button>
@@ -81,10 +99,10 @@ const Tip = ({
         id={id}
         ref={tipRef}
         role="tooltip"
-        style={{ left: -shift }}
+        style={pos}
         className={`${
           open ? "block" : "hidden"
-        } group-hover:block group-has-focus-visible:block absolute top-full z-10 mt-1 w-max ${
+        } group-hover:block group-has-focus-visible:block fixed z-50 w-max ${
           wide ? "max-w-[min(24rem,calc(100vw-1rem))]" : "max-w-64"
         } whitespace-normal rounded font-sans bg-gray-900 px-2 py-1 text-xs font-normal text-white shadow`}
       >
