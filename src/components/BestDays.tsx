@@ -1,8 +1,8 @@
 import { type ReactNode, useState } from "react";
 import { type DayStats, routeOf } from "../lib/stats";
 import type { Flight } from "../types";
-import { dateText as date, ExpandTh, pad, ShortDate, Th } from "./CompactTable";
-import ExpandButton from "./ExpandButton";
+import { dateText as date, pad, ShortDate, Th } from "./CompactTable";
+import ExpandButton, { ExpandSpacer } from "./ExpandButton";
 import { PilotLink } from "./FlightRow";
 import Route from "./Route";
 
@@ -39,7 +39,19 @@ const DayRow = ({ day }: { day: DayStats }) => {
   return (
     <tr className="border-b border-gray-100 align-top">
       <td className={`${pad} whitespace-nowrap font-medium text-gray-900`}>
-        <ShortDate date={day.date} />
+        <div className="flex items-start gap-1.5">
+          {flights.length > 1 ? (
+            <ExpandButton
+              expanded={expanded}
+              onToggle={() => setExpanded(!expanded)}
+              label={`All flights on ${weekday} ${dayMonth}`}
+              className="mt-0.5"
+            />
+          ) : (
+            <ExpandSpacer />
+          )}
+          <ShortDate date={day.date} />
+        </div>
       </td>
       <td className={`${pad} text-right tabular-nums whitespace-nowrap`}>
         <div className="text-gray-700">{km(scoringKm)}</div>
@@ -69,15 +81,6 @@ const DayRow = ({ day }: { day: DayStats }) => {
           item={(flight) => <Route route={routeOf(flight).filter(Boolean)} />}
         />
       </td>
-      <td className="py-2 pr-1.5 sm:pr-4">
-        {flights.length > 1 && (
-          <ExpandButton
-            expanded={expanded}
-            onToggle={() => setExpanded(!expanded)}
-            label={`All flights on ${weekday} ${dayMonth}`}
-          />
-        )}
-      </td>
     </tr>
   );
 };
@@ -98,7 +101,7 @@ const BestDays = ({ days }: { days: DayStats[] }) => (
         <table className="w-full min-w-72 table-fixed border-collapse text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              <Th width="w-14 sm:w-28">Date</Th>
+              <Th width="w-[4.75rem] sm:w-32">Date</Th>
               <Th right width="w-[4.5rem] sm:w-32 lg:w-24">
                 Total
               </Th>
@@ -109,7 +112,6 @@ const BestDays = ({ days }: { days: DayStats[] }) => (
               <Th width="lg:w-80" className="hidden lg:table-cell">
                 Task
               </Th>
-              <ExpandTh width="w-7 sm:w-12" />
             </tr>
           </thead>
           <tbody>

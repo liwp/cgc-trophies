@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { type ClubGliderStats, routeOf } from "../lib/stats";
 import type { Flight } from "../types";
-import { ExpandTh, pad, Th } from "./CompactTable";
-import ExpandButton from "./ExpandButton";
+import { pad, Th } from "./CompactTable";
+import ExpandButton, { ExpandSpacer } from "./ExpandButton";
 import { FlightSpeed, FlightSummary, flightCell, kph } from "./FlightRow";
 import Route from "./Route";
 
@@ -27,7 +27,6 @@ const GliderFlightRow = ({ flight }: { flight: Flight }) => (
       <FlightSpeed flight={flight} />
     </td>
     <td className={flightCell}>{km(flight.task.scoringDistanceKm)}</td>
-    <td />
   </tr>
 );
 
@@ -46,25 +45,32 @@ const GliderRow = ({ stats }: { stats: ClubGliderStats }) => {
         onClick={flown ? toggle : undefined}
       >
         <td className={pad}>
-          <div className="truncate font-medium text-gray-900">{name}</div>
-          <div className={`${sub} truncate`}>
-            {/* A phone has the comp number in the name, and no room for both. */}
-            <span className="hidden sm:inline">{glider.registration} · </span>
-            <span className="tabular-nums">{flights.length}</span>{" "}
-            {flights.length === 1 ? "flight" : "flights"}
+          <div className="flex items-start gap-1.5">
+            {flown ? (
+              <ExpandButton
+                expanded={expanded}
+                onToggle={toggle}
+                label={`Flights in ${name}`}
+                className="mt-0.5"
+              />
+            ) : (
+              <ExpandSpacer />
+            )}
+            <div className="min-w-0">
+              <div className="truncate font-medium text-gray-900">{name}</div>
+              <div className={`${sub} truncate`}>
+                {/* A phone has the comp number in the name, and no room for both. */}
+                <span className="hidden sm:inline">
+                  {glider.registration} ·{" "}
+                </span>
+                <span className="tabular-nums">{flights.length}</span>{" "}
+                {flights.length === 1 ? "flight" : "flights"}
+              </div>
+            </div>
           </div>
         </td>
         <td className={cell}>{kph(avgSpeedKph)}</td>
         <td className={cell}>{km(scoringKm)}</td>
-        <td className="py-2 pr-1.5 sm:pr-4">
-          {flown && (
-            <ExpandButton
-              expanded={expanded}
-              onToggle={toggle}
-              label={`Flights in ${name}`}
-            />
-          )}
-        </td>
       </tr>
       {expanded &&
         flights.map((flight) => (
@@ -95,7 +101,6 @@ const ClubGliders = ({ stats }: { stats: ClubGliderStats[] }) => (
             <Th right width="w-20 sm:w-24">
               Distance
             </Th>
-            <ExpandTh width="w-7 sm:w-12" />
           </tr>
         </thead>
         <tbody>

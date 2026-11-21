@@ -7,7 +7,6 @@ import {
   pilotStatsCopyData,
 } from "../lib/stats";
 import { shortPilotName } from "../lib/trophyCopyData";
-import { ExpandTh } from "./CompactTable";
 import CopyButton from "./CopyButton";
 import ExpandButton from "./ExpandButton";
 import Toggle from "./Toggle";
@@ -104,26 +103,27 @@ const PilotRow = ({ stats }: { stats: PilotStats }) => {
         {tableColumns.map((column) => (
           <td key={column.key} className={cell(column.key)}>
             {column.key === "pilot" ? (
-              <>
-                <span className="sm:hidden">{shortPilotName(stats.pilot)}</span>
+              <span className="flex items-center gap-1.5">
+                <ExpandButton
+                  expanded={expanded}
+                  onToggle={toggle}
+                  label={`More stats for ${tableColumns[0].format(stats)}`}
+                  className="sm:hidden"
+                />
+                <span className="truncate sm:hidden">
+                  {shortPilotName(stats.pilot)}
+                </span>
                 <span className="hidden sm:inline">{column.format(stats)}</span>
-              </>
+              </span>
             ) : (
               column.format(stats)
             )}
           </td>
         ))}
-        <td className="py-2 pr-1.5 sm:hidden">
-          <ExpandButton
-            expanded={expanded}
-            onToggle={toggle}
-            label={`More stats for ${tableColumns[0].format(stats)}`}
-          />
-        </td>
       </tr>
       {expanded && (
         <tr className="bg-gray-50 sm:hidden">
-          <td colSpan={PHONE.size + 1} className="px-4 py-2">
+          <td colSpan={PHONE.size} className="px-4 py-2">
             <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
               {moreColumns.map((column) => (
                 <div key={column.key} className="flex justify-between gap-2">
@@ -196,7 +196,6 @@ const PilotStatsTable = ({ stats }: { stats: PilotStats[] }) => {
                     onSort={onSort}
                   />
                 ))}
-                <ExpandTh width="w-7 sm:hidden" />
               </tr>
             </thead>
             <tbody>

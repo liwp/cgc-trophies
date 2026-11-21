@@ -123,7 +123,7 @@ test("the pilot table fits a phone, a pilot expanding to the rest", async ({
   await page.goto("/stats?season=2024");
   const card = pilots(page).locator("div:has(> table)");
   await expect(pilots(page).getByRole("columnheader")).toHaveText(
-    ["Pilot", "Flights", "Km", "Points", "Expand"],
+    ["Pilot", "Flights", "Km", "Points"],
     { useInnerText: true },
   );
   const row = pilotRows(page).first();
@@ -455,7 +455,6 @@ test("the club glider table lists each club glider's season", async ({
     /Discus DM\s*G-CJXR · 7 flights/,
     "67.4 kph",
     "821 km",
-    "",
   ]);
   // Unflown club gliders are listed too
   await expect(row("Puchacz JEC").getByRole("cell").first()).toContainText(

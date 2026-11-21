@@ -57,13 +57,13 @@ const DayFlights = ({
   }
   return (
     <>
-      <div className="flex items-center justify-between text-sm text-gray-700">
-        {pilots} {pilots === 1 ? "pilot" : "pilots"}
+      <div className="flex items-center gap-1.5 text-sm text-gray-700">
         <ExpandButton
           expanded={expanded}
           onToggle={() => setExpanded(!expanded)}
           label={`${title}: all flights`}
         />
+        {pilots} {pilots === 1 ? "pilot" : "pilots"}
       </div>
       {expanded && (
         <ul className="mt-1 flex flex-col gap-1 text-sm">

@@ -30,14 +30,6 @@ export const Th = ({
   </th>
 );
 
-/** The header of the narrow expand-button column, named for screen readers. */
-export const ExpandTh = ({ width }: { width: string }) => (
-  // Relative, so the hidden label can't escape the scrolling card.
-  <th className={`relative ${width}`}>
-    <span className="sr-only">Expand</span>
-  </th>
-);
-
 /** A date, as the stats tables show it, in UTC like the ladder's dates. */
 export const dateText = (d: Date, options: Intl.DateTimeFormatOptions) =>
   d.toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });

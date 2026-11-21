@@ -66,7 +66,16 @@ const LadderResultRow = ({
         className={`cursor-pointer hover:bg-gray-50 transition-colors ${rank === 1 ? "bg-cambridge-light" : ""}`}
         onClick={() => setExpanded(!expanded)}
       >
-        <td className="px-4 py-3 text-gray-500">{rank}</td>
+        <td className="px-4 py-3 text-gray-500">
+          <div className="flex items-center gap-1.5">
+            <ExpandButton
+              expanded={expanded}
+              onToggle={() => setExpanded(!expanded)}
+              label={`Flights for ${isSyndicate ? result.key : formatPilotName(result.key)}`}
+            />
+            {rank}
+          </div>
+        </td>
         <td className="px-4 py-3 text-gray-700">
           {isSyndicate ? result.key : formatPilotName(result.key)}
         </td>
@@ -83,21 +92,14 @@ const LadderResultRow = ({
         </td>
         <td className="px-4 py-3 text-gray-500">{result.flights.length}</td>
         <td className="px-4 py-3">
-          <div className="inline-flex items-center gap-1">
-            <ExpandButton
-              expanded={expanded}
-              onToggle={() => setExpanded(!expanded)}
-              label={`Flights for ${isSyndicate ? result.key : formatPilotName(result.key)}`}
+          {rank === 1 && (
+            <CopyButton
+              data={ladderCopyData(
+                result,
+                isSyndicate ? "registration" : "pilot",
+              )}
             />
-            {rank === 1 && (
-              <CopyButton
-                data={ladderCopyData(
-                  result,
-                  isSyndicate ? "registration" : "pilot",
-                )}
-              />
-            )}
-          </div>
+          )}
         </td>
       </tr>
       {expanded &&
@@ -131,8 +133,16 @@ const LadderResultCard = ({
       className={`flex flex-col gap-0.5 border-t border-gray-100 px-3 py-2.5 ${rank === 1 ? "bg-cambridge-light" : ""}`}
     >
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-gray-900">
-          <span className="text-gray-500">{rank}.</span> {name}
+        <span className="flex items-center gap-1.5 text-gray-900">
+          <ExpandButton
+            expanded={expanded}
+            onToggle={() => setExpanded(!expanded)}
+            label={`Flights for ${name}`}
+            className="self-center"
+          />
+          <span>
+            <span className="text-gray-500">{rank}.</span> {name}
+          </span>
         </span>
         <span className="font-semibold whitespace-nowrap text-gray-700">
           {formatScore({ value: result.totalScore, unit: "pts" })}
@@ -157,11 +167,6 @@ const LadderResultCard = ({
               )}
             />
           )}
-          <ExpandButton
-            expanded={expanded}
-            onToggle={() => setExpanded(!expanded)}
-            label={`Flights for ${name}`}
-          />
         </div>
       </div>
       {expanded && (

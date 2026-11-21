@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { TopTask } from "../lib/stats";
 import type { Flight } from "../types";
-import { ExpandTh, pad, Th } from "./CompactTable";
+import { pad, Th } from "./CompactTable";
 import ExpandButton from "./ExpandButton";
 import { FlightSpeed, FlightSummary, flightCell, kph } from "./FlightRow";
 import Route from "./Route";
@@ -19,7 +19,6 @@ const TaskFlightRow = ({ flight }: { flight: Flight }) => (
     <td colSpan={2} className={flightCell}>
       <FlightSpeed flight={flight} />
     </td>
-    <td />
   </tr>
 );
 
@@ -35,10 +34,20 @@ const TaskRow = ({ task }: { task: TopTask }) => {
         onClick={toggle}
       >
         <td className={pad}>
-          {/* Long routes wrap on a phone rather than widen the table. */}
-          <Route route={route} className="text-left text-gray-900" />
-          <div className={`${sub} tabular-nums`}>
-            {Math.round(taskDistanceKm)} km
+          <div className="flex items-start gap-1.5">
+            <ExpandButton
+              expanded={expanded}
+              onToggle={toggle}
+              label={`Flights of ${route.join("-")}`}
+              className="mt-0.5"
+            />
+            <div className="min-w-0">
+              {/* Long routes wrap on a phone rather than widen the table. */}
+              <Route route={route} className="text-left text-gray-900" />
+              <div className={`${sub} tabular-nums`}>
+                {Math.round(taskDistanceKm)} km
+              </div>
+            </div>
           </div>
         </td>
         <td className={`${pad} text-right tabular-nums whitespace-nowrap`}>
@@ -51,13 +60,6 @@ const TaskRow = ({ task }: { task: TopTask }) => {
           className={`${pad} text-right tabular-nums whitespace-nowrap text-gray-700`}
         >
           {kph(avgSpeedKph)}
-        </td>
-        <td className="py-2 pr-1.5 sm:pr-4">
-          <ExpandButton
-            expanded={expanded}
-            onToggle={toggle}
-            label={`Flights of ${route.join("-")}`}
-          />
         </td>
       </tr>
       {expanded &&
@@ -91,7 +93,6 @@ const TopTasks = ({ tasks }: { tasks: TopTask[] }) => (
               <Th right width="w-20 sm:w-28">
                 Avg speed
               </Th>
-              <ExpandTh width="w-7 sm:w-12" />
             </tr>
           </thead>
           <tbody>

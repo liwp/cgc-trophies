@@ -119,7 +119,17 @@ const LadderResultEntry = ({
         className={`cursor-pointer transition-colors ${rank === 1 ? "bg-cambridge-light" : "hover:bg-gray-50"}`}
         onClick={() => setExpanded(!expanded)}
       >
-        <td className="px-4 py-2 text-gray-500 text-sm">{rank}</td>
+        <td className="px-4 py-2 text-gray-500 text-sm">
+          <div className="flex items-center gap-1.5">
+            <ExpandButton
+              expanded={expanded}
+              onToggle={() => setExpanded(!expanded)}
+              label={`Flights for ${isSyndicate ? result.key : formatPilotName(result.key)}`}
+              iconSize={14}
+            />
+            {rank}
+          </div>
+        </td>
         <td className="px-4 py-2 text-gray-700">
           <div className="inline-flex items-center gap-1">
             {isSyndicate
@@ -149,12 +159,6 @@ const LadderResultEntry = ({
                 result,
                 isSyndicate ? "registration" : "pilot",
               )}
-            />
-            <ExpandButton
-              expanded={expanded}
-              onToggle={() => setExpanded(!expanded)}
-              label={`Flights for ${isSyndicate ? result.key : formatPilotName(result.key)}`}
-              iconSize={14}
             />
           </div>
         </td>
