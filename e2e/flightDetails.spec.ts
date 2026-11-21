@@ -212,10 +212,10 @@ test("the pop-up lists every podium place, best first", async ({ page }) => {
     .getByRole("listitem");
   await expect(trophies).toHaveText(
     [
-      "Gold · Pot Pewter Pringle",
-      "Gold · Complicity Cup",
-      "Gold · Jubilee Bowl",
-      "Bronze · Mug Metal Machin Trophy",
+      /^Gold · Pot Pewter Pringle\s/,
+      /^Gold · Complicity Cup\s/,
+      /^Gold · Jubilee Bowl\s/,
+      /^Bronze · Mug Metal Machin Trophy\s/,
     ],
     { useInnerText: true },
   );
@@ -429,18 +429,57 @@ test("the ladder link's tooltip in the pop-up isn't cut off", async ({
   );
 });
 
-test("a trophy in the pop-up has a tooltip with its summary", async ({
+test("a trophy in the pop-up links to its page, its summary underneath", async ({
   page,
 }) => {
   const dialog = await openGolds(page);
-  await dialog
-    .getByRole("button", { name: "Gold · Pot Pewter Pringle" })
-    .hover();
-  const tooltip = page.getByRole("tooltip").filter({ hasText: "Open ladder" });
+  const trophy = dialog
+    .getByRole("list", { name: "Trophies" })
+    .getByRole("listitem")
+    .first();
+  await expect(trophy).toContainText("Open ladder");
+  const link = trophy.getByRole("link", { name: "Pot Pewter Pringle" });
+  await expect(link).toHaveAttribute("href", "/trophy/L1?season=2024");
+  await link.click();
+  await expect(page).toHaveURL(/\/trophy\/L1\?season=2024$/);
+});
+
+test("a tooltip stays open a moment after the pointer leaves, and while it's on the tooltip", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  await expandAll(page);
+  const medal = page.getByRole("button", { name: GOLDS }).first();
+  const tooltip = page
+    .getByRole("tooltip")
+    .filter({ hasText: "Jubilee Bowl" })
+    .first();
+  await medal.hover();
   await expect(tooltip).toBeVisible();
-  expect(
-    await showsAt(page, await tooltip.boundingBox(), "[role=tooltip]"),
-  ).toBe(true);
+  // Moving onto the tooltip, across the gap, keeps it open.
+  const box = await tooltip.boundingBox();
+  await page.mouse.move(
+    (box?.x ?? 0) + (box?.width ?? 0) / 2,
+    (box?.y ?? 0) + (box?.height ?? 0) / 2,
+    { steps: 5 },
+  );
+  await page.waitForTimeout(500);
+  await expect(tooltip).toBeVisible();
+  // Leaving both, it closes after a moment.
+  await page.mouse.move(5, 5);
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toBeHidden({ timeout: 1000 });
+});
+
+test("the desktop pop-up fades in, with no motion when reduced", async ({
+  page,
+}) => {
+  const dialog = await openGolds(page);
+  const transition = () =>
+    dialog.evaluate((el) => getComputedStyle(el).transitionProperty);
+  expect(await transition()).toContain("opacity");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(await transition()).not.toContain("opacity");
 });
 
 test.describe("the pop-up sheet on a phone @touch", () => {
@@ -450,17 +489,19 @@ test.describe("the pop-up sheet on a phone @touch", () => {
     isMobile: true,
   });
 
-  test("a trophy's tooltip near the bottom of the screen opens above it", async ({
+  test("a tooltip near the bottom of the screen opens above it", async ({
     page,
   }) => {
-    const dialog = await openGolds(page);
-    const last = dialog.getByRole("button", {
-      name: "Bronze · Mug Metal Machin Trophy",
-    });
-    await last.tap();
+    await page.goto("/stats?season=2024");
+    await expandAll(page);
+    // A medal at the very bottom of the screen.
+    const medal = page.getByRole("button", { name: GOLDS }).first();
+    await medal.evaluate((el) => el.scrollIntoView({ block: "end" }));
+    await medal.tap();
     const tooltip = page
       .getByRole("tooltip")
-      .filter({ hasText: "Longest flight (up to 3 TPs)" });
+      .filter({ hasText: "Jubilee Bowl" })
+      .first();
     await expect(tooltip).toBeVisible();
     const box = await tooltip.boundingBox();
     expect(box?.y).toBeGreaterThanOrEqual(0);

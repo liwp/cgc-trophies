@@ -8,27 +8,30 @@ import {
   useRef,
   useState,
 } from "react";
+import { Link } from "react-router";
 import { formatDate } from "../lib/formatDate";
-import type { Podium } from "../lib/medals";
+import { type Podium, placeName } from "../lib/medals";
 import { formatScore } from "../lib/results";
 import { hasSpeed, isCompletedTask } from "../lib/stats";
 import { formatPilotName } from "../lib/trophyCopyData";
 import type { Flight } from "../types";
 import { LadderLink } from "./FlightLinks";
 import { kph, PenaltyWarning } from "./FlightRow";
-import { MedalIcon, podiumText } from "./Medal";
-import Tip from "./Tip";
+import { MedalIcon } from "./Medal";
 
 type FlightDetailsContext = {
   /** Show a flight's details in the pop-up. */
   open: (flight: Flight) => void;
   /** Each flight id's trophy podium places, best first. */
   podiums: Map<string, Podium[]>;
+  /** The season the places are for, for links to its trophy pages. */
+  season: number;
 };
 
 const Context = createContext<FlightDetailsContext>({
   open: () => {},
   podiums: new Map(),
+  season: 0,
 });
 
 export const useFlightDetails = () => useContext(Context);
@@ -66,7 +69,8 @@ const Details = ({
   onClose: () => void;
 }) => {
   const { glider, task } = flight;
-  const podiums = useContext(Context).podiums.get(flight.id) ?? [];
+  const { season, podiums: places } = useContext(Context);
+  const podiums = places.get(flight.id) ?? [];
   return (
     <div className="flex flex-col gap-4 p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
@@ -125,9 +129,19 @@ const Details = ({
                 <span className="mt-0.5">
                   <MedalIcon place={place} />
                 </span>
-                <Tip tip={trophySummary} className="min-w-0 text-left">
-                  {podiumText({ place, trophyId, trophyName, trophySummary })}
-                </Tip>
+                {/* The trophy's page for the season, its summary underneath. */}
+                <span className="min-w-0">
+                  {placeName[place]} ·{" "}
+                  <Link
+                    to={`/trophy/${trophyId}?season=${season}`}
+                    className="text-cambridge hover:text-cambridge-dark"
+                  >
+                    {trophyName}
+                  </Link>
+                  <span className="block text-xs text-gray-500">
+                    {trophySummary}
+                  </span>
+                </span>
               </li>
             ))}
           </ul>
@@ -145,9 +159,11 @@ const Details = ({
  */
 export const FlightDetailsProvider = ({
   podiums,
+  season,
   children,
 }: {
   podiums: Map<string, Podium[]>;
+  season: number;
   children: ReactNode;
 }) => {
   // The flight shown, kept after closing so the sheet slides away with its
@@ -176,7 +192,7 @@ export const FlightDetailsProvider = ({
   }, [opened]);
 
   return (
-    <Context.Provider value={{ open, podiums }}>
+    <Context.Provider value={{ open, podiums, season }}>
       {children}
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: Esc is the keyboard way out */}
       <dialog
@@ -188,12 +204,13 @@ export const FlightDetailsProvider = ({
         onClick={(e) => {
           if (e.target === e.currentTarget) close();
         }}
-        // On a phone the sheet slides up from the bottom edge and back down,
-        // the backdrop fading with it; allow-discrete keeps it on screen
+        // On a phone the sheet slides up from the bottom edge and back down;
+        // wider, the dialog fades in as it rises a little and grows to full
+        // size. The backdrop fades with either; allow-discrete keeps it on screen
         // until it has slid away. At rest it has no translate at all: any
         // would make it the frame its fixed tooltips are placed in. Not for
         // those who'd rather less motion.
-        className="m-auto max-h-[calc(100dvh-1rem)] w-full max-w-md overflow-y-auto rounded-xl bg-white p-0 shadow-xl backdrop:bg-gray-900/40 max-sm:mb-0 max-sm:max-w-none max-sm:rounded-b-none max-sm:translate-y-full max-sm:open:translate-none max-sm:starting:open:translate-y-full max-sm:transition-[translate,overlay,display] max-sm:transition-discrete max-sm:duration-300 max-sm:ease-out max-sm:backdrop:opacity-0 max-sm:open:backdrop:opacity-100 max-sm:starting:open:backdrop:opacity-0 max-sm:backdrop:transition-[opacity,overlay,display] max-sm:backdrop:transition-discrete max-sm:backdrop:duration-300 max-sm:motion-reduce:transition-none max-sm:motion-reduce:backdrop:transition-none"
+        className="m-auto max-h-[calc(100dvh-1rem)] w-full max-w-md overflow-y-auto rounded-xl bg-white p-0 shadow-[0_24px_64px_-12px_rgb(0_0_0/0.3)] backdrop:bg-gray-900/40 backdrop:opacity-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 motion-reduce:backdrop:transition-none max-sm:mb-0 max-sm:max-w-none max-sm:rounded-b-none max-sm:translate-y-full max-sm:open:translate-none max-sm:starting:open:translate-y-full max-sm:transition-[translate,overlay,display] max-sm:transition-discrete max-sm:duration-300 max-sm:ease-out max-sm:motion-reduce:transition-none sm:translate-y-2 sm:scale-[0.98] sm:opacity-0 sm:open:translate-none sm:open:scale-none sm:open:opacity-100 sm:starting:open:translate-y-2 sm:starting:open:scale-[0.98] sm:starting:open:opacity-0 sm:transition-[opacity,translate,scale,overlay,display] sm:transition-discrete sm:duration-200 sm:ease-out sm:motion-reduce:transition-none"
       >
         {flight && (
           <Details flight={flight} headingId={headingId} onClose={close} />

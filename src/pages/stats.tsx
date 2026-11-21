@@ -197,7 +197,7 @@ const StatsPage = () => {
 
   return (
     <PageLayout>
-      <FlightDetailsProvider podiums={podiums}>
+      <FlightDetailsProvider podiums={podiums} season={season}>
         <div className="flex flex-col gap-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h1 className="text-2xl font-bold text-gray-900">
