@@ -385,10 +385,22 @@ export type Superlative = {
   /** The headline figure, e.g. "758.2 km". */
   value: string;
 } & (
-  | { pilot: string; flight?: Flight }
+  | {
+      pilot: string;
+      flight?: Flight;
+      /**
+       * A pilot card's top pilots, the winner first, each with their figure
+       * (without its unit, which the card's title gives), to show how close
+       * it was.
+       */
+      leaders?: { pilot: string; value: string }[];
+    }
   /** A card for a day: its flights, longest first. */
   | { dayFlights: Flight[] }
 );
+
+/** How many pilots a pilot card's leaderboard lists. */
+const LEADERS = 5;
 
 const fmtKm = (v: number) =>
   `${v.toLocaleString("en-GB", { maximumFractionDigits: 1, minimumFractionDigits: 1 })} km`;
@@ -409,8 +421,8 @@ function superlatives(
   // orderBy is stable, so equal flights keep date order
   const top = (fs: Flight[], value: (f: Flight) => number) =>
     orderBy(fs, value, "desc")[0];
-  const topPilot = (value: (p: PilotStats) => number) =>
-    orderBy(pilots, [value, "pilot"], ["desc", "asc"])[0];
+  const topPilots = (value: (p: PilotStats) => number) =>
+    orderBy(pilots, [value, "pilot"], ["desc", "asc"]).slice(0, LEADERS);
 
   const cards: (Superlative | undefined)[] = [];
   const flightCard = (
@@ -431,22 +443,35 @@ function superlatives(
   const pilotCard = (
     key: string,
     title: string,
-    stat: PilotStats | undefined,
+    leaders: PilotStats[],
     value: (p: PilotStats) => string,
-  ) =>
-    cards.push(stat && { key, title, pilot: stat.pilot, value: value(stat) });
+    figure: (p: PilotStats) => string,
+  ) => {
+    const [stat] = leaders;
+    cards.push(
+      stat && {
+        key,
+        title,
+        pilot: stat.pilot,
+        value: value(stat),
+        leaders: leaders.map((p) => ({ pilot: p.pilot, value: figure(p) })),
+      },
+    );
+  };
 
   pilotCard(
     "mostFlights",
     "Most flights",
-    topPilot((p) => p.flights),
-    (p) => `${p.flights} flights`,
+    topPilots((p) => p.flights),
+    (p) => `${p.flights} ${p.flights === 1 ? "flight" : "flights"}`,
+    (p) => String(p.flights),
   );
   pilotCard(
     "mostKm",
     "Most km",
-    topPilot((p) => p.scoringKm),
+    topPilots((p) => p.scoringKm),
     (p) => `${Math.round(p.scoringKm).toLocaleString("en-GB")} km`,
+    (p) => Math.round(p.scoringKm).toLocaleString("en-GB"),
   );
   flightCard(
     "longest",

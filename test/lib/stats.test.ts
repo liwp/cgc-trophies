@@ -637,6 +637,39 @@ describe("superlatives", () => {
     expect(cards.mostTurnpoints).toBeUndefined();
   });
 
+  it("lists a pilot card's top pilots, the winner first", () => {
+    const cards = byKey(superlatives(flights, 2025, calendar));
+    expect(cards.mostFlights).toMatchObject({
+      leaders: [
+        { pilot: "Roe, Rick", value: "3" },
+        { pilot: "Doe, Jane", value: "2" },
+      ],
+    });
+    expect(cards.mostKm).toMatchObject({
+      leaders: [
+        { pilot: "Doe, Jane", value: "812" },
+        { pilot: "Roe, Rick", value: "810" },
+      ],
+    });
+  });
+
+  it("lists at most five pilots, ties by name", () => {
+    const many = ["E", "D", "C", "B", "A", "F"].map((p, i) =>
+      flight(String(i), `${p}, Pilot`, "2025-05-01", { scoringDistanceKm: 10 }),
+    );
+    const { mostFlights } = byKey(superlatives(many, 2025, calendar));
+    const leaders = "leaders" in mostFlights ? mostFlights.leaders : [];
+    expect(leaders?.map((l) => l.pilot)).toEqual([
+      "A, Pilot",
+      "B, Pilot",
+      "C, Pilot",
+      "D, Pilot",
+      "E, Pilot",
+    ]);
+    expect(leaders?.[0].value).toBe("1");
+    expect(mostFlights.value).toBe("1 flight");
+  });
+
   it("lists every flight on the first and last days, longest first", () => {
     const cards = byKey(
       superlatives(

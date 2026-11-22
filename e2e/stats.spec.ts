@@ -404,9 +404,7 @@ test("the season highlights show each card's winner", async ({ page }) => {
   await expect(card("Most flights")).toContainText("28 flights");
   await expect(card("Most flights")).toContainText("Wendy Head");
   await expect(card("Longest flight")).toContainText("758.2 km");
-  await expect(
-    card("Longest flight").getByRole("link", { name: "Alex Holswilder" }),
-  ).toHaveAttribute("href", /bgaladder\.net\/flightdetails/);
+  await expect(card("Longest flight")).toContainText("Alex Holswilder");
   await expect(card("Top scoring flight")).toContainText("pts");
   await expect(card("Longest FAI triangle")).toContainText("km");
   await expect(highlights.locator("> ul > li")).toHaveCount(8);
@@ -416,10 +414,9 @@ test("the season highlights show each card's winner", async ({ page }) => {
     .locator("> ul > li")
     .filter({ hasText: "First flights" });
   await expect(first).toContainText("26 Mar");
-  await expect(
-    first.getByRole("link", { name: "Paul Bonhomme" }),
-  ).toBeVisible();
-  await expect(first.getByRole("button")).toHaveCount(0);
+  await expect(first).toContainText("Paul Bonhomme");
+  // It opens that flight rather than expanding.
+  await expect(first.getByRole("button", { expanded: false })).toHaveCount(0);
 });
 
 test("a day award with several pilots expands to them", async ({ page }) => {
@@ -430,14 +427,70 @@ test("a day award with several pilots expands to them", async ({ page }) => {
     .filter({ hasText: "First flights" });
   await expect(first).toContainText("15 Mar");
   await expect(first).toContainText("3 pilots");
-  await expect(first.getByRole("link")).toHaveCount(0);
+  const flights = first.getByRole("button", { name: /^Flight details for / });
+  await expect(flights).toHaveCount(0);
   await first
     .getByRole("button", { name: "First flights: all flights" })
     .click();
-  await expect(first.getByRole("link")).toHaveCount(3);
+  await expect(flights).toHaveCount(3);
+  // Each opens its flight's pop-up, leaving the card open.
+  await first
+    .getByRole("button", { name: "Flight details for Alex Holswilder" })
+    .click();
   await expect(
-    first.getByRole("link", { name: "Alex Holswilder" }),
+    page.getByRole("dialog", { name: /Alex Holswilder/ }),
   ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(flights).toHaveCount(3);
+});
+
+test("a day award expands from anywhere on its card", async ({ page }) => {
+  await page.goto("/stats?season=2025");
+  const first = page
+    .getByRole("region", { name: "Season highlights" })
+    .locator("> ul > li")
+    .filter({ hasText: "First flights" });
+  await first.getByText("15 Mar").click();
+  await expect(
+    first.getByRole("button", { name: "First flights: all flights" }),
+  ).toHaveAttribute("aria-expanded", "true");
+  await first.getByText("15 Mar").click();
+  await expect(
+    first.getByRole("button", { name: "First flights: all flights" }),
+  ).toHaveAttribute("aria-expanded", "false");
+});
+
+test("a flight award opens its flight's pop-up from anywhere on it", async ({
+  page,
+}) => {
+  await page.goto("/stats?season=2024");
+  const card = page
+    .getByRole("region", { name: "Season highlights" })
+    .getByRole("button", { name: /^Longest flight/ });
+  await card.getByText("758.2 km").click();
+  const dialog = page.getByRole("dialog", { name: /Alex Holswilder/ });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText(/G-[A-Z]{4}/);
+  await expect(dialog.getByRole("link", { name: "BGA Ladder" })).toBeVisible();
+  await expect(page).toHaveURL(/[?&]flight=/);
+});
+
+test("a pilot award expands to its top five", async ({ page }) => {
+  await page.goto("/stats?season=2024");
+  const card = page
+    .getByRole("region", { name: "Season highlights" })
+    .locator("> ul > li")
+    .filter({ hasText: "Most flights" });
+  const expand = card.getByRole("button", { name: "Most flights: top pilots" });
+  await expect(card.getByRole("listitem")).toHaveCount(0);
+  await card.getByText("28 flights").click();
+  await expect(expand).toHaveAttribute("aria-expanded", "true");
+  const leaders = card.getByRole("listitem");
+  await expect(leaders).toHaveCount(5);
+  await expect(leaders.first()).toContainText("Wendy Head");
+  await expect(leaders.first()).toContainText("28");
+  // The winner heads the list, so it isn't named twice.
+  await expect(card).toContainText("Top 5");
 });
 
 test("the club glider table lists each club glider's season", async ({

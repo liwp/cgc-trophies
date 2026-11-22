@@ -617,6 +617,8 @@ test.describe("the open pop-up is in the URL", () => {
     const url = page.url();
     const name = await opened.getByRole("heading", { level: 2 }).textContent();
     const fresh = await page.context().newPage();
+    // Mocked like every test page, rather than fetching the live ladder.
+    await mockFlights(fresh);
     await fresh.goto(url);
     const dialog = fresh.getByRole("dialog");
     await expect(dialog).toBeVisible();
@@ -696,6 +698,8 @@ test.describe("expanded rows and the scroll survive Back", () => {
     await expect(day).toHaveAttribute("aria-expanded", "true");
     // A reload keeps them; a new visit doesn't.
     const fresh = await page.context().newPage();
+    // Mocked like every test page, rather than fetching the live ladder.
+    await mockFlights(fresh);
     await fresh.goto(page.url());
     await expect(
       region(fresh, "Best days").getByRole("button", {
