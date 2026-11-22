@@ -45,7 +45,7 @@ When unset, it falls back to `trophies.config.ts`.
 
 Vite · React 19 · React Router · TypeScript · Tailwind CSS v4 · SWR · Vitest.
 Tooling: **bun** (package manager + scripts), **Biome** (lint + format), and
-**Node 24 LTS** pinned via `mise`.
+**Node 26 LTS** pinned via `mise`.
 
 ## Getting started
 

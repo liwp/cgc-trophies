@@ -32,9 +32,24 @@
       "groupName": "bun"
     },
     {
-      "description": "Keep @types/node on the major matching the pinned Node LTS (mise.toml: node 24); bump this cap when the Node version is raised",
+      "description": "Keep @types/node on the major matching the pinned Node LTS (mise.toml: node 26); bump this cap when the Node version is raised",
       "matchPackageNames": ["@types/node"],
-      "allowedVersions": "<25"
+      "allowedVersions": "<27"
+    },
+    {
+      "description": "Bump Node in mise.toml, CI and netlify.toml in a single PR",
+      "matchDepNames": ["node"],
+      "groupName": "node"
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "Keep Netlify's NODE_VERSION in step with mise.toml and CI",
+      "customType": "regex",
+      "managerFilePatterns": ["/^netlify\\.toml$/"],
+      "matchStrings": ["NODE_VERSION = \"(?<currentValue>\\d+)\""],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version"
     }
   ]
 }
