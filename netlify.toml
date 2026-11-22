@@ -15,7 +15,7 @@
 
 [build.environment]
   # Match the Node version pinned in mise.toml. Netlify auto-detects bun from bun.lock.
-  NODE_VERSION = "24"
+  NODE_VERSION = "26"
 
 # SPA fallback: serve index.html for any path that isn't an existing static file.
 # force defaults to false, so real files (e.g. /assets/*) are served before this rule.
